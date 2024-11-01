@@ -42,6 +42,9 @@ const config: Config = {
         'gray-medium': '#ECECEE',
         'gray-light': '#F6F6F9',
       },
+      backgroundImage: {
+        wood: "url('/images/texture/wooden.jpg')",
+      },
     },
   },
   plugins: [],
