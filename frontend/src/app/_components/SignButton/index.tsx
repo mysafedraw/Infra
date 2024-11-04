@@ -1,11 +1,10 @@
-import { MouseEventHandler } from 'react'
 import Image from 'next/image'
 
 export default function SignButton({
   onClick,
   content,
 }: {
-  onClick: MouseEventHandler<HTMLButtonElement>
+  onClick: () => void
   content: string
 }) {
   return (
