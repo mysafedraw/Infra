@@ -12,7 +12,7 @@ export default function Scenario() {
         onClick={() => router.back()}
       >
         <img src="/icons/back-arrow.svg" className="h-16" />
-        <span className="text-6xl text-white mb-2">나가기</span>
+        <span className="text-6xl text-white">나가기</span>
       </button>
       <h1 className="bg-wood shadow-md inline-block py-4 text-white px-24 text-5xl rounded-xl">
         화재 시나리오
