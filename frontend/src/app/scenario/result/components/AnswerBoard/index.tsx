@@ -1,14 +1,12 @@
 import Image from 'next/image'
 
 interface AnswerBoardProps {
-  isCorrect: boolean
   nickname: string
   characterImage: string
   drawingImage: string
 }
 
 export default function AnswerBoard({
-  isCorrect,
   nickname,
   characterImage,
   drawingImage,
@@ -33,16 +31,7 @@ export default function AnswerBoard({
         />
       </div>
 
-      <div className="z-10 absolute -top-6 -left-2 bg-white px-5 py-2 rounded-lg border-2 border-gray-medium">
-        <Image
-          src={isCorrect ? '/icons/correct.svg' : '/icons/wrong.svg'}
-          alt={isCorrect ? 'correct' : 'wrong'}
-          width={46}
-          height={46}
-        />
-      </div>
-
-      <div className="absolute -top-4 right-2 bg-primary-50 border-2 border-primary-300 w-[14rem] text-2xl text-center py-1 rounded-lg">
+      <div className="absolute -top-4 right-0 bg-primary-50 border-2 border-primary-300 w-[14rem] text-2xl text-center py-1 rounded-lg">
         {nickname}
       </div>
 
