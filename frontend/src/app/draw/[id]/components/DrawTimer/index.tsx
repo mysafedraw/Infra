@@ -56,9 +56,15 @@ export default function DrawTimer({
           : 'border-primary-600 '
       }`}
     >
-      <Image src="/icons/alarm-clock.svg" alt="clock" width={32} height={32} />
+      <Image
+        src="/icons/alarm-clock.svg"
+        alt="clock"
+        width={30}
+        height={30}
+        priority
+      />
       <span
-        className={`text-2xl font-bold tracking-wide min-w-[70px] ${
+        className={`text-3xl font-bold tracking-wide min-w-[80px] ${
           time <= 10 ? 'text-inherit' : 'text-text'
         }`}
       >
