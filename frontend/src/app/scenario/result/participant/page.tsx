@@ -1,19 +1,13 @@
 import ScoredBoard from '@/app/scenario/result/components/ScoredBoard'
-
-interface AnswerData {
-  id: number
-  isCorrect: boolean
-  nickname: string
-  characterImage: string
-  drawingImage: string
-}
+import { AnswerData } from '@/app/scenario/result/types/answerTypes'
+import VolumeMicIcon from '@/app/scenario/result/components/VolumeMicIcon'
 
 // 임시 데이터 리스트
 const answerData: AnswerData[] = [
   {
     id: 1,
     isCorrect: false,
-    nickname: '이구역그림짱은나야',
+    nickname: '이구역그림짱은나야 (나)',
     characterImage: '/images/tiger.png',
     drawingImage: '/images/drawing.png',
   },
@@ -67,12 +61,13 @@ export default function ScenarioResultParticipant() {
       <h2 className="mb-4 w-2/5 bg-wood bg-cover bg-left text-5xl text-white text-center py-4 rounded-xl shadow-lg">
         작은 불 끄기
       </h2>
-      <ScoredBoard
-        isCorrect={false}
-        nickname="이구역그림짱은나야 (나)"
-        characterImage="/images/tiger.png"
-        drawingImage="/images/drawing.png"
-      />
+      <div className="relative">
+        <ScoredBoard data={answerData[0]} />
+        {/* 발언 중일 때 마이크 표시 */}
+        <div className="absolute left-10 bottom-10">
+          <VolumeMicIcon />
+        </div>
+      </div>
       <button className="bg-secondary-50 border-2 border-secondary-500 w-full py-3 rounded-xl">
         <p className="text-3xl">억울해요 😢</p>
         <p className="text-xl">
@@ -80,14 +75,8 @@ export default function ScenarioResultParticipant() {
         </p>
       </button>
       <div className="grid grid-cols-3 gap-x-6 mt-8">
-        {answerData.map((data) => (
-          <ScoredBoard
-            key={data.id}
-            isCorrect={data.isCorrect}
-            nickname={data.nickname}
-            characterImage={data.characterImage}
-            drawingImage={data.drawingImage}
-          />
+        {answerData.slice(1).map((data) => (
+          <ScoredBoard key={data.id} data={data} />
         ))}
       </div>
     </div>

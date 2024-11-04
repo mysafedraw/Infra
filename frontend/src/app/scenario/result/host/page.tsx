@@ -113,13 +113,7 @@ export default function ScenarioResultHost() {
       </div>
       <button className="flex gap-x-6 w-full overflow-x-auto overflow-y-hidden mt-4 ps-1">
         {waitingData.map((data) => (
-          <ExplainQueueBoard
-            key={data.id}
-            id={data.id}
-            nickname={data.nickname}
-            characterImage={data.characterImage}
-            drawingImage={data.drawingImage}
-          />
+          <ExplainQueueBoard key={data.id} data={data} />
         ))}
       </button>
 
@@ -128,13 +122,7 @@ export default function ScenarioResultHost() {
       </div>
       <div className="grid grid-cols-3 gap-x-6 mt-4">
         {answerData.map((data) => (
-          <ScoredBoard
-            key={data.id}
-            isCorrect={data.isCorrect}
-            nickname={data.nickname}
-            characterImage={data.characterImage}
-            drawingImage={data.drawingImage}
-          />
+          <ScoredBoard key={data.id} data={data} />
         ))}
       </div>
     </div>

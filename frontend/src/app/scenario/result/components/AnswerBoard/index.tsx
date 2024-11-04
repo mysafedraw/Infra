@@ -1,18 +1,22 @@
 import Image from 'next/image'
 
 interface AnswerBoardProps {
+  id: number
   nickname: string
   characterImage: string
   drawingImage: string
+  shouldBlink?: boolean
 }
 
 export default function AnswerBoard({
+  id,
   nickname,
   characterImage,
   drawingImage,
+  shouldBlink = true,
 }: AnswerBoardProps) {
   return (
-    <div className="relative flex items-center justify-center m-2 mt-6 max-w-full">
+    <div className="relative flex items-center justify-center m-2 mt-8 max-w-full">
       <Image
         src="/images/blackboard.png"
         alt="blackboard"
@@ -31,8 +35,16 @@ export default function AnswerBoard({
         />
       </div>
 
-      <div className="absolute -top-4 right-0 bg-primary-50 border-2 border-primary-300 w-[14rem] text-2xl text-center py-1 rounded-lg">
-        {nickname}
+      {/*발언 중일 때, 아닐 때 구분해서 표시*/}
+      <div className="absolute -top-7 right-0 flex items-center justify-center w-56 h-16 z-50">
+        {shouldBlink && id === 1 && (
+          <div className="animate-small-ping absolute inline-flex w-full h-full bg-primary-500 rounded-lg opacity-75"></div>
+        )}
+        <div
+          className={`relative inline-flex justify-center items-center border-2 w-56 h-11 text-2xl rounded-lg ${id === 1 ? 'bg-primary-300 border-primary-600' : 'bg-primary-50 border-primary-300'}`}
+        >
+          {nickname}
+        </div>
       </div>
 
       <div className="absolute -bottom-3 -right-3">
