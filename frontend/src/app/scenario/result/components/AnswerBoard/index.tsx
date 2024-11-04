@@ -36,7 +36,7 @@ export default function AnswerBoard({
       </div>
 
       {/*발언 중일 때, 아닐 때 구분해서 표시*/}
-      <div className="absolute -top-7 right-0 flex items-center justify-center w-56 h-16 z-50">
+      <div className="absolute -top-7 right-0 flex items-center justify-center w-56 h-16 z-10">
         {shouldBlink && id === 1 && (
           <div className="animate-small-ping absolute inline-flex w-full h-full bg-primary-500 rounded-lg opacity-75"></div>
         )}
