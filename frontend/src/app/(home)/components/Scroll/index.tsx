@@ -1,6 +1,16 @@
-import { Canvas } from '@react-three/fiber'
+'use client'
 
-export default function Scroll({ cloudScene }: any) {
+import { useGLTF } from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
+import { useEffect } from 'react'
+
+export default function Scroll() {
+  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
+
+  useEffect(() => {
+    useGLTF.preload('/assets/background/cloud.glb')
+  }, [])
+
   return (
     <section className="h-screen relative">
       <Canvas

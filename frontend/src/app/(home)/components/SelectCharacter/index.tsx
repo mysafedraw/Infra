@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
 import Image from 'next/image'
 
@@ -43,12 +43,16 @@ const CHARACTER_LIST = [
   },
 ]
 
-export default function Home() {
+export default function SelectCharcter() {
   const [selectedCharacter, setSelectedCharacter] = useState(1)
   const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
   const { scene: characterScene } = useGLTF(
     CHARACTER_LIST[selectedCharacter].characterUrl,
   )
+
+  useEffect(() => {
+    useGLTF.preload('/assets/background/cloud.glb')
+  }, [])
 
   return (
     <section className="h-screen relative">

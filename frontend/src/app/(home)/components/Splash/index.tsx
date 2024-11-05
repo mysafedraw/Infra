@@ -1,8 +1,27 @@
+'use client'
+
 import SafeIcon from '/public/icons/safe-word.svg'
 import NoIcon from '/public/icons/no.svg'
 import { Canvas } from '@react-three/fiber'
+import { useEffect } from 'react'
+import { useGLTF } from '@react-three/drei'
 
-export default function Splash({ cloudScene, setIsScroll }: any) {
+export default function Splash({
+  setIsScroll,
+}: {
+  setIsScroll: React.Dispatch<React.SetStateAction<boolean>>
+}) {
+  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
+
+  useEffect(() => {
+    useGLTF.preload('/assets/background/cloud.glb')
+    document.documentElement.classList.add('scrollbar-hide')
+
+    return () => {
+      document.documentElement.classList.remove('scrollbar-hide')
+    }
+  }, [])
+
   return (
     <section className="relative h-screen w-full">
       <Canvas

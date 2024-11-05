@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import SelectCharcter from './components/SelectCharacter'
-import Splash from './components/Splash'
-import Scroll from './components/Scroll'
-import { useGLTF } from '@react-three/drei'
+import dynamic from 'next/dynamic'
+
+const Splash = dynamic(() => import('./components/Splash'), { ssr: false })
+const Scroll = dynamic(() => import('./components/Scroll'), { ssr: false })
+const SelectCharcter = dynamic(() => import('./components/SelectCharacter'), {
+  ssr: false,
+})
 
 export default function Home() {
-  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
   const [isScroll, setIsScroll] = useState(false)
 
   const scrollToBottomSlowly = () => {
@@ -40,7 +42,6 @@ export default function Home() {
 
   useEffect(() => {
     document.documentElement.classList.add('scrollbar-hide')
-    useGLTF.preload('/assets/background/cloud.glb')
 
     return () => {
       document.documentElement.classList.remove('scrollbar-hide')
@@ -49,8 +50,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col bg-main-gradient w-full overflow-auto">
-      <Splash cloudScene={cloudScene} setIsScroll={setIsScroll} />
-      <Scroll cloudScene={cloudScene} />
+      <Splash setIsScroll={setIsScroll} />
+      <Scroll />
       <SelectCharcter />
     </div>
   )
