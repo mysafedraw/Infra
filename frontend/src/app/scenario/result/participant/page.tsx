@@ -1,6 +1,7 @@
 import ScoredBoard from '@/app/scenario/result/components/ScoredBoard'
 import { AnswerData } from '@/app/scenario/result/types/answerTypes'
 import VolumeMicIcon from '@/app/scenario/result/components/VolumeMicIcon'
+import SpeakingRightsToast from '@/app/scenario/result/participant/SpeakingRightsToast'
 
 // 임시 데이터 리스트
 const answerData: AnswerData[] = [
@@ -79,6 +80,8 @@ export default function ScenarioResultParticipant() {
           <ScoredBoard key={data.id} data={data} />
         ))}
       </div>
+
+      <SpeakingRightsToast />
     </div>
   )
 }
