@@ -1,8 +1,8 @@
 'use client'
 
-import DrawingBoard from './components/DrawingBoard'
-import DrawTimer from './components/DrawTimer'
-import QuestionBoard from './components/QuestionBoard'
+import DrawingBoard from '@/app/draw/components/DrawingBoard'
+import DrawTimer from '@/app/draw/components/DrawTimer'
+import QuestionBoard from '@/app/draw/components/QuestionBoard'
 
 export default function Draw() {
   const question =
@@ -16,7 +16,7 @@ export default function Draw() {
       <div className="mt-4 flex-1 relative">
         <DrawingBoard />
         <div className="absolute left-1 top-1">
-          <DrawTimer initialTime={80} handleTimeEnd={handleNext} />
+          <DrawTimer initialTime={14} handleTimeEnd={handleNext} />
         </div>
       </div>
     </div>

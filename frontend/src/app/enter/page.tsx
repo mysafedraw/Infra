@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import SignButton from '../_components/SignButton'
-import EnterInput from './components/EnterInput'
+import SignButton from '@/app/_components/SignButton'
+import EnterInput from '@/app/enter/components/EnterInput'
 
 export default function Enter() {
   const router = useRouter()
