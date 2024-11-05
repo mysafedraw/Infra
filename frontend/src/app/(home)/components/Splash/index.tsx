@@ -43,8 +43,12 @@ export default function Splash({
             <h1 className="text-9xl text-text whitespace-nowrap select-none">
               내가 그린 기린 그림
             </h1>
-            <SafeIcon className="absolute -top-32 right-40" draggable="false" />
-            <NoIcon className="absolute top-0 right-40" draggable="false" />
+            <span className="absolute -top-32 right-40" draggable="false">
+              <SafeIcon />
+            </span>
+            <span className="absolute top-0 right-40" draggable="false">
+              <NoIcon />
+            </span>
           </div>
           <button
             className="bg-primary-600 text-white text-6xl py-7 rounded-xl border-[5px] border-primary-700 px-44 whitespace-nowrap select-none"
