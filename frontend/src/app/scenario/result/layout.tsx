@@ -1,4 +1,5 @@
 import ChatButton from '@/app/scenario/result/components/ChatButton'
+import VotingSidebar from '@/app/scenario/result/components/VotingSidebar'
 
 export default function ScenarioResultLayout({
   children,
@@ -8,6 +9,7 @@ export default function ScenarioResultLayout({
   return (
     <div className="bg-[url('/images/classroom.png')] bg-cover bg-center min-h-screen">
       {children}
+      <VotingSidebar />
       <ChatButton />
     </div>
   )
