@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'main-gradient': 'linear-gradient(180deg, #A5DEF5 40%, #DCF3B4 100%)',
+        wood: "url('/images/texture/wooden.jpg')",
+      },
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
@@ -44,6 +48,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
 }
 export default config
