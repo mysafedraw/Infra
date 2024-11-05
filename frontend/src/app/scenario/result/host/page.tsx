@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import ScoredBoard from '@/app/scenario/result/components/ScoredBoard'
 import ExplainQueueBoard from '@/app/scenario/result/host/components/ExplainQueueBoard'
+import VotingSidebar from '@/app/scenario/result/components/VotingSidebar'
 
 interface AnswerData {
   id: number
@@ -125,6 +126,8 @@ export default function ScenarioResultHost() {
           <ScoredBoard key={data.id} data={data} />
         ))}
       </div>
+
+      <VotingSidebar role="host" />
     </div>
   )
 }
