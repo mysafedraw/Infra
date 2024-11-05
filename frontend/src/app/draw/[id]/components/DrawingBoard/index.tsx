@@ -12,8 +12,10 @@ type EventType = React.MouseEvent | React.Touch | MouseEvent | Touch
 
 export default function DrawingBoard() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null) // 캔버스 컨텍스트 상태
-  const [scale, setScale] = useState<number>(1) // 디바이스 픽셀 비율에 따른 스케일 값
+
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
+  const [scale, setScale] = useState<number>(1)
+  const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
   // 캔버스 초기화 및 리사이즈 처리
   useEffect(() => {
@@ -24,39 +26,31 @@ export default function DrawingBoard() {
       const container = canvas.parentElement
       if (!container) return
 
-      // 컨테이너의 실제 크기 가져오기
       const containerWidth = container.clientWidth
       const containerHeight = container.clientHeight
 
-      // 디바이스 픽셀 비율 계산
       const dpr = window.devicePixelRatio || 1
       setScale(dpr)
 
-      // 실제 캔버스 크기 설정
       canvas.width = containerWidth * dpr
       canvas.height = containerHeight * dpr
 
-      // 화면에 표시될 크기 설정
       canvas.style.width = `${containerWidth}px`
       canvas.style.height = `${containerHeight}px`
 
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      // 컨텍스트 스케일 조정
       ctx.scale(dpr, dpr)
 
-      // 기본 그리기 설정
       ctx.strokeStyle = '#000000'
       ctx.lineWidth = 4
       ctx.lineCap = 'round'
       setContext(ctx)
     }
 
-    // 초기 크기 설정
     resizeCanvas()
 
-    // 윈도우 크기 변경 시 캔버스 크기도 조정
     window.addEventListener('resize', resizeCanvas)
 
     return () => {
@@ -71,7 +65,6 @@ export default function DrawingBoard() {
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
 
-    // 실제 캔버스 크기와 표시 크기의 비율을 고려하여 좌표 계산
     return {
       x: (event.clientX - rect.left) * (canvas.width / rect.width),
       y: (event.clientY - rect.top) * (canvas.height / rect.height),
@@ -83,6 +76,7 @@ export default function DrawingBoard() {
     (point: Point) => {
       if (!context) return
 
+      setIsDrawing(true)
       context.beginPath()
       context.moveTo(point.x / scale, point.y / scale)
     },
@@ -92,21 +86,21 @@ export default function DrawingBoard() {
   // 그리기 진행
   const draw = useCallback(
     (point: Point) => {
-      if (!context) return
+      if (!context || !isDrawing) return
 
       context.lineTo(point.x / scale, point.y / scale)
       context.stroke()
     },
-    [context, scale],
+    [context, scale, isDrawing],
   )
 
   // 그리기 종료
   const stopDrawing = useCallback(() => {
     if (!context) return
+    setIsDrawing(false)
     context.closePath()
   }, [context])
 
-  // 마우스 이벤트 핸들러
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
@@ -118,13 +112,13 @@ export default function DrawingBoard() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
+      if (!isDrawing) return
       const point = getCoordinates(e)
       draw(point)
     },
     [getCoordinates, draw],
   )
 
-  // 터치 이벤트 핸들러
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
       const touch = e.touches[0]
@@ -150,7 +144,6 @@ export default function DrawingBoard() {
     context.clearRect(0, 0, canvas.width / scale, canvas.height / scale)
   }, [context, scale])
 
-  // 모바일에서 스크롤 및 기본 터치 동작 방지
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -159,7 +152,6 @@ export default function DrawingBoard() {
       e.preventDefault()
     }
 
-    // 터치 이벤트 리스너 등록
     canvas.addEventListener('touchstart', preventDefaultTouch, {
       passive: false,
     })
