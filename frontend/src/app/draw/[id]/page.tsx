@@ -4,7 +4,7 @@ import DrawingBoard from '@/app/draw/components/DrawingBoard'
 import DrawTimer from '@/app/draw/components/DrawTimer'
 import Image from 'next/image'
 import ProgressBarTimer from '@/app/draw/components/ProgressBarTimer'
-import QuestionBubble from '../components/QuestionBubble'
+import QuestionBubble from '@/app/draw/components/QuestionBubble'
 
 export default function Draw() {
   const scenario =
