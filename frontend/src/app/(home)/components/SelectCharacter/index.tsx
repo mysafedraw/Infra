@@ -32,7 +32,7 @@ const CHARACTER_LIST = [
     profile: '/images/character/tiger.png',
     name: '야옹이',
     personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/cat2.glb',
+    characterUrl: '/assets/character/cat.glb',
   },
   {
     id: 5,
