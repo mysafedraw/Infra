@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import VoteAction from '@/app/scenario/result/participant/components/VoteAction'
+import VotingStatus from '@/app/scenario/result/host/components/VotingStatus'
 
-export default function VotingSidebar() {
+export default function VotingSidebar({ role }: { role: string }) {
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleSidebar = () => {
@@ -46,47 +48,8 @@ export default function VotingSidebar() {
           {/* 사이드바 내용 */}
           <div className="p-6 pl-2">
             <h2 className="text-4xl mb-4">현재 진행 중인 투표</h2>
-            <div className="flex justify-around items-center m-4">
-              {/* 찬성 버튼 */}
-              <button className="flex items-center justify-center p-2 bg-green-100 border-2 border-green-300 rounded-3xl">
-                <Image
-                  src="/icons/thumbs-up.svg"
-                  alt="thumbs-up"
-                  width={32}
-                  height={32}
-                  className="size-20"
-                />
-              </button>
-              {/* 그림 */}
-              <div className="relative flex items-center justify-center w-80 mx-6">
-                <Image
-                  src="/images/blackboard.png"
-                  alt="blackboard"
-                  width={898}
-                  height={488}
-                  className="max-w-full h-auto"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Image
-                    src="/images/drawing.png"
-                    alt="drawing"
-                    width={135}
-                    height={131}
-                    className="h-3/5 w-auto object-contain"
-                  />
-                </div>
-              </div>
-              {/* 반대 버튼 */}
-              <button className="flex items-center justify-center p-2 bg-red-100 border-2 border-red-300 rounded-3xl">
-                <Image
-                  src="/icons/thumbs-down.svg"
-                  alt="thumbs-down"
-                  width={32}
-                  height={32}
-                  className="size-20"
-                />
-              </button>
-            </div>
+
+            {role === 'host' ? <VotingStatus /> : <VoteAction />}
           </div>
         </div>
       </div>
