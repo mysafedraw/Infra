@@ -42,8 +42,39 @@ const config: Config = {
         'gray-medium': '#ECECEE',
         'gray-light': '#F6F6F9',
       },
+      textStroke: {
+        '1': '1px',
+      },
+      textStrokeColor: {
+        primary: '#240F0F',
+      },
+      boxShadow: {
+        'button-inactive': `
+          0px 4px 4px 0px rgba(0, 0, 0, 0.15), 
+          0px -10px 20px 10px rgba(0, 0, 0, 0.1) inset, 
+          0px 10px 20px 3px rgba(0, 0, 0, 0.15) inset
+        `,
+        'button-active': `
+        0px 4px 4px 0px rgba(0, 0, 0, 0.15), 
+        0px -10px 20px 10px rgba(256, 256, 256, 0.1) inset, 
+        0px 10px 20px 3px rgba(256, 256, 256, 0.25) inset
+      `,
+      },
+      backgroundImage: {
+        wood: "url('/images/texture/wooden.jpg')",
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities, theme }: any) {
+      const newUtilities = {
+        '.text-stroke': {
+          '-webkit-text-stroke-width': theme('textStroke.1'),
+          '-webkit-text-stroke-color': theme('textStrokeColor.primary'),
+        },
+      }
+      addUtilities(newUtilities, ['responsive'])
+    },
+  ],
 }
 export default config
