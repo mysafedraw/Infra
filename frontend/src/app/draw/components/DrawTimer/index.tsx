@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import AlarmClockIcon from '/public/icons/alarm-clock.svg'
 
 export default function DrawTimer({

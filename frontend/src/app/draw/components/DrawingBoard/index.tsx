@@ -116,7 +116,7 @@ export default function DrawingBoard() {
       const point = getCoordinates(e)
       draw(point)
     },
-    [getCoordinates, draw],
+    [getCoordinates, draw, isDrawing],
   )
 
   const handleTouchStart = useCallback(
