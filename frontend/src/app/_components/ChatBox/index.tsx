@@ -51,7 +51,7 @@ export default function ChatBox() {
                   height={32}
                   className="size-8 shrink-0 bg-secondary-400 rounded-full object-cover object-top pt-1"
                 />
-                <p className="text-xl">{message.user}</p>
+                <p className="text-2xl">{message.user}</p>
               </div>
             )}
             <div
@@ -60,11 +60,13 @@ export default function ChatBox() {
               <div
                 className={`${
                   message.isSender ? 'bg-primary-500' : 'bg-secondary-500'
-                } px-4 py-3 rounded-xl max-w-xs text-xl`}
+                } px-4 py-3 rounded-xl max-w-xs text-2xl`}
               >
                 {message.text}
               </div>
-              <p className="text-gray-dark self-end mx-1.5">{message.time}</p>
+              <p className="text-gray-dark text-lg self-end mx-1.5">
+                {message.time}
+              </p>
             </div>
           </div>
         ))}
@@ -75,7 +77,7 @@ export default function ChatBox() {
         <input
           type="text"
           placeholder="메시지를 입력하세요"
-          className="flex-grow bg-gray-medium rounded-lg px-4 py-3 mr-3 text-xl hover:outline-primary-500 focus:outline-primary-500 focus:bg-gray-light"
+          className="flex-grow bg-gray-medium rounded-lg px-4 py-3 mr-3 text-2xl hover:outline-primary-500 focus:outline-primary-500 focus:bg-gray-light"
         />
         <button className="bg-primary-500 p-3 rounded-lg">
           <Image

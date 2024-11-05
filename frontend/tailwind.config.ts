@@ -63,6 +63,14 @@ const config: Config = {
       backgroundImage: {
         wood: "url('/images/texture/wooden.jpg')",
       },
+      keyframes: {
+        smallPing: {
+          '75%, 100%': { transform: 'scale(1.2)', opacity: '0' },
+        },
+      },
+      animation: {
+        'small-ping': 'smallPing 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+      },
     },
   },
   plugins: [
