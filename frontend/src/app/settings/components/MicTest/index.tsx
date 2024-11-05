@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function MicTest() {
   const [micTestValue, setMicTestValue] = useState<number>(0)

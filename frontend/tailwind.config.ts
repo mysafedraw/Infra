@@ -64,12 +64,19 @@ const config: Config = {
         0px 10px 20px 3px rgba(256, 256, 256, 0.25) inset
       `,
       },
+      keyframes: {
+        smallPing: {
+          '75%, 100%': { transform: 'scale(1.2)', opacity: '0' },
+        },
+      },
+      animation: {
+        'small-ping': 'smallPing 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+      },
     },
   },
   plugins: [
     require('tailwind-scrollbar-hide'),
     function ({ addUtilities, theme }: any) {
-      // 커스텀 유틸리티 추가
       const newUtilities = {
         '.text-stroke': {
           '-webkit-text-stroke-width': theme('textStroke.1'),
