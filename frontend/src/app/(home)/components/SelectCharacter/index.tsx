@@ -77,6 +77,7 @@ export default function Home() {
               {CHARACTER_LIST.map((character, index) => {
                 return (
                   <div
+                    key={character.id}
                     className="flex gap-6 items-center cursor-pointer select-none"
                     onClick={() => {
                       setSelectedCharacter(index)
@@ -95,7 +96,10 @@ export default function Home() {
                       <span className="text-3xl">{character.name}</span>
                       <div className="flex gap-2 text-2xl text-gray-dark flex-wrap">
                         {character.personality.map((personality) => (
-                          <span className="whitespace-nowrap">{`#${personality}`}</span>
+                          <span
+                            key={personality}
+                            className="whitespace-nowrap"
+                          >{`#${personality}`}</span>
                         ))}
                       </div>
                     </div>
