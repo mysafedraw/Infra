@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import AlarmClockIcon from '/public/icons/alarm-clock.svg'
 
 export default function DrawTimer({
   initialTime,
@@ -56,13 +57,7 @@ export default function DrawTimer({
           : 'border-primary-600 '
       }`}
     >
-      <Image
-        src="/icons/alarm-clock.svg"
-        alt="clock"
-        width={30}
-        height={30}
-        priority
-      />
+      <AlarmClockIcon />
       <span
         className={`text-3xl font-bold tracking-wide min-w-[80px] ${
           time <= 10 ? 'text-inherit' : 'text-text'
