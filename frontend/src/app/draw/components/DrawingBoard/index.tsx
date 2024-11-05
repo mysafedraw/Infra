@@ -27,7 +27,7 @@ export default function DrawingBoard() {
       if (!container) return
 
       const containerWidth = container.clientWidth
-      const containerHeight = container.clientHeight
+      const containerHeight = container.clientHeight - 5
 
       const dpr = window.devicePixelRatio || 1
       setScale(dpr)
@@ -169,11 +169,11 @@ export default function DrawingBoard() {
 
   return (
     <div
-      className="bg-white rounded-md relative"
+      className="bg-white rounded-md relative h-fit"
       style={{ touchAction: 'none' }}
     >
       {/* 전체 지우개(임시 아이콘) */}
-      <div className="absolute right-4 top-4 flex gap-2 z-10">
+      <div className="absolute right-4 top-8 flex gap-2 z-10">
         <button
           onClick={clearCanvas}
           className="p-2 rounded-lg hover:bg-gray-100"

@@ -50,7 +50,7 @@ export default function DrawTimer({
 
   return (
     <div
-      className={`absolute left-4 top-4 rounded-md px-4 py-2 min-w-36 flex justify-center items-center gap-2 border-4 bg-gray-light select-none ${
+      className={`absolute left-4 top-8 rounded-md px-4 py-2 min-w-36 flex justify-center items-center gap-2 border-4 bg-gray-light select-none ${
         time <= 10 && isBlinking
           ? 'border-red-500 text-red-500'
           : 'border-primary-600 '
