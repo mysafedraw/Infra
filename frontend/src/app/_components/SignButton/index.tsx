@@ -16,7 +16,7 @@ export default function SignButton({
         height={100}
         className="rounded-lg object-cover"
       />
-      <span className="absolute top-[38px] left-[90px] transform -translate-x-1/2 -translate-y-1/2 text-white text-3xl font-bold">
+      <span className="absolute top-[38px] left-[90px] transform -translate-x-1/2 -translate-y-1/2 text-white text-3xl">
         {content}
       </span>
     </button>

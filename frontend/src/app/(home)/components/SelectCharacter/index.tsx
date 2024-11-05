@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
 import Image from 'next/image'
+import SignButton from '@/app/_components/SignButton'
 
 const CHARACTER_LIST = [
   {
@@ -139,18 +140,10 @@ export default function SelectCharcter() {
             </div>
             <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 py-6 flex justify-center items-center text-white rounded-lg relative">
               <div className="absolute -top-[117px] -right-6">
-                <button className="relative">
-                  <Image
-                    src="/images/wood-button.svg"
-                    width={180}
-                    height={104}
-                    alt="character-select-button"
-                    draggable={false}
-                  />
-                  <span className="absolute top-4 left-1/2 -translate-x-2/3 text-3xl">
-                    선택완료
-                  </span>
-                </button>
+                <SignButton
+                  content="선택완료"
+                  onClick={() => console.log('캐릭터 선택 완료')}
+                />
               </div>
 
               <p className="text-3xl leading-normal ">
