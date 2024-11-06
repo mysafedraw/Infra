@@ -12,6 +12,17 @@ export default function CharacterModel({ url }: { url: string }) {
   const moveSpeed = 0.05
   const intervalId = useRef<NodeJS.Timeout | null>(null)
 
+  // 캐릭터 회전
+  const rotateCharacter = (degrees: number) => {
+    const radians = MathUtils.degToRad(degrees)
+    characterScene.rotation.y += radians
+  }
+
+  // 캐릭터 이동
+  const moveCharacter = (x: number, y: number, z: number) => {
+    characterPosition.current.set(x, y, z)
+  }
+
   useEffect(() => {
     mixer.current = new AnimationMixer(characterScene)
     const action = mixer.current.clipAction(animations[0])
@@ -36,29 +47,21 @@ export default function CharacterModel({ url }: { url: string }) {
       }, 20)
     }, 3000)
 
-    // const routeTimeout = setTimeout(() => {
-    //   router.push('/scenario')
-    // }, 5000)
+    const routeTimeout = setTimeout(() => {
+      router.push('/scenario')
+    }, 5000)
+
+    console.log(characterMoveTimeout, routeTimeout)
   }, [])
 
   useFrame((state, delta) => {
+    console.log(state)
     if (mixer.current) {
       mixer.current.update(delta)
     }
 
     characterScene.position.lerp(characterPosition.current, moveSpeed)
   })
-
-  // 캐릭터 회전
-  const rotateCharacter = (degrees: number) => {
-    const radians = MathUtils.degToRad(degrees)
-    characterScene.rotation.y += radians
-  }
-
-  // 캐릭터 이동
-  const moveCharacter = (x: number, y: number, z: number) => {
-    characterPosition.current.set(x, y, z)
-  }
 
   return (
     <primitive object={characterScene} dispose={null} scale={[0.1, 0.1, 0.1]} />
