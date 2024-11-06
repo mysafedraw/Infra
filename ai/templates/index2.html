@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick, Draw! 테스트</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            cursor: crosshair;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        #clearButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>무언가 그려보세요!</h1>
+    <canvas id="drawingCanvas" width="400" height="400"></canvas>
+    <button id="clearButton">지우기</button>
+    <div id="result">예측 결과가 여기 표시됩니다.</div>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const clearButton = document.getElementById('clearButton');
+        let drawing = false;
+        let strokes = [];
+
+        // 마우스 버튼을 눌렀을 때
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            strokes.push([[], []]);
+            ctx.beginPath();
+        });
+
+        // 마우스 버튼을 떼었을 때
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+            ctx.closePath();
+        });
+
+        // 마우스를 움직일 때
+        canvas.addEventListener('mousemove', (e) => {
+            if (drawing) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const currentStroke = strokes[strokes.length - 1];
+                currentStroke[0].push(x);
+                currentStroke[1].push(y);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+
+                realTimePrediction(strokes);
+            }
+        });
+
+        // 실시간 예측 함수
+        async function realTimePrediction(strokes) {
+            const response = await fetch('/api2/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ drawing: strokes })
+            });
+
+            const result = await response.json();
+            const resultText = result.top_labels.map((label, index) => {
+                return `${index + 1}위: ${label} (${result.top_probabilities[index]}%)`;
+            }).join('<br>');
+            document.getElementById('result').innerHTML = resultText;
+        }
+
+        // 지우기 버튼 클릭 이벤트
+        clearButton.addEventListener('click', () => {
+            // 캔버스 초기화
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 예측 결과 초기화
+            document.getElementById('result').innerHTML = '예측 결과가 여기 표시됩니다.';
+            // 그린 데이터 초기화
+            strokes = [];
+        });
+    </script>
+</body>
+</html>
