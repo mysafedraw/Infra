@@ -1,5 +1,5 @@
 # Python 3.9 이미지 사용
-FROM python:3.9-slim
+FROM ai-base-image
 
 # 작업 디렉토리 설정
 WORKDIR /app
