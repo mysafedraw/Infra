@@ -30,7 +30,7 @@ export default function ChatButton() {
 
       {/* ChatBox 컴포넌트 */}
       {isChatBoxOpen && (
-        <div className="z-40 fixed bottom-40 right-20 w-[500px] h-3/4 pb-8">
+        <div className="z-40 fixed bottom-40 right-20 w-[500px] h-3/4 mb-8">
           <ChatBox />
         </div>
       )}

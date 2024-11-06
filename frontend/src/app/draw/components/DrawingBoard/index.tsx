@@ -12,22 +12,22 @@ type EventType = React.MouseEvent | React.Touch | MouseEvent | Touch
 
 export default function DrawingBoard() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
   const [scale, setScale] = useState<number>(1)
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
-  // 캔버스 초기화 및 리사이즈 처리
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
     const resizeCanvas = () => {
-      const container = canvas.parentElement
+      const container = containerRef.current
       if (!container) return
 
       const containerWidth = container.clientWidth
-      const containerHeight = container.clientHeight - 5
+      const containerHeight = container.clientHeight
 
       const dpr = window.devicePixelRatio || 1
       setScale(dpr)
@@ -169,8 +169,12 @@ export default function DrawingBoard() {
 
   return (
     <div
+      ref={containerRef}
       className="bg-white rounded-md relative h-fit"
-      style={{ touchAction: 'none' }}
+      style={{
+        touchAction: 'none',
+        height: `calc(100vh - 320px)`,
+      }}
     >
       {/* 전체 지우개(임시 아이콘) */}
       <div className="absolute right-4 top-8 flex gap-2 z-10">
