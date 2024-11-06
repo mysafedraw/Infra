@@ -9,7 +9,7 @@ export default function Enter() {
   const roomCode = 1
 
   const handleMove = () => {
-    router.push(`/lobby/${roomCode}`)
+    router.push(`/room/${roomCode}`)
   }
 
   return (
