@@ -10,10 +10,14 @@
   },
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
+    "@react-three/drei": "^9.115.0",
+    "@react-three/fiber": "^8.17.10",
+    "@svgr/webpack": "^8.1.0",
     "next": "14.2.11",
     "react": "^18",
     "react-dom": "^18",
     "sockjs-client": "^1.6.1"
+    "tailwind-scrollbar-hide": "^1.1.7"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",

@@ -1,0 +1,15 @@
+services:
+  frontend-service:
+    build: .  # 현재 디렉토리에서 빌드
+    image: frontend-image  # Jenkins에서 빌드된 이미지를 사용
+    container_name: frontend-app
+    ports:
+      - "3000:3000"
+    environment:
+      - TZ=Asia/Seoul  # 타임존 설정
+    networks:
+      - project-network
+
+networks:
+  project-network:
+    external: true  # 외부에 이미 정의된 msa-network를 사용

@@ -1,0 +1,41 @@
+<svg width="207" height="139" viewBox="0 0 207 139" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    /* 공통 스타일 */
+    path {
+      stroke-dasharray: 500;
+      stroke-dashoffset: 500;
+      animation: draw 2s ease forwards;
+    }
+
+    /* 각 경로에 다른 지연 시간 설정 */
+    .path1 {
+      animation-delay: 0s;
+    }
+
+    .path2 {
+      animation-delay: 0.5s;
+    }
+
+    /* 애니메이션 키프레임 */
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  </style>
+
+  <path
+    class="path1"
+    d="M180.711 7C152.563 35.1483 122.121 60.676 90.2148 84.436C68.8966 100.311 43.3155 110.644 20.1757 123.616C16.0385 125.936 10.2187 128.604 7 131.822"
+    stroke="#DF0707"
+    stroke-width="13"
+    stroke-linecap="round"
+  />
+  <path
+    class="path2"
+    d="M11.1602 12.2012C13.1948 12.8794 14.6239 14.7143 16.3611 15.8996C27.4534 23.4685 41.1671 28.0388 53.5188 32.9471C83.7975 44.9792 119.516 55.4862 144.766 77.2128C157.432 88.1116 170.071 98.1327 184.871 106.049C189.35 108.444 195.275 116.22 200.474 116.22"
+    stroke="#DF0707"
+    stroke-width="13"
+    stroke-linecap="round"
+  />
+</svg>

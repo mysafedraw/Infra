@@ -8,6 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'main-gradient': 'linear-gradient(180deg, #A5DEF5 40%, #DCF3B4 100%)',
+        wood: "url('/images/texture/wooden.jpg')",
+        'ranking-gradient': 'linear-gradient(180deg, #FFE097 0%, #FFEBBC 100%)',
+      },
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
@@ -60,9 +65,6 @@ const config: Config = {
         0px 10px 20px 3px rgba(256, 256, 256, 0.25) inset
       `,
       },
-      backgroundImage: {
-        wood: "url('/images/texture/wooden.jpg')",
-      },
       keyframes: {
         smallPing: {
           '75%, 100%': { transform: 'scale(1.2)', opacity: '0' },
@@ -74,6 +76,7 @@ const config: Config = {
     },
   },
   plugins: [
+    require('tailwind-scrollbar-hide'),
     function ({ addUtilities, theme }: any) {
       const newUtilities = {
         '.text-stroke': {

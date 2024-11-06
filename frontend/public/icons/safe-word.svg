@@ -1,0 +1,64 @@
+<svg width="194" height="122" viewBox="0 0 194 122" fill="none" xmlns="http://www.w3.org/2000/svg">
+ <style>
+    /* 공통 스타일 */
+    path {
+      stroke-dasharray: 500;
+      stroke-dashoffset: 500;
+      animation: draw 2s ease forwards;
+      animation-delay: 1.3s;
+    }
+
+    /* 각 경로에 다른 지연 시간 설정 */
+    .path1 {
+      animation-delay: 1.5s;
+    }
+
+    .path2 {
+      animation-delay: 2s;
+    }
+
+    .path3 {
+      animation-delay: 2.4s;
+    }
+
+    .path4 {
+      animation-delay: 2.8s;
+    }
+
+    .path5 {
+      animation-delay: 3.2s;
+    }
+
+    .path6 {
+      animation-delay: 3.6s;
+    }
+
+    .path7 {
+      animation-delay: 4s;
+    }
+
+    .path8 {
+      animation-delay: 4.4s;
+    }
+
+    .path9 {
+      animation-delay: 4.8s;
+    }
+
+    /* 애니메이션 키프레임 */
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  </style>
+<path class="path1" d="M17.3517 21.0233C9.42646 31.4846 1.75552 54.4999 15.8195 63.541C19.1295 65.6688 22.5939 67.2555 26.9703 65.7967C30.9621 64.4661 37.3886 62.0908 39.3979 58.221C44.6523 48.1015 43.1269 36.4244 36.5038 27.152C31.8401 20.6229 27.0578 17.959 18.8839 17.959" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path2" d="M71.7441 8C73.4582 10.5711 73.0341 15.3754 73.2763 18.3421C73.8142 24.9317 74.0424 31.3886 74.0424 38.005C74.0424 47.6662 74.0424 57.3273 74.0424 66.9885" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path3" d="M75.5742 39.4096C79.4324 39.4096 83.5074 38.9403 87.2357 40.0055C89.3451 40.6082 91.1039 39.4096 93.1942 39.4096" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path4" d="M35.2646 84.2549C34.3723 90.9342 33.4799 97.6136 32.5875 104.293C31.5092 112.364 45.6632 110.445 50.9173 111.079C56.0141 111.693 61.0999 112.439 66.1884 113.119" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path5" d="M106.218 20.2574C112.703 20.2574 120.063 18.1496 126.306 20.0872C128.718 20.8356 130.967 22.0734 133.329 22.5983C134.945 22.9575 134.189 31.4902 134.052 32.6425C133.293 39.039 128.614 45.5551 125.838 51.1562C123.085 56.7113 120.611 62.282 118.475 68.0952C117.539 70.6447 114.522 74.328 118.475 72.3512" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path6" d="M129.2 54.731C135.352 58.6458 144.157 65.2924 148.352 71.5848" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path7" d="M149.118 47.0703H178.229" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path8" d="M185.124 22.5557C184.783 29.1967 182.962 35.7128 182.485 42.3887C182.041 48.6022 182.06 54.8061 182.06 61.0301C182.06 66.8467 182.06 72.6633 182.06 78.4798" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+<path class="path9" d="M135.329 89.9712C135.329 95.6957 132.948 105.559 138.776 108.698C141.17 109.987 145.645 109.008 148.097 108.783C153.541 108.282 158.798 107.591 164.27 107.591C167.902 107.591 171.534 107.591 175.165 107.591" stroke="#DF0707" stroke-width="16" stroke-linecap="round"/>
+</svg>

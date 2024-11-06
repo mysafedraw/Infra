@@ -2,6 +2,7 @@
 
 import RoomActionButton from '@/app/scenario/components/RoomActionButton'
 import { useRouter } from 'next/navigation'
+import BackArrowIcon from '/public/icons/back-arrow.svg'
 
 export default function Scenario() {
   const router = useRouter()
@@ -11,7 +12,7 @@ export default function Scenario() {
         className="absolute left-10 top-10 flex gap-8 items-center hover:-translate-x-3 transition-all duration-400 ease-in-out"
         onClick={() => router.back()}
       >
-        <img src="/icons/back-arrow.svg" className="h-16" />
+        <BackArrowIcon />
         <span className="text-6xl text-white">나가기</span>
       </button>
       <h1 className="bg-wood shadow-md inline-block py-4 text-white px-24 text-5xl rounded-xl">
