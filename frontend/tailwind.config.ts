@@ -11,6 +11,7 @@ const config: Config = {
       backgroundImage: {
         'main-gradient': 'linear-gradient(180deg, #A5DEF5 40%, #DCF3B4 100%)',
         wood: "url('/images/texture/wooden.jpg')",
+        'ranking-gradient': 'linear-gradient(180deg, #FFE097 0%, #FFEBBC 100%)',
       },
       colors: {
         background: 'var(--background)',

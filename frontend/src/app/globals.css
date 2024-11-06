@@ -9,6 +9,9 @@
   .font-outline-4 {
     -webkit-text-stroke: 4px #6e8546;
   }
+  .ranking-font-outline-2 {
+    -webkit-text-stroke: 2px #75520e;
+  }
 }
 
 @font-face {
