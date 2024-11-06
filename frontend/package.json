@@ -15,7 +15,8 @@
     "next": "14.2.11",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-scrollbar-hide": "^1.1.7"
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
