@@ -35,7 +35,7 @@ export default function Draw() {
         <button className="absolute right-6 flex items-center justify-center">
           <Image
             src="/images/wood-arrow.png"
-            alt="next"
+            alt="draw-submit"
             width={241}
             height={88}
             className="h-20 w-auto"
