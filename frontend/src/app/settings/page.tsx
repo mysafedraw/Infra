@@ -6,7 +6,7 @@ import MicTest from './components/MicTest'
 
 export default function Settings() {
   return (
-    <div className="p-20 w-screen h-screen bg-secondary-500 flex flex-col">
+    <div className="p-20 w-screen min-h-screen bg-secondary-500 flex flex-col">
       <div className="flex items-center drop-shadow-md mb-10">
         <Image
           src="/icons/back-arrow.svg"
