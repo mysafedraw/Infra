@@ -1,6 +1,11 @@
+'use client'
+
 import Image from 'next/image'
 import ScoredBoard from '@/app/scenario/result/components/ScoredBoard'
 import ExplainQueueBoard from '@/app/scenario/result/host/components/ExplainQueueBoard'
+import VotingSidebar from '@/app/scenario/result/components/VotingSidebar'
+import VotingResult from '@/app/scenario/result/host/components/VotingResult'
+import { useState } from 'react'
 
 interface AnswerData {
   id: number
@@ -88,6 +93,18 @@ const waitingData: AnswerData[] = [
 ]
 
 export default function ScenarioResultHost() {
+  const [isVotingResultVisible, setIsVotingResultVisible] = useState(true)
+
+  const handleApprove = () => {
+    // 승인 시 실행할 로직
+    setIsVotingResultVisible(false)
+  }
+
+  const handleReject = () => {
+    // 거절 시 실행할 로직
+    setIsVotingResultVisible(false)
+  }
+
   return (
     <div className="p-6 flex flex-col items-center">
       <div className="flex items-center w-full mb-4">
@@ -125,6 +142,11 @@ export default function ScenarioResultHost() {
           <ScoredBoard key={data.id} data={data} />
         ))}
       </div>
+
+      <VotingSidebar role="host" />
+      {isVotingResultVisible && (
+        <VotingResult onApprove={handleApprove} onReject={handleReject} />
+      )}
     </div>
   )
 }
