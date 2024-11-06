@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
 import Image from 'next/image'
 import SignButton from '@/app/_components/SignButton'
+import Link from 'next/link'
 
 const CHARACTER_LIST = [
   {
@@ -140,10 +141,12 @@ export default function SelectCharcter() {
             </div>
             <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 py-6 flex justify-center items-center text-white rounded-lg relative">
               <div className="absolute -top-[117px] -right-6">
-                <SignButton
-                  content="선택완료"
-                  onClick={() => console.log('캐릭터 선택 완료')}
-                />
+                <Link href={'/nickname'}>
+                  <SignButton
+                    content="선택완료"
+                    onClick={() => console.log('캐릭터 선택 완료')}
+                  />
+                </Link>
               </div>
 
               <p className="text-3xl leading-normal ">
