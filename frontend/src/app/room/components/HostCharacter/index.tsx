@@ -28,7 +28,9 @@ export default function HostCharacter({ host }: { host: Host }) {
             style={{ clipPath: 'ellipse(90px 15px)' }}
           />
         </div>
-        <p className="text-center text-xl font-medium -mt-4">{host.nickname}</p>
+        <p className="text-center text-xl font-medium -mt-4 select-none">
+          {host.nickname}
+        </p>
       </div>
     </div>
   )

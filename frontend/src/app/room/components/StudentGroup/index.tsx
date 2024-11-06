@@ -27,18 +27,20 @@ export default function StudentGroup({ students }: { students: Student[] }) {
   }
 
   return (
-    <div className="bg-primary-500 px-4 py-4 rounded-lg">
+    <div className="bg-primary-500 px-4 py-4 rounded-lg shadow-md">
       <div className="grid grid-cols-3 gap-4">
         {gridSlots.map((student, index) =>
           student ? (
             <div
               key={student.userId}
               className={`
-              flex flex-col items-center p-4 rounded-lg cursor-pointer shadow-md h-40 text-text
+              flex flex-col items-center p-4 rounded-lg cursor-pointer shadow-md h-44 text-text
               ${student.userId === 'player001' ? 'bg-primary-600' : 'bg-white'}
             `}
             >
-              <p className="text-xl font-bold text-text">{student.nickname}</p>
+              <p className="text-xl font-bold text-text select-none">
+                {student.nickname}
+              </p>
               <div className="relative w-40 h-40 mt-auto overflow-hidden">
                 <Image
                   src="/images/rabbit.png"
@@ -51,7 +53,7 @@ export default function StudentGroup({ students }: { students: Student[] }) {
           ) : (
             <div
               key={`empty-${index}`}
-              className="bg-gray-300 opacity-30 rounded-lg p-4 h-40"
+              className="bg-gray-300 opacity-30 rounded-lg p-4 h-44"
             />
           ),
         )}

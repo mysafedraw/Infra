@@ -36,10 +36,11 @@ const mockData: RoomResponse = {
 }
 
 export default function Room() {
-  const isHost = false
+  const isHost = true
+  const speech = '여러분, 화재 상황에 대해 \n잘 배워보아요 ^^'
 
   return (
-    <div className="w-screen h-screen bg-secondary-500 p-6 flex flex-col">
+    <div className="w-full min-h-screen bg-secondary-500 p-6 flex flex-col">
       <div className="h-[10%] flex justify-between items-center">
         {/* 나가기 */}
         <div className="flex items-center drop-shadow-md mb-10">
@@ -75,10 +76,9 @@ export default function Room() {
           </div>
         )}
       </div>
-
-      <div className="h-[30%] flex gap-6 my-5 items-center justify-between">
+      <div className="h-[30%] flex gap-6 my-3 items-center justify-between">
         {/* 시나리오 이미지 */}
-        <div className="relative w-[340px] h-full rounded-lg overflow-hidden">
+        <div className="relative w-[350px] h-[200px] rounded-lg overflow-hidden">
           <Image
             src="/images/fire_event.png"
             alt="화재 상황"
@@ -88,10 +88,8 @@ export default function Room() {
         </div>
         {/* 방장 캐릭터 */}
         <HostCharacter host={mockData.host} />
-        {/* 그림 그리는 시간 설정(방장) */}
-        <div className="flex items-center w-[350px] justify-center">
-          {isHost && <TimerSetting />}
-          {!isHost && (
+        {!isHost && (
+          <div className="-ml-16">
             <div className="relative bg-white p-6 rounded-2xl shadow-md">
               {/* 왼쪽 중앙 꼬리 모양 */}
               <div
@@ -103,12 +101,17 @@ export default function Room() {
                   clipPath: 'polygon(100% 0, 100% 100%, 0 50%)',
                 }}
               />
-              <p className="text-2xl whitespace-pre-wrap">
-                여러분, 화재 상황에 대해
-                <br />잘 배워보아요 ^^
+              <p className="text-2xl whitespace-pre-wrap select-none">
+                {speech}
               </p>
             </div>
-          )}
+          </div>
+        )}
+        {/* 그림 그리는 시간 설정(방장) */}
+        <div
+          className={`flex items-center justify-center ${isHost ? 'w-[350px]' : 'w-[100px]'}`}
+        >
+          {isHost && <TimerSetting />}
         </div>
       </div>
 
