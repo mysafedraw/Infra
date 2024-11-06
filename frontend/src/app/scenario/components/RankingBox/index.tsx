@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 interface RankingProps {
   height: string
-  ranking?: any
+  ranking?: React.ReactNode
   score: number
   user: string
   border?: string
