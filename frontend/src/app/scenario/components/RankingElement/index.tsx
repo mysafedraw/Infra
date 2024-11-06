@@ -18,7 +18,7 @@ export default function RankingElement({ rank }: { rank: number }) {
             />
           </span>
         </p>
-        <span className="text-2xl text-texxt">2학년 1반 김유경</span>
+        <span className="text-2xl text-text">2학년 1반 김유경</span>
       </div>
       <span className="whitespace-nowrap text-3xl text-primary-950">200점</span>
     </li>
