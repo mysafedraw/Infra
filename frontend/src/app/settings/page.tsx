@@ -6,8 +6,8 @@ import MicTest from './components/MicTest'
 
 export default function Settings() {
   return (
-    <div className="p-20 w-screen min-h-screen bg-secondary-500 flex flex-col">
-      <div className="flex items-center drop-shadow-md mb-10">
+    <div className="p-20 pt-16 w-full h-full min-h-screen bg-secondary-500 flex flex-col">
+      <div className="flex items-center drop-shadow-md mb-8">
         <Image
           src="/icons/back-arrow.svg"
           alt="back"
@@ -33,7 +33,7 @@ export default function Settings() {
             캐릭터 변경
           </button>
         </div>
-        <div className="ml-10 px-6 flex-grow space-y-16">
+        <div className="ml-10 px-6 flex-grow space-y-16 w-full">
           <NicknameInput />
           <GameVolumeControl />
           <div className="grid grid-cols-[1fr_3fr]">
