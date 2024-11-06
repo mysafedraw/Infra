@@ -5,9 +5,8 @@ import Image from 'next/image'
 export default function HostCharacter({ host }: { host: Host }) {
   return (
     <div className="w-1/4 flex flex-col items-center justify-center rounded-lg p-3 relative">
-      {/* 왕관 아이콘 - 위치 수정 */}
+      {/* 왕관 아이콘 */}
       <div className="absolute -top-1 left-8">
-        {/* 위치 조정 */}
         <CrownIcon className="w-8 h-8" />
       </div>
       <div className="flex flex-col items-center">

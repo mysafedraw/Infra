@@ -36,7 +36,7 @@ const mockData: RoomResponse = {
 }
 
 export default function Room() {
-  const isHost = true
+  const isHost = false
 
   return (
     <div className="w-screen h-screen bg-secondary-500 p-6 flex flex-col">
@@ -88,12 +88,30 @@ export default function Room() {
         </div>
         {/* 방장 캐릭터 */}
         <HostCharacter host={mockData.host} />
-
         {/* 그림 그리는 시간 설정(방장) */}
         <div className="flex items-center w-[350px] justify-center">
           {isHost && <TimerSetting />}
+          {!isHost && (
+            <div className="relative bg-white p-6 rounded-2xl shadow-md">
+              {/* 왼쪽 중앙 꼬리 모양 */}
+              <div
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4"
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  background: 'white',
+                  clipPath: 'polygon(100% 0, 100% 100%, 0 50%)',
+                }}
+              />
+              <p className="text-2xl whitespace-pre-wrap">
+                여러분, 화재 상황에 대해
+                <br />잘 배워보아요 ^^
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
       <div className="flex gap-6 flex-1">
         {/* 학생 목록 */}
         <div className="flex-1">
