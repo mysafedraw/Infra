@@ -16,7 +16,7 @@ model = load_model('model.h5')
 label_encoder = LabelEncoder()
 label_encoder.classes_ = np.load('classes.npy', allow_pickle=True)  # 클래스 저장 및 로드
 
-max_timesteps = 100
+max_timesteps = 150
 
 def preprocess_drawing(drawing):
     strokes = []
