@@ -103,7 +103,7 @@ export default function DrawingBoard({
     } catch (error) {
       console.error('예측 중 오류 발생:', error)
     }
-  }, [strokes, onPrediction])
+  }, [strokes, onPrediction, predictions])
 
   useEffect(() => {
     const interval = setInterval(() => {
