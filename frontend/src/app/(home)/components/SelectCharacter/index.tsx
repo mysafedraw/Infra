@@ -6,51 +6,72 @@ import { OrbitControls, useGLTF } from '@react-three/drei'
 import Image from 'next/image'
 import SignButton from '@/app/_components/SignButton'
 import Link from 'next/link'
+import { Character } from '@/app/(home)/page'
 
-const CHARACTER_LIST = [
-  {
-    id: 1,
-    profile: '/images/character/tiger.png',
-    name: '펭펭이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/penguin.glb',
-  },
-  {
-    id: 2,
-    profile: '/images/character/tiger.png',
-    name: '돌돌이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/dog.glb',
-  },
-  {
-    id: 3,
-    profile: '/images/character/tiger.png',
-    name: '유니코드',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/unicorn.glb',
-  },
-  {
-    id: 4,
-    profile: '/images/character/tiger.png',
-    name: '야옹이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/cat.glb',
-  },
-  {
-    id: 5,
-    profile: '/images/character/tiger.png',
-    name: '호돌이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/dog.glb',
-  },
-]
+interface CharacterDetail {
+  assetImg: string
+  feature: string
+  name: string
+  profileImg: string
+}
 
-export default function SelectCharcter() {
-  const [selectedCharacter, setSelectedCharacter] = useState(1)
+const CHARACTER_ASSETS: Record<number, string> = {
+  1: '/assets/character/dog.glb',
+  2: '/assets/character/tiger.glb',
+  3: '/assets/character/bunny.glb',
+  4: '/assets/character/fox.glb',
+  5: '/assets/character/penguin.glb',
+  6: '/assets/character/unicorn.glb',
+  7: '/assets/character/cat.glb',
+}
+
+export default function SelectCharcter({
+  characters,
+}: {
+  characters: Character[]
+}) {
+  const [selectedCharacter, setSelectedCharacter] = useState(
+    characters[0].id || 1,
+  ) // id
+  const [characterDetail, setCharacterDetail] = useState('')
   const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
   const { scene: characterScene } = useGLTF(
-    CHARACTER_LIST[selectedCharacter].characterUrl,
+    CHARACTER_ASSETS[
+      characters.filter((c) => c.id === selectedCharacter)[0].id
+    ],
   )
+
+  const fetchCharacterDetail = async (
+    characterId: number,
+  ): Promise<CharacterDetail> => {
+    const response = await fetch(
+      `http://70.12.247.148:8080/api/avatars/${characterId}`,
+      {
+        method: 'GET',
+        cache: 'no-store',
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch character detail')
+    }
+
+    const result = await response.json()
+    return result.data
+  }
+
+  useEffect(() => {
+    const updateCharacterDetail = async () => {
+      try {
+        const detail = await fetchCharacterDetail(selectedCharacter)
+        setCharacterDetail(detail.feature)
+      } catch (error) {
+        console.error('Failed to fetch character detail:', error)
+      }
+    }
+
+    updateCharacterDetail()
+  }, [selectedCharacter])
 
   useEffect(() => {
     useGLTF.preload('/assets/background/cloud.glb')
@@ -80,32 +101,32 @@ export default function SelectCharcter() {
           {/* 캐릭터 고르는 창 */}
           <div className="w-1/2 h-full bg-[rgba(256,256,256,0.8)] rounded-2xl py-10 px-10  ">
             <div className="flex flex-col gap-14 overflow-y-auto  h-full pr-4">
-              {CHARACTER_LIST.map((character, index) => {
+              {characters.map((character) => {
                 return (
                   <div
                     key={character.id}
                     className="flex gap-6 items-center cursor-pointer select-none"
                     onClick={() => {
-                      setSelectedCharacter(index)
+                      setSelectedCharacter(character.id)
                     }}
                   >
                     <p className="w-32 h-32 aspect-square overflow-hidden rounded-full bg-secondary-600 shadow-md shrink-0">
                       <Image
-                        src={character.profile}
-                        alt="character_profile"
+                        src={character.profileImg}
+                        alt="character-profile"
                         width={125}
                         height={125}
                         draggable={false}
                       />
                     </p>
                     <div className="bg-white flex flex-col gap-3 justify-center shadow-md rounded-2xl px-7 py-5  w-full">
-                      <span className="text-3xl">{character.name}</span>
+                      <span className="text-3xl">{character.avatarName}</span>
                       <div className="flex gap-2 text-2xl text-gray-dark flex-wrap">
-                        {character.personality.map((personality) => (
+                        {character.hashTagNameList.map((tag) => (
                           <span
-                            key={personality}
+                            key={tag}
                             className="whitespace-nowrap"
-                          >{`#${personality}`}</span>
+                          >{`#${tag}`}</span>
                         ))}
                       </div>
                     </div>
@@ -139,8 +160,8 @@ export default function SelectCharcter() {
                 />
               </Canvas>
             </div>
-            <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 py-6 flex justify-center items-center text-white rounded-lg relative">
-              <div className="absolute -top-[117px] -right-6">
+            <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 flex justify-center items-start text-white rounded-lg relative">
+              <div className="absolute -top-[117px] -right-6 z-50">
                 <Link href={'/nickname'}>
                   <SignButton
                     content="선택완료"
@@ -149,9 +170,8 @@ export default function SelectCharcter() {
                 </Link>
               </div>
 
-              <p className="text-3xl leading-normal ">
-                호돌이는 활발하고 친구가 많아. <br />
-                항상 긍정적이고 밝은 성격이지.
+              <p className="flex text-3xl leading-normal px-4 w-full overflow-y-auto h-full scrollbar-hide items-start">
+                {characterDetail}
               </p>
             </div>
           </div>
