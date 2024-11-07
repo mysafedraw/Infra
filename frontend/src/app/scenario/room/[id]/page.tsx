@@ -2,10 +2,10 @@
 
 import Image from 'next/image'
 import ChatBox from '@/app/_components/ChatBox'
-import StudentGroup from '@/app/room/components/StudentGroup'
-import { Host, Student } from '@/app/room/types/studentType'
-import TimerSetting from '@/app/room/components/TimerSetting'
-import HostCharacter from '@/app/room/components/HostCharacter'
+import StudentGroup from '@/app/scenario/room/components/StudentGroup'
+import { Host, Student } from '@/app/scenario/room/types/studentType'
+import TimerSetting from '@/app/scenario/room/components/TimerSetting'
+import HostCharacter from '@/app/scenario/room/components/HostCharacter'
 
 interface RoomResponse {
   userId: string
@@ -84,6 +84,7 @@ export default function Room() {
             alt="화재 상황"
             fill
             className="object-cover"
+            priority
           />
         </div>
         {/* 방장 캐릭터 */}

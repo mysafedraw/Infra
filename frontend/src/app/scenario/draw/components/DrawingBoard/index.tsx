@@ -8,15 +8,31 @@ interface Point {
   y: number
 }
 
+interface Stroke {
+  x: number[]
+  y: number[]
+}
+
+interface DrawResponse {
+  label: string
+  probability: number
+}
+
 type EventType = React.MouseEvent | React.Touch | MouseEvent | Touch
 
-export default function DrawingBoard() {
+export default function DrawingBoard({
+  onPrediction,
+}: {
+  onPrediction: (prediction: DrawResponse) => void
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
   const [scale, setScale] = useState<number>(1)
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
+  const [strokes, setStrokes] = useState<Stroke[]>([])
+  const [predictions, setPredictions] = useState<DrawResponse[]>([])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -59,6 +75,46 @@ export default function DrawingBoard() {
   }, [])
 
   // 마우스/터치 이벤트 좌표 -> 캔버스 좌표로 변환
+  const predictDrawing = useCallback(async () => {
+    try {
+      const response = await fetch('/api2/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          drawing: strokes.map((stroke) => [stroke.x, stroke.y]),
+        }),
+      })
+
+      const result = await response.json()
+      const resultPredictions = result.top_labels.map(
+        (label: string, index: number) => ({
+          label,
+          probability: result.top_probabilities[index],
+        }),
+      )
+
+      setPredictions(resultPredictions)
+
+      if (onPrediction) {
+        onPrediction(predictions[0])
+      }
+    } catch (error) {
+      console.error('예측 중 오류 발생:', error)
+    }
+  }, [strokes, onPrediction])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (strokes.length > 0) {
+        predictDrawing()
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [strokes, predictDrawing])
+
   const getCoordinates = useCallback((event: EventType): Point => {
     if (!canvasRef.current) return { x: 0, y: 0 }
 
@@ -79,6 +135,7 @@ export default function DrawingBoard() {
       setIsDrawing(true)
       context.beginPath()
       context.moveTo(point.x / scale, point.y / scale)
+      setStrokes((prevStrokes) => [...prevStrokes, { x: [], y: [] }])
     },
     [context, scale],
   )
@@ -88,17 +145,22 @@ export default function DrawingBoard() {
     (point: Point) => {
       if (!context || !isDrawing) return
 
+      const currentStroke = strokes[strokes.length - 1]
+      currentStroke.x.push(point.x)
+      currentStroke.y.push(point.y)
+
       context.lineTo(point.x / scale, point.y / scale)
       context.stroke()
     },
-    [context, scale, isDrawing],
+    [context, scale, isDrawing, strokes],
   )
 
   // 그리기 종료
   const stopDrawing = useCallback(() => {
-    if (!context) return
     setIsDrawing(false)
-    context.closePath()
+    if (context) {
+      context.closePath()
+    }
   }, [context])
 
   const handleMouseDown = useCallback(
@@ -142,7 +204,13 @@ export default function DrawingBoard() {
     if (!context || !canvasRef.current) return
     const canvas = canvasRef.current
     context.clearRect(0, 0, canvas.width / scale, canvas.height / scale)
-  }, [context, scale])
+    setStrokes([])
+    setPredictions([]) // 예측 결과 초기화
+
+    if (onPrediction) {
+      onPrediction({ label: '', probability: 0 }) // 예측값 초기화
+    }
+  }, [context, scale, onPrediction])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -173,7 +241,7 @@ export default function DrawingBoard() {
       className="bg-white rounded-md relative h-fit"
       style={{
         touchAction: 'none',
-        height: `calc(100vh - 320px)`,
+        height: `calc(100vh - 290px)`,
       }}
     >
       {/* 전체 지우개(임시 아이콘) */}
@@ -200,6 +268,14 @@ export default function DrawingBoard() {
         onTouchEnd={stopDrawing}
         onTouchCancel={stopDrawing}
       />
+
+      <div id="result" className="mt-4 p-4">
+        {predictions.map((prediction, index) => (
+          <div key={index}>
+            {index + 1}위: {prediction.label} {prediction.probability}%
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
