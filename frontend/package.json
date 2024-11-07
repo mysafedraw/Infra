@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ar-js-org/ar.js": "^3.4.5",
+    "@stomp/stompjs": "^7.0.0",
     "@react-three/drei": "^9.115.0",
     "@react-three/fiber": "^8.17.10",
     "@svgr/webpack": "^8.1.0",
