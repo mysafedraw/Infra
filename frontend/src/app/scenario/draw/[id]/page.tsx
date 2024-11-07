@@ -1,16 +1,34 @@
 'use client'
 
-import DrawingBoard from '@/app/draw/components/DrawingBoard'
-import DrawTimer from '@/app/draw/components/DrawTimer'
+import { useState } from 'react'
+import DrawingBoard from '@/app/scenario/draw/components/DrawingBoard'
+import DrawTimer from '@/app/scenario/draw/components/DrawTimer'
 import Image from 'next/image'
-import ProgressBarTimer from '@/app/draw/components/ProgressBarTimer'
-import QuestionBubble from '@/app/draw/components/QuestionBubble'
+import ProgressBarTimer from '@/app/scenario/draw/components/ProgressBarTimer'
+import QuestionBubble from '@/app/scenario/draw/components/QuestionBubble'
+import { DRAW_TYPES } from '@/app/_constants/draw'
+
+interface DrawResponse {
+  label: string
+  probability: number
+}
 
 export default function Draw() {
   const scenario =
     '헉 콘센트에 불이 붙었어!\n초기에 빨리 진압해야 할 텐데... 지금 필요한 건.....'
 
-  const question = '소화기를 그린 건가요?'
+  const [question, setQuestion] = useState<string>('...')
+
+  // 예측 결과를 받아와 한글로 변환
+  const handlePrediction = (prediction: DrawResponse) => {
+    if (prediction) {
+      const translatedLabel = DRAW_TYPES[prediction.label] || prediction.label
+
+      if (prediction?.probability >= 40)
+        setQuestion(`${translatedLabel}를 그린 건가요?`)
+      else setQuestion(`...`)
+    }
+  }
 
   const handleNext = () => {}
 
@@ -24,7 +42,7 @@ export default function Draw() {
       </div>
       {/* 그림판 */}
       <div className="relative mt-4">
-        <DrawingBoard />
+        <DrawingBoard onPrediction={handlePrediction} />
         <ProgressBarTimer initialTime={14} handleTimeEnd={handleNext} />
         <DrawTimer initialTime={14} handleTimeEnd={handleNext} />
       </div>
@@ -38,7 +56,7 @@ export default function Draw() {
             alt="draw-submit"
             width={241}
             height={88}
-            className="h-20 w-auto"
+            className="h-16 w-auto"
             priority
           />
           <p className="absolute text-white text-4xl shadow-lg pr-2">

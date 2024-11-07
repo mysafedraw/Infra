@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Image from 'next/image'
-import { Student } from '@/app/room/types/studentType'
+import { Student } from '@/app/scenario/room/types/studentType'
 import RightArrowIcon from '/public/icons/rounded-right-arrow.svg'
 import LeftArrowIcon from '/public/icons/rounded-left-arrow.svg'
 
@@ -34,7 +34,7 @@ export default function StudentGroup({ students }: { students: Student[] }) {
             <div
               key={student.userId}
               className={`
-              flex flex-col items-center p-4 rounded-lg cursor-pointer shadow-md h-44 text-text
+              flex flex-col items-center p-4 rounded-lg shadow-md h-44 text-text
               ${student.userId === 'player001' ? 'bg-primary-600' : 'bg-white'}
             `}
             >

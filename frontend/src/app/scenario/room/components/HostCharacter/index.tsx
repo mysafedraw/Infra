@@ -1,4 +1,4 @@
-import { Host } from '@/app/room/types/studentType'
+import { Host } from '@/app/scenario/room/types/studentType'
 import CrownIcon from '/public/icons/crown.svg'
 import Image from 'next/image'
 
