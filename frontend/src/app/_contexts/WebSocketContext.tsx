@@ -1,6 +1,12 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { Client, Frame } from '@stomp/stompjs'
 
 interface WebSocketContextProps {
@@ -16,7 +22,7 @@ const WebSocketContext = createContext<WebSocketContextProps | undefined>(
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [client, setClient] = useState<Client | null>(null)
+  const clientRef = useRef<Client | null>(null)
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
@@ -52,28 +58,34 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     initializeClient()
-      .then((wsClient) => setClient(wsClient))
+      .then((wsClient) => {
+        clientRef.current = wsClient
+      })
       .catch((error) =>
         console.error('WebSocket initialization failed:', error),
       )
 
     return () => {
-      if (client) {
-        client.deactivate().then(() => console.log('WebSocket 연결 해제 완료'))
+      if (clientRef.current) {
+        clientRef.current
+          .deactivate()
+          .then(() => console.log('WebSocket 연결 해제 완료'))
       }
     }
   }, [])
 
-  const sendMessage = async (destination: string, body: string) => {
-    if (client && client.connected) {
-      client.publish({ destination, body })
+  const sendMessage = (destination: string, body: string) => {
+    if (clientRef.current && clientRef.current.connected) {
+      clientRef.current.publish({ destination, body })
     } else {
       console.warn('STOMP client is not connected')
     }
   }
 
   return (
-    <WebSocketContext.Provider value={{ client, isConnected, sendMessage }}>
+    <WebSocketContext.Provider
+      value={{ client: clientRef.current, isConnected, sendMessage }}
+    >
       {children}
     </WebSocketContext.Provider>
   )
