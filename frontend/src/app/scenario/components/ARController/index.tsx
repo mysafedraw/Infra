@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -27,18 +27,31 @@ export default function ARController({
   const markerRoot = useRef(new THREE.Group())
   const markerControls = useRef<any>(null)
 
+  const onResize = useCallback(() => {
+    if (arSource.current) {
+      arSource.current.onResizeElement()
+      arSource.current.copyElementSizeTo(gl.domElement)
+      if (arContext.current?.arController !== null) {
+        arSource.current.copyElementSizeTo(
+          arContext.current.arController.canvas,
+        )
+      }
+    }
+  }, [gl])
+
   useEffect(() => {
     let isMarkerVisible = false
 
     const initAR = async () => {
+      // eslint-disable-next-line import/extensions
       const AR = await import('@ar-js-org/ar.js/three.js/build/ar-threex.js')
       const THREEx: any = AR.default || AR
 
       // AR 소스 설정
       arSource.current = new THREEx.ArToolkitSource({
         sourceType: 'webcam',
-        sourceWidth: 640,
-        sourceHeight: 480,
+        sourceWidth: 1280,
+        sourceHeight: 720,
         displayWidth: window.innerWidth,
         displayHeight: window.innerHeight,
         constraints: {
@@ -114,18 +127,6 @@ export default function ARController({
       }
     }
 
-    const onResize = () => {
-      if (arSource.current) {
-        arSource.current.onResizeElement()
-        arSource.current.copyElementSizeTo(gl.domElement)
-        if (arContext.current?.arController !== null) {
-          arSource.current.copyElementSizeTo(
-            arContext.current.arController.canvas,
-          )
-        }
-      }
-    }
-
     initAR()
 
     // 리사이즈 이벤트 리스너
@@ -136,7 +137,15 @@ export default function ARController({
       window.removeEventListener('resize', onResize)
       window.removeEventListener('orientationchange', onResize)
     }
-  }, [camera, gl, markerUrl, cameraParamsUrl, onMarkerFound, onMarkerLost])
+  }, [
+    camera,
+    gl,
+    markerUrl,
+    cameraParamsUrl,
+    onMarkerFound,
+    onMarkerLost,
+    onResize,
+  ])
 
   // AR 업데이트 프레임
   useFrame(() => {

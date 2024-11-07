@@ -6,9 +6,9 @@ export default function CharacterDialogue({
   speechText: string
 }) {
   return (
-    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-      <div className="flex items-end">
-        <div className="relative inline-block py-3 px-10 w-11/12 bg-white border-4 border-primary-600 rounded-3xl shadow-md z-50">
+    <div className="absolute bottom-2 left-6 right-6">
+      <div className="flex items-end max-w-5xl mx-auto">
+        <div className="relative inline-block py-8 mb-7 mr-4 px-10 w-full bg-white border-4 border-primary-600 rounded-3xl shadow-md z-50">
           <p className="text-3xl text-gray-800">{speechText}</p>
           <div className="absolute right-[-11px] top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-t-4 border-r-4 border-primary-600 rotate-45"></div>
         </div>
