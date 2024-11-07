@@ -43,19 +43,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const roomNumber = '859338'
   const nickname = '유경'
 
-  const {
-    client,
-    isConnected,
-    sendMessage: sendWebSocketMessage,
-  } = useWebSocketContext()
+  const { sendMessage: sendWebSocketMessage, registerCallback } =
+    useWebSocketContext()
 
   const addMessage = (message: ChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message])
   }
 
   const handleReceivedMessage = useCallback(
-    (message: string) => {
-      const parsedMessage = JSON.parse(message)
+    (parsedMessage: {
+      senderId: string
+      nickname: string
+      content: string
+      sentAt: string
+    }) => {
       if (parsedMessage.senderId === userId) return
 
       setMessages((prevMessages) => [
@@ -72,20 +73,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     [userId],
   )
 
-  // WebSocket 연결 후 메시지 구독
   useEffect(() => {
-    if (client && isConnected) {
-      const subscription = client.subscribe(
-        `/chat/${roomNumber}`,
-        (message) => {
-          handleReceivedMessage(message.body)
-        },
-      )
-      return () => {
-        subscription.unsubscribe()
-      }
-    }
-  }, [client, handleReceivedMessage, isConnected])
+    // 콜백을 /chat/${roomNumber} 채널에 대해 등록
+    registerCallback(
+      `/chat/${roomNumber}`,
+      'CHAT_MESSAGE',
+      handleReceivedMessage,
+    )
+  }, [registerCallback, roomNumber, handleReceivedMessage])
 
   const handleSendMessage = (content: string) => {
     const newMessage = {
