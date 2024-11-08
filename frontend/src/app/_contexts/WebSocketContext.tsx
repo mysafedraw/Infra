@@ -30,8 +30,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const clientRef = useRef<Client | null>(null)
   const [isConnected, setIsConnected] = useState(false)
-  const [roomNumber, setRoomNumber] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
 
   // 콜백 함수를 저장할 객체
   const callbackRegistry = useRef<{
@@ -58,13 +56,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   useEffect(() => {
-    // 클라이언트 사이드에서만 localStorage 접근
-    setRoomNumber(localStorage.getItem('roomNumber'))
-    setUserId(localStorage.getItem('userId'))
-  }, [])
-
-  useEffect(() => {
     const initializeClient = async () => {
+      const roomNumber = localStorage.getItem('roomNumber')
+      const userId = localStorage.getItem('userId')
+
       return new Promise<Client>((resolve, reject) => {
         const wsClient = new Client({
           brokerURL: 'http://70.12.247.148:8080/ws-stomp',
