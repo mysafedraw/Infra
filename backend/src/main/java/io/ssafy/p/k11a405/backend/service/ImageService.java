@@ -26,6 +26,8 @@ import java.util.UUID;
 @Slf4j
 public class ImageService {
 
+    private final String drawSrcField = "drawingSrc";
+
     private final StringRedisTemplate stringRedisTemplate;
     private final AmazonS3 amazonS3;
 
@@ -37,7 +39,7 @@ public class ImageService {
         // 실제로는 이미지를 저장하고, 그 경로를 가져와야 한다.
         String drawingSrc = "https://cdn.sortiraparis.com/images/1001/69688/1076636-venom-the-last-dance-le-dernier-chapitre-de-la-trilogie-marvel-avec-tom-hardy-se-devoile.jpg";
 
-        stringRedisTemplate.opsForHash().put(userKey, "drawingSrc", drawingSrc);
+        stringRedisTemplate.opsForHash().put(userKey, drawSrcField, drawingSrc);
     }
 
     private String uploadImage(MultipartFile image, String path) {

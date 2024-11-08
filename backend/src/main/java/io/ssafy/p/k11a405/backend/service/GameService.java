@@ -4,14 +4,17 @@ import io.ssafy.p.k11a405.backend.dto.*;
 import io.ssafy.p.k11a405.backend.dto.game.*;
 import io.ssafy.p.k11a405.backend.entity.DialogueSituation;
 import io.ssafy.p.k11a405.backend.entity.Dialogue;
-import io.ssafy.p.k11a405.backend.pubsub.MessagePublisher;
+import io.ssafy.p.k11a405.backend.exception.BusinessException;
+import io.ssafy.p.k11a405.backend.pubsub.GenericMessagePublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -19,26 +22,37 @@ import java.util.List;
 public class GameService {
 
     private final String redisKeyPrefix = "games:";
+    private final String idField = "id";
+    private final String isCorrectField = "isCorrect";
+    private final String nicknameField = "nickname";
+    private final String avatarProfileImgField = "avatarProfileImg";
+    private final String drawSrcField = "drawingSrc";
 
-    private final MessagePublisher messagePublisher;
+    private final GenericMessagePublisher genericMessagePublisher;
     private final StringRedisTemplate stringRedisTemplate;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     private final DialogueService dialogueService;
+    private final ScenarioService scenarioService;
 
     public void startGame(StartGameRequestDTO startGameRequestDTO) {
-        String channelName = redisKeyPrefix + "start:" + startGameRequestDTO.roomId();
+        String channelName = redisKeyPrefix + startGameRequestDTO.roomId() + ":start";
         // db에서 scenarioDialog 가져오기
         Integer stageNumber = startGameRequestDTO.stageNumber();
         String situationTag = ScenarioType.SITUATION.getKoreanName();
         Dialogue dialogue = dialogueService.findScenarioByStageAndSituation(stageNumber, situationTag);
         DialogueSituation dialogueSituation = dialogue.getDialogues().get(0);
+        clearRoomStatus(startGameRequestDTO.roomId());
 
         StartGameResponseDTO startGameResponseDTO = new StartGameResponseDTO(dialogueSituation.getSituationDialogue(), GameAction.GAME_START);
-        messagePublisher.publish(channelName, startGameResponseDTO);
+        genericMessagePublisher.publishString(channelName, startGameResponseDTO);
     }
 
     public void addToExplanationQueue(ExplainRequestDTO explainRequestDTO) {
-        String channelName = redisKeyPrefix + explainRequestDTO.roomId();
+        if (correctUser(explainRequestDTO.userId())) {
+            return;
+        }
+        String channelName = redisKeyPrefix + explainRequestDTO.roomId() + ":explainQueue";
         String enqueuedKey = redisKeyPrefix + explainRequestDTO.roomId() + ":enqueued";
         String queueKey = redisKeyPrefix + explainRequestDTO.roomId() + ":explanationQueue";
 
@@ -53,8 +67,9 @@ public class GameService {
         stringRedisTemplate.opsForSet().add(enqueuedKey, explainRequestDTO.userId());
         stringRedisTemplate.opsForList().rightPush(queueKey, explainRequestDTO.userId());
         List<String> userIds = stringRedisTemplate.opsForList().range(queueKey, 0, -1);
-        ExplainResponseDTO explainResponseDTO = new ExplainResponseDTO(userIds, GameAction.ADD_EXPLAIN_QUEUE);
-        messagePublisher.publish(channelName, explainResponseDTO);
+        List<AnswerStatusResponseDTO> answerStatuses = userIds.stream().map(this::getUserAnswerStatus).toList();
+        ExplainResponseDTO explainResponseDTO = new ExplainResponseDTO(answerStatuses, GameAction.ADD_EXPLAIN_QUEUE);
+        genericMessagePublisher.publishString(channelName, explainResponseDTO);
     }
 
     public void haveASay(HaveASayRequestDTO haveASayRequestDTO) {
@@ -63,40 +78,50 @@ public class GameService {
         String userId = stringRedisTemplate.opsForList().leftPop(queueKey);
         List<String> userIds = stringRedisTemplate.opsForList().range(queueKey, 0, -1);
         HaveASayResponseDTO haveASayResponseDTO = new HaveASayResponseDTO(userId, userIds, GameAction.HAVE_A_SAY);
-        messagePublisher.publish(channelName, haveASayResponseDTO);
+        genericMessagePublisher.publishString(channelName, haveASayResponseDTO);
     }
 
-    public void checkAllAnswers(CheckAllAnswersRequestDTO checkAllAnswersRequestDTO) {
+    public void checkAllAnswers(String roomId) {
+        // 각 유저의 정답을 담아야 한다. 1. 유저 아이디 리스트 조회 2. 유저 아이디에 맞는 이미지 생성
+        String userKey = "rooms:" + roomId + ":users";
+        Set<String> userIds = stringRedisTemplate.opsForZSet().range(userKey, 0, -1);
         List<AnswerStatusResponseDTO> answerStatuses = new ArrayList<>();
-        answerStatuses.add(AnswerStatusResponseDTO.builder()
-                        .avatarsImgSrc("https://cdn.inflearn.com/public/main/profile/default_profile.png")
-                        .drawSrc("https://cdn.inflearn.com/public/main_sliders/1c333cda-3dcf-46c4-be01-46b6f99ae750/I_O_python_1.png")
-                        .isCorrect(true)
-                        .nickname("하이")
-                        .userId("userID")
-                .build());
+        userIds.stream().map(this::getUserAnswerStatus).forEach(answerStatuses::add);
+//        List<AnswerStatusResponseDTO> answerStatuses = userIds.stream().map(this::getUserAnswerStatus).toList();
+
         CheckAllAnswersResponseDTO checkAllAnswersResponseDTO = new CheckAllAnswersResponseDTO(answerStatuses, GameAction.CHECK_ALL_ANSWERS);
-        String channelName = redisKeyPrefix + checkAllAnswersRequestDTO.roomId();
-        messagePublisher.publish(channelName, checkAllAnswersResponseDTO);
+        String channelName = redisKeyPrefix + roomId + ":allAnswers";
+        genericMessagePublisher.publishString(channelName, checkAllAnswersResponseDTO);
     }
 
-    public void checkAnswer(String roomId, String userId, String scenarioId, String userAnswer) {
+    public void checkAnswer(String roomId, String userId, Integer scenarioId, String userAnswer, Integer stageNumber) {
         // 정답 체크
+        AnswerStatus answerStatus;
+        try {
+            Boolean isCorrect = scenarioService.findAssetValidations(stageNumber, userAnswer, scenarioId);
+            answerStatus = AnswerStatus.getAnswerStatus(isCorrect);
+        } catch (BusinessException e) {
+            answerStatus = AnswerStatus.INCORRECT_ANSWER;
+        }
 
         // 유저 정답 여부 redis 저장
         String userKey = "user:" + userId;
-        stringRedisTemplate.opsForHash().put(userKey, "isCorrect", true);
+        stringRedisTemplate.opsForHash().put(userKey, isCorrectField, answerStatus);
 
-        // 해당 유저에게 정답 여부 전송
-        String channelName = "rooms:" + userId + ":" + "users";
-        messagePublisher.publish(channelName, new CheckAnswerResponseDTO(userId, true));
+        InGameResponseDTO inGameResponseDTO = InGameResponseDTO.builder()
+                .userId(userId)
+                .isCorrect(answerStatus)
+                .action(GameAction.CHECK_ANSWER)
+                .build();
+        // 해당 유저에게 다이렉트로 정답 여부 전송
+        simpMessagingTemplate.convertAndSend("/games/" + userId, inGameResponseDTO);
     }
 
     public void vote(String roomId, boolean isAgreed, String userId) {
         // 방장 아이디 가져오기
         String hostId = "123123";
         String channelName = "rooms:" + hostId + ":users";
-        messagePublisher.publish(channelName, new VoteResponseDTO(userId, isAgreed));
+        genericMessagePublisher.publishString(channelName, new VoteResponseDTO(userId, isAgreed, GameAction.VOTE));
     }
 
     public void confirmAnswer(String userId, boolean isConfirmed, String roomId) {
@@ -110,6 +135,38 @@ public class GameService {
         // 방장 id 가져오기
         String hostId = "hostId";
         String channelName = "rooms:" + hostId + ":users";
-        messagePublisher.publish(channelName, confirmResponseDTO);
+        genericMessagePublisher.publishString(channelName, confirmResponseDTO);
+    }
+
+    private AnswerStatusResponseDTO getUserAnswerStatus(String userId) {
+        String key = "user:" + userId;
+        String nickname = String.valueOf(stringRedisTemplate.opsForHash().get(key, nicknameField));
+        AnswerStatus isCorrect = AnswerStatus.valueOf(String.valueOf(stringRedisTemplate.opsForHash().get(key, isCorrectField)));
+        String drawingSrc = String.valueOf(stringRedisTemplate.opsForHash().get(key, drawSrcField));
+        String avatarsImgSrc = String.valueOf(stringRedisTemplate.opsForHash().get(key, avatarProfileImgField));
+
+        return AnswerStatusResponseDTO.builder()
+                .userId(userId)
+                .nickname(nickname)
+                .isCorrect(isCorrect)
+                .drawingSrc(drawingSrc)
+                .avatarsImgSrc(avatarsImgSrc)
+                .build();
+    }
+
+    private boolean correctUser(String userId) {
+        String key = "user:" + userId;
+        AnswerStatus isCorrect = AnswerStatus.valueOf(String.valueOf(stringRedisTemplate.opsForHash().get(key, isCorrectField)));
+        return AnswerStatus.CORRECT_ANSWER.equals(isCorrect);
+    }
+
+    private void clearRoomStatus(String roomId) {
+        String enqueuedKey = redisKeyPrefix + roomId + ":enqueued";
+        String queueKey = redisKeyPrefix + roomId + ":explanationQueue";
+
+        ArrayList<String> keys = new ArrayList<>();
+        keys.add(enqueuedKey);
+        keys.add(queueKey);
+        stringRedisTemplate.delete(keys);
     }
 }

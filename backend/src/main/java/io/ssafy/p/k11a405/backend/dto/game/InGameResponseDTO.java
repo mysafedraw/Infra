@@ -1,7 +1,10 @@
 package io.ssafy.p.k11a405.backend.dto.game;
 
-public record VoteResponseDTO(
+import lombok.Builder;
+
+@Builder
+public record InGameResponseDTO(
         String userId,
-        boolean isAgreed,
+        AnswerStatus isCorrect,
         GameAction action
 ) {}
