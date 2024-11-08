@@ -66,7 +66,7 @@ export default function Room() {
     if (roomNumber && isConnected) {
       handleJoinRoom()
     }
-  }, [isConnected, roomNumber])
+  }, [isConnected, roomNumber, handleJoinRoom])
 
   if (!roomData) {
     return <LoadingScreen />

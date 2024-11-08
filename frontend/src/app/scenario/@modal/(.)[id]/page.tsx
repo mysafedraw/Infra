@@ -3,14 +3,11 @@
 import RoomActionButton from '@/app/scenario/components/RoomActionButton'
 import { useRouter } from 'next/navigation'
 import BackArrowIcon from '/public/icons/back-arrow.svg'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 
 export default function Scenario() {
   const router = useRouter()
-
-  // 방 만들기
-  const handleCreateRoom = () => {
-    fetchCreateRoom()
-  }
+  const { isConnected } = useWebSocketContext()
 
   const fetchCreateRoom = async () => {
     try {
@@ -20,7 +17,7 @@ export default function Scenario() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          hostId: '92dd8b5e-1245-4f93-a0fd-a1842b7f62fb',
+          hostId: 'a8861570-eb52-488f-9138-d8970c38ae86',
         }),
       })
 
@@ -32,6 +29,13 @@ export default function Scenario() {
       }
     } catch (error) {
       console.error('방 생성 중 오류 발생:', error)
+    }
+  }
+
+  // 방 만들기
+  const handleCreateRoom = () => {
+    if (isConnected) {
+      fetchCreateRoom()
     }
   }
 
@@ -56,7 +60,7 @@ export default function Scenario() {
         <RoomActionButton
           bgColor="bg-primary-500"
           label={'방 접속하기'}
-          onClick={() => router.push('enter')}
+          onClick={() => router.push('/scenario/1/enter')}
         />
       </div>
     </div>

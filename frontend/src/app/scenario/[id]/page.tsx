@@ -3,14 +3,11 @@
 import RoomActionButton from '@/app/scenario/components/RoomActionButton'
 import { useRouter } from 'next/navigation'
 import BackArrowIcon from '/public/icons/back-arrow.svg'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 
 export default function Scenario() {
   const router = useRouter()
-
-  // 방 만들기
-  const handleCreateRoom = () => {
-    fetchCreateRoom()
-  }
+  const { isConnected } = useWebSocketContext()
 
   const fetchCreateRoom = async () => {
     try {
@@ -32,6 +29,13 @@ export default function Scenario() {
       }
     } catch (error) {
       console.error('방 생성 중 오류 발생:', error)
+    }
+  }
+
+  // 방 만들기
+  const handleCreateRoom = () => {
+    if (isConnected) {
+      fetchCreateRoom()
     }
   }
 

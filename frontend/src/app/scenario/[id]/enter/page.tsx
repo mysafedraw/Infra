@@ -12,6 +12,11 @@ export default function Enter() {
     setRoomId(e.target.value)
 
   const handleMove = async () => {
+    if (!roomId.trim()) {
+      alert('방 코드를 입력해주세요.')
+      return
+    }
+
     router.push(`/scenario/1/room/${roomId}`)
   }
 
