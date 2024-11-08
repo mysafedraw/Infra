@@ -6,9 +6,10 @@ from flask import Flask, request, jsonify, render_template
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # 모델 로드
 model = load_model('model.h5')
@@ -16,7 +17,9 @@ model = load_model('model.h5')
 label_encoder = LabelEncoder()
 label_encoder.classes_ = np.load('classes.npy', allow_pickle=True)  # 클래스 저장 및 로드
 
-max_timesteps = 100
+#max_timesteps = 150
+max_timesteps = 200
+
 
 def preprocess_drawing(drawing):
     strokes = []
@@ -75,4 +78,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
