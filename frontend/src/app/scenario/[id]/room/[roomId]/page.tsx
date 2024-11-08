@@ -24,28 +24,40 @@ export default function Room() {
   const { roomId } = useParams()
   const roomNumber = Array.isArray(roomId) ? roomId[0] : roomId
   const userId = '32e93a63-2c89-4f8a-8c6c-c0ef50054906'
-  const { client, isConnected, sendMessage, registerCallback } =
-    useWebSocketContext()
+  const { client, isConnected, sendMessage } = useWebSocketContext()
 
-  const [roomData, setRoomData] = useState<RoomResponse | null>(null)
-
-  const subscribeRequest = {
-    userId: userId,
-    roomId: roomNumber,
-  }
+  const [roomData, setRoomData] = useState<RoomResponse>()
+  const [isInitialized, setIsInitialized] = useState(false)
 
   // 방 입장
   const handleJoinRoom = () => {
-    client?.subscribe(`/rooms/join`, (message) => {
-      const response = JSON.parse(message.body)
-      console.log('방 입장 응답:', response)
+    if (!client?.connected || !roomNumber) return
 
-      // localStorage 저장
-      localStorage.setItem('roomNumber', roomNumber)
-      localStorage.setItem('userId', userId)
-    })
+    try {
+      // 방 데이터 구독
+      client.subscribe(`/rooms/${roomNumber}`, (message) => {
+        const response = JSON.parse(message.body)
+        if (response.action === 'ENTER_ROOM') {
+          handleReceivedMessage(response)
+        }
 
-    sendMessage(`/rooms/join`, JSON.stringify(subscribeRequest))
+        // localStorage 저장
+        localStorage.setItem('roomNumber', roomNumber)
+        localStorage.setItem('userId', userId)
+      })
+
+      const subscribeRequest = {
+        userId: userId,
+        roomId: roomNumber,
+      }
+
+      // 방 입장 요청 전송
+      sendMessage(`/rooms/join`, JSON.stringify(subscribeRequest))
+
+      setIsInitialized(true)
+    } catch (error) {
+      console.error('방 초기화 중 오류 발생:', error)
+    }
   }
 
   const handleReceivedMessage = (message: RoomResponse) => {
@@ -53,22 +65,14 @@ export default function Room() {
     setRoomData(message)
   }
 
-  useEffect(() => {
-    registerCallback(
-      `/rooms/${roomNumber}`,
-      'ENTER_ROOM',
-      handleReceivedMessage,
-    )
-  }, [registerCallback, roomNumber])
-
   // 방 입장
   useEffect(() => {
-    if (roomNumber && isConnected) {
+    if (isConnected && !isInitialized) {
       handleJoinRoom()
     }
-  }, [isConnected, roomNumber, handleJoinRoom])
+  }, [isConnected, isInitialized])
 
-  if (!roomData) {
+  if (!roomData || !isInitialized) {
     return <LoadingScreen />
   }
 
