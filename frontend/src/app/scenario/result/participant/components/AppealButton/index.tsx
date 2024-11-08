@@ -10,9 +10,9 @@ export default function AppealButton() {
 
   const handleAppeal = () => {
     const message = JSON.stringify({ roomId, userId })
-
     sendMessage('/games/explanation-queue', message)
   }
+
   return (
     <button
       onClick={handleAppeal}

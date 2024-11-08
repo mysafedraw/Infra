@@ -16,6 +16,7 @@ interface WebSocketContextProps {
   registerCallback: (
     destination: string,
     action: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     callback: (message: any) => void,
   ) => void
 }
@@ -127,7 +128,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const registerCallback = (
     destination: string,
     action: string,
-    callback: (message: unknown) => void,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callback: (message: any) => void,
   ) => {
     if (!callbackRegistry.current[destination]) {
       callbackRegistry.current[destination] = {}
