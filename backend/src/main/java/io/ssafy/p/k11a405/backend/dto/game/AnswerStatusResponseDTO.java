@@ -6,8 +6,8 @@ import lombok.Builder;
 public record AnswerStatusResponseDTO(
         String userId,
         String nickname,
-        boolean isCorrect,
-        String drawSrc,
+        AnswerStatus isCorrect,
+        String drawingSrc,
         String avatarsImgSrc
 ) {
 }
