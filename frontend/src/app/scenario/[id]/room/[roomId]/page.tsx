@@ -27,7 +27,7 @@ export default function Room() {
   const { client, isConnected, sendMessage, registerCallback } =
     useWebSocketContext()
 
-  const [roomData, setRoomData] = useState<RoomResponse>()
+  const [roomData, setRoomData] = useState<RoomResponse | null>(null)
 
   const subscribeRequest = {
     userId: userId,
@@ -59,7 +59,7 @@ export default function Room() {
       'ENTER_ROOM',
       handleReceivedMessage,
     )
-  }, [registerCallback, roomId])
+  }, [registerCallback, roomNumber])
 
   // 방 입장
   useEffect(() => {
