@@ -54,7 +54,7 @@ export default function AllAnswers() {
       sendMessage(
         '/games/answers',
         JSON.stringify({
-          roomNumber,
+          roomId: roomNumber,
         }),
       )
     }
