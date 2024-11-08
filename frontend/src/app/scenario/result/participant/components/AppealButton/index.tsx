@@ -1,12 +1,18 @@
 'use client'
 
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useEffect, useState } from 'react'
 
 export default function AppealButton() {
   const { sendMessage } = useWebSocketContext()
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
-  const roomId = localStorage.getItem('roomNumber')
-  const userId = localStorage.getItem('userId')
+  useEffect(() => {
+    // 클라이언트 사이드에서만 실행되도록 `useEffect` 안에서 `localStorage`에 접근
+    setRoomId(localStorage.getItem('roomNumber'))
+    setUserId(localStorage.getItem('userId'))
+  }, [])
 
   const handleAppeal = () => {
     const message = JSON.stringify({ roomId, userId })

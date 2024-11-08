@@ -27,7 +27,8 @@ interface AddExplainQueueMessage {
 
 export default function WaitingQueue() {
   const [waitingData, setWaitingData] = useState<AnswerData[]>([])
-  const roomId = localStorage.getItem('roomNumber')
+  const [roomNumber, setRoomNumber] = useState<string | null>(null)
+
   const { registerCallback } = useWebSocketContext()
 
   const handleReceivedMessage = (message: AddExplainQueueMessage) => {
@@ -42,13 +43,18 @@ export default function WaitingQueue() {
   }
 
   useEffect(() => {
+    // 클라이언트 사이드에서만 localStorage 접근
+    setRoomNumber(localStorage.getItem('roomNumber'))
+  }, [])
+
+  useEffect(() => {
     // ADD_EXPLAIN_QUEUE action에 대한 콜백 등록
     registerCallback(
-      `/games/${roomId}`,
+      `/games/${roomNumber}`,
       'ADD_EXPLAIN_QUEUE',
       handleReceivedMessage,
     )
-  }, [registerCallback, roomId])
+  }, [registerCallback, roomNumber])
 
   return (
     <button className="flex gap-x-6 w-full overflow-x-auto overflow-y-hidden mt-4 ps-1">
