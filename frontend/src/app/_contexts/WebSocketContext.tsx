@@ -7,12 +7,18 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Client, Frame } from '@stomp/stompjs'
+import { Client, Frame, Message } from '@stomp/stompjs'
 
 interface WebSocketContextProps {
   client: Client | null
   isConnected: boolean
   sendMessage: (destination: string, body: string) => void
+  registerCallback: (
+    destination: string,
+    action: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callback: (message: any) => void,
+  ) => void
 }
 
 const WebSocketContext = createContext<WebSocketContextProps | undefined>(
@@ -24,6 +30,30 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const clientRef = useRef<Client | null>(null)
   const [isConnected, setIsConnected] = useState(false)
+
+  // 콜백 함수를 저장할 객체
+  const callbackRegistry = useRef<{
+    [destination: string]: { [action: string]: (message: Message) => void }
+  }>({})
+
+  const handleMessage = (message: Message) => {
+    const parsedMessage = JSON.parse(message.body)
+    const destination = message.headers.destination
+    const action = parsedMessage.action
+
+    // 등록된 콜백 실행
+    if (
+      destination &&
+      action &&
+      callbackRegistry.current[destination]?.[action]
+    ) {
+      callbackRegistry.current[destination][action](parsedMessage)
+    } else {
+      console.warn(
+        `등록된 콜백이 없습니다: destination=${destination}, action=${action}`,
+      )
+    }
+  }
 
   useEffect(() => {
     const initializeClient = async () => {
@@ -39,12 +69,25 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         wsClient.onConnect = (frame: Frame) => {
           console.log('WebSocket 연결 성공:', frame)
           setIsConnected(true)
+
+          const roomNumber = localStorage.getItem('roomNumber')
+          const userId = localStorage.getItem('userId')
+
+          if (roomNumber && userId) {
+            // 단일 구독 설정
+            wsClient.subscribe(`/games/${roomNumber}`, handleMessage)
+            wsClient.subscribe(`/chat/${roomNumber}`, handleMessage)
+            wsClient.subscribe(`/games/${userId}`, handleMessage)
+            wsClient.subscribe(`/rooms/${roomNumber}`, handleMessage)
+          } else {
+            console.warn('roomNumber 또는 userId가 localStorage에 없습니다.')
+          }
+
           resolve(wsClient)
         }
 
         wsClient.onStompError = (frame) => {
           console.error('STOMP Error:', frame.headers.message)
-          console.log('Additional details: ' + frame.body)
           reject(new Error('STOMP connection error'))
         }
 
@@ -82,9 +125,26 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
+  const registerCallback = (
+    destination: string,
+    action: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callback: (message: any) => void,
+  ) => {
+    if (!callbackRegistry.current[destination]) {
+      callbackRegistry.current[destination] = {}
+    }
+    callbackRegistry.current[destination][action] = callback
+  }
+
   return (
     <WebSocketContext.Provider
-      value={{ client: clientRef.current, isConnected, sendMessage }}
+      value={{
+        client: clientRef.current,
+        isConnected,
+        sendMessage,
+        registerCallback,
+      }}
     >
       {children}
     </WebSocketContext.Provider>

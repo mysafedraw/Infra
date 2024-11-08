@@ -3,6 +3,7 @@ import VolumeMicIcon from '@/app/scenario/result/components/VolumeMicIcon'
 import SpeakingRightsToast from '@/app/scenario/result/participant/components/SpeakingRightsToast'
 import VotingSidebar from '@/app/scenario/result/components/VotingSidebar'
 import AllAnswers from '@/app/scenario/result/components/AllAnswers'
+import AppealButton from '@/app/scenario/result/participant/components/AppealButton'
 
 export default function ScenarioResultParticipant() {
   return (
@@ -25,12 +26,7 @@ export default function ScenarioResultParticipant() {
           <VolumeMicIcon />
         </div>
       </div>
-      <button className="bg-secondary-50 border-2 border-secondary-500 w-full py-3 rounded-xl">
-        <p className="text-3xl">억울해요 😢</p>
-        <p className="text-xl">
-          차례가 되면 마이크를 켜고 의견을 이야기할 수 있어요
-        </p>
-      </button>
+      <AppealButton />
       <AllAnswers />
 
       <VotingSidebar role="participant" />

@@ -1,43 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import ExplainQueueBoard from '@/app/scenario/result/host/components/ExplainQueueBoard'
 import VotingSidebar from '@/app/scenario/result/components/VotingSidebar'
 import VotingResult from '@/app/scenario/result/host/components/VotingResult'
 import { useState } from 'react'
 import AllAnswers from '@/app/scenario/result/components/AllAnswers'
-
-interface AnswerData {
-  id: number
-  isCorrect: boolean
-  nickname: string
-  characterImage: string
-  drawingImage: string
-}
-
-const waitingData: AnswerData[] = [
-  {
-    id: 1,
-    isCorrect: false,
-    nickname: '이구역그림짱은나야',
-    characterImage: '/images/tiger.png',
-    drawingImage: '/images/drawing.png',
-  },
-  {
-    id: 6,
-    isCorrect: false,
-    nickname: '아가주호',
-    characterImage: '/images/rabbit.png',
-    drawingImage: '/images/drawing.png',
-  },
-  {
-    id: 7,
-    isCorrect: false,
-    nickname: 'hand given tiger',
-    characterImage: '/images/tiger.png',
-    drawingImage: '/images/drawing.png',
-  },
-]
+import WaitingQueue from '@/app/scenario/result/host/components/WaitingQueue'
 
 export default function ScenarioResultHost() {
   const [isVotingResultVisible, setIsVotingResultVisible] = useState(true)
@@ -75,11 +43,7 @@ export default function ScenarioResultHost() {
       <div className="-ml-6 mr-auto bg-wood bg-cover w-72 py-3 pr-5 text-right text-4xl text-white rounded-r-lg shadow-lg">
         발언 대기 목록
       </div>
-      <button className="flex gap-x-6 w-full overflow-x-auto overflow-y-hidden mt-4 ps-1">
-        {waitingData.map((data) => (
-          <ExplainQueueBoard key={data.id} data={data} />
-        ))}
-      </button>
+      <WaitingQueue />
 
       <div className="-ml-6 mr-auto mt-6 bg-wood bg-cover w-72 py-3 pr-5 text-right text-4xl text-white rounded-r-lg shadow-lg mb-4">
         전체 답변
