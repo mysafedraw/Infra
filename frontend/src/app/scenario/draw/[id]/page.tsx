@@ -1,10 +1,9 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import DrawingBoard from '@/app/scenario/draw/components/DrawingBoard'
 import DrawTimer from '@/app/scenario/draw/components/DrawTimer'
 import Image from 'next/image'
-import ProgressBarTimer from '@/app/scenario/draw/components/ProgressBarTimer'
 import QuestionBubble from '@/app/scenario/draw/components/QuestionBubble'
 import { DRAW_TYPES } from '@/app/_constants/draw'
 import CommonToast from '@/app/_components/CommonToast'
