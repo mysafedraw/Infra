@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Image from 'next/image'
-import { Student } from '@/app/scenario/room/types/studentType'
+import { Student } from '@/app/scenario/[id]/room/types/studentType'
 import RightArrowIcon from '/public/icons/rounded-right-arrow.svg'
 import LeftArrowIcon from '/public/icons/rounded-left-arrow.svg'
 
@@ -10,6 +10,8 @@ export default function StudentGroup({ students }: { students: Student[] }) {
   const [currentPage, setCurrentPage] = useState(0)
   const totalPages = Math.ceil(students.length / STUDENTS_PER_PAGE)
   const startIndex = currentPage * STUDENTS_PER_PAGE
+
+  const userId = localStorage.getItem('userId')
 
   const gridSlots = Array(STUDENTS_PER_PAGE)
     .fill(null)
@@ -35,7 +37,7 @@ export default function StudentGroup({ students }: { students: Student[] }) {
               key={student.userId}
               className={`
               flex flex-col items-center p-4 rounded-lg shadow-md h-44 text-text
-              ${student.userId === 'player001' ? 'bg-primary-600' : 'bg-white'}
+              ${student.userId === userId ? 'bg-primary-600' : 'bg-white'}
             `}
             >
               <p className="text-xl font-bold text-text select-none">
@@ -43,7 +45,11 @@ export default function StudentGroup({ students }: { students: Student[] }) {
               </p>
               <div className="relative w-40 h-40 mt-auto overflow-hidden">
                 <Image
-                  src="/images/rabbit.png"
+                  src={
+                    student.avatarsImg !== 'null'
+                      ? student.avatarsImg
+                      : '/images/rabbit.png'
+                  }
                   alt={student.nickname}
                   fill
                   className="object-contain scale-125 translate-y-5"

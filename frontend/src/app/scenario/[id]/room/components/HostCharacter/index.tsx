@@ -1,4 +1,4 @@
-import { Host } from '@/app/scenario/room/types/studentType'
+import { Host } from '@/app/scenario/[id]/room/types/studentType'
 import CrownIcon from '/public/icons/crown.svg'
 import Image from 'next/image'
 
@@ -11,7 +11,9 @@ export default function HostCharacter({ host }: { host: Host }) {
       </div>
       <div className="flex flex-col items-center">
         <Image
-          src="/images/tiger.png"
+          src={
+            host.avatarsImg !== 'null' ? host.avatarsImg : '/images/rabbit.png'
+          }
           alt="teacher"
           width={200}
           height={200}

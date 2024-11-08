@@ -30,7 +30,7 @@ export default function CommonToast({
     }, duration)
 
     return () => clearTimeout(timer)
-  }, [duration])
+  }, [duration, handleDurationEnd])
 
   if (!isVisible) return null
 
