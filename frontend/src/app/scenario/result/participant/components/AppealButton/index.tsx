@@ -14,10 +14,10 @@ export default function AppealButton() {
     setRoomId(localStorage.getItem('roomNumber'))
     setUserId(localStorage.getItem('userId'))
 
-    registerCallback('/games/explanation-queue', 'WAIT_TO_SPEAK', () => {
+    registerCallback(`/games/${roomId}`, 'ADD_EXPLAIN_QUEUE', () => {
       setIsWaiting(true)
     })
-  }, [registerCallback])
+  }, [registerCallback, roomId])
 
   const handleAppeal = () => {
     const message = JSON.stringify({ roomId, userId })
