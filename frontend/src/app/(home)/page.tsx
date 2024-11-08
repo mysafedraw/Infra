@@ -15,7 +15,7 @@ export interface Character {
 
 async function fetchCharacter(): Promise<Character[]> {
   try {
-    const response = await fetch(`http://70.12.247.148:8080/api/avatars/list`, {
+    const response = await fetch(`https://mysafedraw.site/api/avatars/list`, {
       method: 'GET',
       cache: 'no-store',
     })
