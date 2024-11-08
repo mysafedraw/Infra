@@ -2,42 +2,75 @@
 
 import Image from 'next/image'
 import ChatBox from '@/app/_components/ChatBox'
-import StudentGroup from '@/app/scenario/room/components/StudentGroup'
-import { Host, Student } from '@/app/scenario/room/types/studentType'
-import TimerSetting from '@/app/scenario/room/components/TimerSetting'
-import HostCharacter from '@/app/scenario/room/components/HostCharacter'
+import StudentGroup from '@/app/scenario/[id]/room/components/StudentGroup'
+import { Host, Student } from '@/app/scenario/[id]/room/types/studentType'
+import TimerSetting from '@/app/scenario/[id]/room/components/TimerSetting'
+import HostCharacter from '@/app/scenario/[id]/room/components/HostCharacter'
+import { useEffect, useState } from 'react'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useParams } from 'next/navigation'
+import LoadingScreen from '@/app/_components/LoadingScreen'
 
 interface RoomResponse {
-  userId: string
-  roomId: string
+  action: 'ENTER_ROOM'
   host: Host
   currentPlayers: Student[]
-}
-
-const mockData: RoomResponse = {
-  userId: 'user123',
-  roomId: 'room001',
-  host: {
-    userId: 'host001',
-    nickname: '2학년 1반 담임 권동원',
-  },
-  currentPlayers: [
-    { userId: 'player001', nickname: '2학년 1반 김지윤' },
-    { userId: 'player002', nickname: '2학년 1반 손준범' },
-    { userId: 'player003', nickname: '2학년 1반 이주호' },
-    { userId: 'player004', nickname: '2학년 1반 김혜인' },
-    { userId: 'player005', nickname: '2학년 1반 김유경' },
-    { userId: 'player006', nickname: '2학년 1반 김지윤' },
-    { userId: 'player007', nickname: '2학년 1반 손준범' },
-    { userId: 'player008', nickname: '2학년 1반 이주호' },
-    { userId: 'player009', nickname: '2학년 1반 김혜인' },
-    { userId: 'player010', nickname: '2학년 1반 김유경' },
-  ],
 }
 
 export default function Room() {
   const isHost = true
   const speech = '여러분, 화재 상황에 대해 \n잘 배워보아요 ^^'
+
+  const { roomId } = useParams()
+  const roomNumber = Array.isArray(roomId) ? roomId[0] : roomId
+  const userId = '32e93a63-2c89-4f8a-8c6c-c0ef50054906'
+  const { client, isConnected, sendMessage, registerCallback } =
+    useWebSocketContext()
+
+  const [roomData, setRoomData] = useState<RoomResponse>()
+
+  const subscribeRequest = {
+    userId: userId,
+    roomId: roomNumber,
+  }
+
+  // 방 입장
+  const handleJoinRoom = () => {
+    client?.subscribe(`/rooms/join`, (message) => {
+      const response = JSON.parse(message.body)
+      console.log('방 입장 응답:', response)
+
+      // localStorage 저장
+      localStorage.setItem('roomNumber', roomNumber)
+      localStorage.setItem('userId', userId)
+    })
+
+    sendMessage(`/rooms/join`, JSON.stringify(subscribeRequest))
+  }
+
+  const handleReceivedMessage = (message: RoomResponse) => {
+    console.log(message)
+    setRoomData(message)
+  }
+
+  useEffect(() => {
+    registerCallback(
+      `/rooms/${roomNumber}`,
+      'ENTER_ROOM',
+      handleReceivedMessage,
+    )
+  }, [registerCallback, roomId])
+
+  // 방 입장
+  useEffect(() => {
+    if (roomNumber && isConnected) {
+      handleJoinRoom()
+    }
+  }, [isConnected, roomNumber])
+
+  if (!roomData) {
+    return <LoadingScreen />
+  }
 
   return (
     <div className="w-full min-h-screen bg-secondary-500 p-6 flex flex-col">
@@ -55,7 +88,9 @@ export default function Room() {
         </div>
         {/* 참여 인원 */}
         <div className="bg-white px-6 py-1.5 rounded-lg border-2 border-primary-500">
-          <span className="text-4xl text-text">참여 인원: 9 / 30</span>
+          <span className="text-4xl text-text">
+            참여 인원: {roomData?.currentPlayers.length} / 30
+          </span>
         </div>
         {/* 게임 시작 (방장만) */}
         {isHost && (
@@ -88,7 +123,7 @@ export default function Room() {
           />
         </div>
         {/* 방장 캐릭터 */}
-        <HostCharacter host={mockData.host} />
+        <HostCharacter host={roomData?.host} />
         {!isHost && (
           <div className="-ml-16">
             <div className="relative bg-white p-6 rounded-2xl shadow-md">
@@ -119,7 +154,7 @@ export default function Room() {
       <div className="flex gap-6 flex-1">
         {/* 학생 목록 */}
         <div className="flex-1">
-          <StudentGroup students={mockData.currentPlayers} />
+          <StudentGroup students={roomData?.currentPlayers} />
         </div>
         {/* 채팅 */}
         <div className="w-[350px]">

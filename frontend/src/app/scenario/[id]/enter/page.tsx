@@ -12,9 +12,9 @@ export default function Enter() {
     setRoomId(e.target.value)
 
   const handleMove = async () => {
-    // 대기방 페이지로 이동
-    router.push(`/room/${roomId}`)
+    router.push(`/scenario/1/room/${roomId}`)
   }
+
   return (
     <div className="p-20 w-screen h-screen bg-secondary-500 flex flex-col">
       <h1 className="text-6xl text-white font-outline-2 text-center select-none">
