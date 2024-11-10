@@ -22,8 +22,10 @@ type EventType = React.MouseEvent | React.Touch | MouseEvent | Touch
 
 export default function DrawingBoard({
   onPrediction,
+  onDrawSubmit,
 }: {
   onPrediction: (prediction: DrawResponse) => void
+  onDrawSubmit: (getCanvas: () => string) => void
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -33,6 +35,15 @@ export default function DrawingBoard({
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
   const [strokes, setStrokes] = useState<Stroke[]>([])
   const [predictions, setPredictions] = useState<DrawResponse[]>([])
+
+  const getCanvasData = useCallback(() => {
+    if (!canvasRef.current) return ''
+    return canvasRef.current.toDataURL('image/png')
+  }, [])
+
+  useEffect(() => {
+    onDrawSubmit(getCanvasData)
+  }, [onDrawSubmit, getCanvasData])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -77,7 +88,7 @@ export default function DrawingBoard({
   // 마우스/터치 이벤트 좌표 -> 캔버스 좌표로 변환
   const predictDrawing = useCallback(async () => {
     try {
-      const response = await fetch('/api2/predict', {
+      const response = await fetch('https://mysafedraw.site/api2/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
