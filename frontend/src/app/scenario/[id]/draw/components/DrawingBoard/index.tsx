@@ -71,7 +71,7 @@ export default function DrawingBoard({
       ctx.scale(dpr, dpr)
 
       ctx.strokeStyle = '#000000'
-      ctx.lineWidth = 4
+      ctx.lineWidth = 8
       ctx.lineCap = 'round'
       setContext(ctx)
     }

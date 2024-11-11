@@ -9,6 +9,7 @@ import { DRAW_TYPES } from '@/app/_constants/draw'
 import CommonToast from '@/app/_components/CommonToast'
 import { useRouter } from 'next/navigation'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useUser } from '@/app/_contexts/UserContext'
 
 interface DrawResponse {
   label: string
@@ -32,6 +33,7 @@ export default function Draw() {
   const drawTime = 20
   const { sendMessage, registerCallback } = useWebSocketContext()
 
+  const { user } = useUser()
   const [roomId, setRoomId] = useState<string | null>(null)
   const [stageNumber, setStageNumber] = useState<string | null>(null)
 
@@ -116,15 +118,13 @@ export default function Draw() {
 
     const formData = new FormData()
     formData.append('file', blob, 'drawing.png')
+    formData.append('userId', user?.userId || '')
 
     try {
-      const response = await fetch(
-        'https://mysafedraw.site/api/images/answer',
-        {
-          method: 'POST',
-          body: formData,
-        },
-      )
+      const response = await fetch('http://localhost:8080/images/answer', {
+        method: 'POST',
+        body: formData,
+      })
 
       if (response.ok) {
         return true

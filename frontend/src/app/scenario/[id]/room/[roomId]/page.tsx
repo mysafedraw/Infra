@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useParams, useRouter } from 'next/navigation'
 import LoadingScreen from '@/app/_components/LoadingScreen'
+import { useUser } from '@/app/_contexts/UserContext'
 
 interface RoomResponse {
   action: 'ENTER_ROOM'
@@ -23,13 +24,12 @@ interface GameStartResponse {
 }
 
 export default function Room() {
-  const isHost = true
   const speech = '여러분, 화재 상황에 대해 \n잘 배워보아요 ^^'
 
   const router = useRouter()
-const { roomId: rawRoomId } = useParams()
-const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
-  const userId = 'a8861570-eb52-488f-9138-d8970c38ae86'
+  const { roomId: rawRoomId } = useParams()
+  const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
+  const { user } = useUser()
   const { client, isConnected, sendMessage, registerCallback } =
     useWebSocketContext()
 
@@ -45,7 +45,7 @@ const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
       // Situation 페이지로 이동
       router.push(`/scenario/1/situation/step1`)
     }
-
+  }
 
   // 방 입장
   const handleJoinRoom = () => {
@@ -61,7 +61,6 @@ const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
 
         // localStorage 저장
         localStorage.setItem('roomId', roomId)
-        localStorage.setItem('userId', userId)
       })
 
       // 콜백 등록
@@ -72,7 +71,7 @@ const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
       )
 
       const subscribeRequest = {
-        userId: userId,
+        userId: user?.userId,
         roomId: roomId,
       }
 
@@ -134,7 +133,7 @@ const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
           </span>
         </div>
         {/* 게임 시작 (방장만) */}
-        {isHost && (
+        {user?.isHost && (
           <div className="text-center">
             <button
               className="right-6 flex items-center justify-center"
@@ -168,7 +167,7 @@ const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
         </div>
         {/* 방장 캐릭터 */}
         <HostCharacter host={roomData?.host} />
-        {!isHost && (
+        {!user?.isHost && (
           <div className="-ml-16">
             <div className="relative bg-white p-6 rounded-2xl shadow-md">
               {/* 왼쪽 중앙 꼬리 모양 */}
@@ -189,9 +188,9 @@ const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
         )}
         {/* 그림 그리는 시간 설정(방장) */}
         <div
-          className={`flex items-center justify-center ${isHost ? 'w-[350px]' : 'w-[100px]'}`}
+          className={`flex items-center justify-center ${user?.isHost ? 'w-[350px]' : 'w-[100px]'}`}
         >
-          {isHost && <TimerSetting time={time} onTimeChange={setTime} />}
+          {user?.isHost && <TimerSetting time={time} onTimeChange={setTime} />}
         </div>
       </div>
 
