@@ -2,26 +2,46 @@
 
 import Image from 'next/image'
 import VotingSidebar from '@/app/scenario/result/components/VotingSidebar'
-import VotingResult from '@/app/scenario/result/host/components/VotingResult'
-import { useState } from 'react'
 import AllAnswers from '@/app/scenario/result/components/AllAnswers'
 import WaitingQueue from '@/app/scenario/result/host/components/WaitingQueue'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useEffect, useState } from 'react'
 
 export default function ScenarioResultHost() {
-  const [isVotingResultVisible, setIsVotingResultVisible] = useState(true)
+  const { registerCallback } = useWebSocketContext()
+  const [toastMessage, setToastMessage] = useState<string>('')
 
-  const handleApprove = () => {
-    // 승인 시 실행할 로직
-    setIsVotingResultVisible(false)
-  }
+  useEffect(() => {
+    // ANSWER_CONFIRMED 응답을 받을 때 토스트 메시지 표시
+    const hostId = localStorage.getItem('userId')
+    if (hostId) {
+      registerCallback(`/games/${hostId}`, 'ANSWER_CONFIRMED', () => {
+        setToastMessage('확인된 투표 결과 전송 완료!')
+      })
+    }
+  }, [registerCallback])
 
-  const handleReject = () => {
-    // 거절 시 실행할 로직
-    setIsVotingResultVisible(false)
-  }
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(''), 3000) // 3초 후 메시지 자동 제거
+      return () => clearTimeout(timer)
+    }
+  }, [toastMessage])
 
   return (
     <div className="p-6 flex flex-col items-center">
+      {/* 토스트 메시지 표시 */}
+      {toastMessage && (
+        <div className="fixed top-6 left-6 bg-primary-500 text-white text-2xl py-4 px-8 rounded-lg shadow-lg z-50 animate-slide-in-out">
+          <div className="relative inline-block">
+            <p className="absolute text-primary-800 text-3xl font-outline-4">
+              {toastMessage}
+            </p>
+            <p className="relative text-white text-3xl"> {toastMessage}</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center w-full mb-4">
         <h2 className="mx-auto w-2/5 h-20 bg-wood bg-cover bg-left flex items-center justify-center text-5xl text-white rounded-xl shadow-lg">
           작은 불 끄기
@@ -51,9 +71,6 @@ export default function ScenarioResultHost() {
       <AllAnswers />
 
       <VotingSidebar role="host" />
-      {isVotingResultVisible && (
-        <VotingResult onApprove={handleApprove} onReject={handleReject} />
-      )}
     </div>
   )
 }

@@ -1,12 +1,31 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import VoteAction from '@/app/scenario/result/participant/components/VoteAction'
 import VotingStatus from '@/app/scenario/result/host/components/VotingStatus'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import VoteConfirm from '@/app/scenario/result/host/components/VoteConfirm'
 
 export default function VotingSidebar({ role }: { role: string }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false)
+
+  const { sendMessage } = useWebSocketContext()
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setRoomId(localStorage.getItem('roomNumber'))
+    setUserId('user1') // 발언중인 애 userId로 바꿔야 함
+  }, [])
+
+  const handleEndVote = () => {
+    const message = JSON.stringify({ roomId, userId })
+    sendMessage('/games/vote/end', message)
+    setIsConfirmVisible(true)
+    setIsOpen(false)
+  }
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
@@ -47,12 +66,26 @@ export default function VotingSidebar({ role }: { role: string }) {
 
           {/* 사이드바 내용 */}
           <div className="p-6 pl-2">
-            <h2 className="text-4xl mb-4">현재 진행 중인 투표</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-4xl">현재 진행 중인 투표</h2>
+              {role === 'host' && (
+                <button
+                  onClick={handleEndVote}
+                  className="bg-amber-200 border border-amber-500 text-3xl py-2 px-8 rounded-lg hover:bg-amber-300"
+                >
+                  종료하기
+                </button>
+              )}
+            </div>
 
             {role === 'host' ? <VotingStatus /> : <VoteAction />}
           </div>
         </div>
       </div>
+
+      {isConfirmVisible && (
+        <VoteConfirm onClose={() => setIsConfirmVisible(false)} />
+      )}
     </>
   )
 }
