@@ -3,18 +3,52 @@
 import SafeIcon from '/public/icons/safe-word.svg'
 import NoIcon from '/public/icons/no.svg'
 import { Canvas } from '@react-three/fiber'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 
-export default function Splash({
-  setIsScroll,
-}: {
-  setIsScroll: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+export default function Splash() {
   const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
 
   useEffect(() => {
     useGLTF.preload('/assets/background/cloud.glb')
+    document.documentElement.classList.add('scrollbar-hide')
+
+    return () => {
+      document.documentElement.classList.remove('scrollbar-hide')
+    }
+  }, [])
+
+  const [isScroll, setIsScroll] = useState(false)
+
+  const scrollToBottomSlowly = () => {
+    const targetPosition = document.documentElement.scrollHeight
+    let currentPosition = window.scrollY
+
+    const interval = setInterval(() => {
+      currentPosition += 10
+      window.scrollTo(0, currentPosition)
+
+      if (currentPosition >= targetPosition) {
+        clearInterval(interval)
+        // document.body.style.overflow = 'hidden'
+      }
+    }, 16)
+  }
+
+  useEffect(() => {
+    if (isScroll) {
+      document.body.style.position = 'static'
+      document.body.style.top = `-${window.scrollY}px`
+      document.body.style.width = '100%'
+      scrollToBottomSlowly()
+    } else {
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${window.scrollY}px`
+      document.body.style.width = '100%'
+    }
+  }, [isScroll])
+
+  useEffect(() => {
     document.documentElement.classList.add('scrollbar-hide')
 
     return () => {
