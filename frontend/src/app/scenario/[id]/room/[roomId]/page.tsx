@@ -27,8 +27,8 @@ export default function Room() {
   const speech = '여러분, 화재 상황에 대해 \n잘 배워보아요 ^^'
 
   const router = useRouter()
-  const { roomId } = useParams()
-  const roomNumber = Array.isArray(roomId) ? roomId[0] : roomId
+const { roomId: rawRoomId } = useParams()
+const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
   const userId = 'a8861570-eb52-488f-9138-d8970c38ae86'
   const { client, isConnected, sendMessage, registerCallback } =
     useWebSocketContext()
@@ -49,31 +49,31 @@ export default function Room() {
 
   // 방 입장
   const handleJoinRoom = () => {
-    if (!client?.connected || !roomNumber) return
+    if (!client?.connected || !roomId) return
 
     try {
       // 방 데이터 구독
-      client.subscribe(`/rooms/${roomNumber}`, (message) => {
+      client.subscribe(`/rooms/${roomId}`, (message) => {
         const response = JSON.parse(message.body)
         if (response.action === 'ENTER_ROOM') {
           handleReceivedMessage(response)
         }
 
         // localStorage 저장
-        localStorage.setItem('roomNumber', roomNumber)
+        localStorage.setItem('roomId', roomId)
         localStorage.setItem('userId', userId)
       })
 
       // 콜백 등록
       registerCallback(
-        `/games/${roomNumber}`,
+        `/games/${roomId}`,
         'GAME_START',
         handleGameStartResponse,
       )
 
       const subscribeRequest = {
         userId: userId,
-        roomId: roomNumber,
+        roomId: roomId,
       }
 
       // 방 입장 요청 전송
@@ -88,7 +88,7 @@ export default function Room() {
   // 게임 시작
   const handleGameStart = () => {
     const startRequest = {
-      roomId: roomNumber,
+      roomId: roomId,
       stageNumber: 1,
       timeLimit: time,
     }

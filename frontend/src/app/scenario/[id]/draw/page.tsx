@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useReducer, useState } from 'react'
 import DrawingBoard from '@/app/scenario/[id]/draw/components/DrawingBoard'
 import DrawTimer from '@/app/scenario/[id]/draw/components/DrawTimer'
 import Image from 'next/image'
@@ -31,6 +31,15 @@ export default function Draw() {
   const router = useRouter()
   const drawTime = 20
   const { sendMessage, registerCallback } = useWebSocketContext()
+
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const [stageNumber, setStageNumber] = useState<string | null>(null)
+
+  // roomId, stageNumber 가져오기
+  useEffect(() => {
+    setRoomId(localStorage.getItem('roomId'))
+    setStageNumber(localStorage.getItem('stageNumber'))
+  }, [])
 
   const getParticle = (word: string): string => {
     if (!word) return '를'
@@ -140,9 +149,9 @@ export default function Draw() {
   const sendAnswerLabel = () => {
     return new Promise<void>((resolve) => {
       const request = {
-        roomId: 'ROOM_ID',
+        roomId: roomId,
         scenarioId: 1,
-        stageNumber: 1,
+        stageNumber: stageNumber,
         answer: label,
       }
 

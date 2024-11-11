@@ -28,23 +28,16 @@ function SituationStep1() {
   const { client, isConnected, sendMessage, registerCallback } =
     useWebSocketContext()
   const [roomId, setRoomId] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
     setRoomId(localStorage.getItem('roomNumber'))
-    setUserId(localStorage.getItem('userId'))
   }, [])
 
   // 그림 그리기 이동
   const handleMoveDraw = () => {
     if (!client || !isConnected) return
 
-    sendMessage(
-      `/games/drawing/start`,
-      JSON.stringify({
-        roomId,
-      }),
-    )
+    sendMessage(`/games/drawing/start`, JSON.stringify({ roomId }))
   }
 
   // 그림 그리기 시작 응답 처리
