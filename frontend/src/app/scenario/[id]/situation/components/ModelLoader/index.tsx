@@ -12,6 +12,7 @@ interface ModelLoaderProps {
   castShadow?: boolean // 그림자 설정
   receiveShadow?: boolean // 그림자 수신 설정
   onLoad?: (model: THREE.Group) => void // 모델이 로드될 때 실행할 콜백
+  onClick?: () => void // 클릭 이벤트 핸들러
 }
 
 export default function ModelLoader({
@@ -22,6 +23,7 @@ export default function ModelLoader({
   castShadow = true,
   receiveShadow = true,
   onLoad,
+  onClick,
 }: ModelLoaderProps) {
   const gltf = useGLTF(path)
   const modelRef = useRef<THREE.Group>(null)
@@ -49,10 +51,7 @@ export default function ModelLoader({
       position={position}
       scale={scale}
       rotation={rotation}
+      onClick={onClick}
     />
   )
 }
-
-// 모델 프리로드
-useGLTF.preload('/models/fire.glb')
-useGLTF.preload('/models/bucket.glb')

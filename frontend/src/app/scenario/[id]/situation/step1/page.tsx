@@ -2,20 +2,66 @@
 /* eslint-disable react/no-unknown-property */
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import Head from 'next/head'
-import Image from 'next/image'
-import ARController from '@/app/scenario/components/ARController'
-import ModelLoader from '@/app/scenario/components/ModelLoader'
-import CharacterDialogue from '@/app/scenario/components/CharacterDialogue'
+import ARController from '@/app/scenario/[id]/situation/components/ARController'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
+import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 import { useRouter } from 'next/navigation'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import ScenarioHeader from '@/app/scenario/[id]/situation/components/SituationHeader/page'
 
-function Situation() {
+interface DrawStartResponse {
+  action: 'DRAWING_START'
+  endTime: string
+}
+
+function SituationStep1() {
   const [showFire] = useState(true)
-  const [speechText] = useState('헉 불이 났어!\n물을 부어서 빨리 불을 꺼야해!')
+  const [speechText] = useState(
+    '헉 저기에 불이 붙었어! \n 초기에 빨리 진압해야 할 텐데... 지금 필요한 건',
+  )
   const router = useRouter()
+  const isHost = true
+  const { client, isConnected, sendMessage, registerCallback } =
+    useWebSocketContext()
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setRoomId(localStorage.getItem('roomNumber'))
+    setUserId(localStorage.getItem('userId'))
+  }, [])
+
+  // 그림 그리기 이동
+  const handleMoveDraw = () => {
+    if (!client || !isConnected) return
+
+    sendMessage(
+      `/games/drawing/start`,
+      JSON.stringify({
+        roomId,
+      }),
+    )
+  }
+
+  // 그림 그리기 시작 응답 처리
+  const handleDrawingStartResponse = (response: DrawStartResponse) => {
+    console.log(response)
+    router.push('/scenario/1/draw')
+  }
+
+  useEffect(() => {
+    if (isConnected) {
+      registerCallback(
+        `/games/${roomId}`,
+        'DRAWING_START',
+        handleDrawingStartResponse,
+      )
+    }
+  }, [isConnected])
 
   return (
     <>
@@ -92,39 +138,15 @@ function Situation() {
         </Canvas>
 
         <div className="absolute inset-0 pointer-events-none">
-          <div className="flex flex-row items-center p-4">
-            <Image
-              src="/icons/back-arrow.svg"
-              alt="back"
-              width={60}
-              height={60}
-              className="h-12 w-auto cursor-pointer pointer-events-auto"
-              onClick={() => router.back()}
-            />
-            <div className="bg-white border-primary-500 border-4 p-4 px-12 rounded-3xl ml-4">
-              <h3 className="text-2xl font-bold">화재 시나리오</h3>
-            </div>
-          </div>
+          <ScenarioHeader
+            title="화재 시나리오"
+            showNextButton={isHost}
+            onNext={handleMoveDraw}
+          />
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-end">
               <CharacterDialogue speechText={speechText} />
             </div>
-          </div>
-        </div>
-
-        {/* 드래그 가이드 */}
-        <div className="absolute top-1/2 right-1/4 transform -translate-x-1/2 -translate-y-1/2">
-          <div
-            className="bg-orange-400 text-white px-6 py-3 rounded-full mb-3 cursor-pointer"
-            onClick={() => {}}
-          >
-            소화기
-          </div>
-          <div
-            className="bg-orange-400 text-white px-6 py-3 rounded-full cursor-pointer"
-            onClick={() => {}}
-          >
-            양동이
           </div>
         </div>
       </div>
@@ -132,4 +154,4 @@ function Situation() {
   )
 }
 
-export default dynamic(() => Promise.resolve(Situation), { ssr: false })
+export default dynamic(() => Promise.resolve(SituationStep1), { ssr: false })

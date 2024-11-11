@@ -1,17 +1,23 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import DrawingBoard from '@/app/scenario/draw/components/DrawingBoard'
-import DrawTimer from '@/app/scenario/draw/components/DrawTimer'
+import DrawingBoard from '@/app/scenario/[id]/draw/components/DrawingBoard'
+import DrawTimer from '@/app/scenario/[id]/draw/components/DrawTimer'
 import Image from 'next/image'
-import QuestionBubble from '@/app/scenario/draw/components/QuestionBubble'
+import QuestionBubble from '@/app/scenario/[id]/draw/components/QuestionBubble'
 import { DRAW_TYPES } from '@/app/_constants/draw'
 import CommonToast from '@/app/_components/CommonToast'
 import { useRouter } from 'next/navigation'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 
 interface DrawResponse {
   label: string
   probability: number
+}
+
+interface CheckAnswerResponse {
+  action: 'CHECK_ANSWER'
+  isCorrect: string
 }
 
 export default function Draw() {
@@ -21,8 +27,10 @@ export default function Draw() {
   const [canvasData, setCanvasData] = useState<(() => string) | null>(null)
   const [question, setQuestion] = useState<string>('...')
   const [isToastShow, setIsToastShow] = useState(false)
+  const [label, setLabel] = useState<string>('')
   const router = useRouter()
   const drawTime = 20
+  const { sendMessage, registerCallback } = useWebSocketContext()
 
   const getParticle = (word: string): string => {
     if (!word) return '를'
@@ -38,8 +46,10 @@ export default function Draw() {
       if (prediction?.probability >= 35) {
         const particle = getParticle(translatedLabel)
         setQuestion(`${translatedLabel}${particle} 그린 건가요?`)
+        setLabel(translatedLabel)
       } else {
         setQuestion(`...`)
+        setLabel('')
       }
     }
   }
@@ -49,7 +59,7 @@ export default function Draw() {
     setCanvasData(() => getCanvas)
   }, [])
 
-  // 그림을 그대로 전송하는 코드
+  // 그림을 전송
   const fetchDraw = async (): Promise<boolean> => {
     if (!canvasData) return false
 
@@ -99,10 +109,13 @@ export default function Draw() {
     formData.append('file', blob, 'drawing.png')
 
     try {
-      const response = await fetch('http://localhost:8080/images/answer', {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await fetch(
+        'https://mysafedraw.site/api/images/answer',
+        {
+          method: 'POST',
+          body: formData,
+        },
+      )
 
       if (response.ok) {
         return true
@@ -116,21 +129,41 @@ export default function Draw() {
     }
   }
 
-  // 타이머 종료
-  const handleNext = async () => {
-    setIsToastShow(true)
-    const isSuccess = await fetchDraw()
-    if (isSuccess) {
-      router.push(`/scenario/1/situation`)
-    }
-  }
-
   // 제출 버튼 클릭
   const handleSubmit = async () => {
     const isSuccess = await fetchDraw()
     if (isSuccess) {
-      router.push(`/scenario/1/situation`)
+      await sendAnswerLabel()
     }
+  }
+
+  const sendAnswerLabel = () => {
+    return new Promise<void>((resolve) => {
+      const request = {
+        roomId: 'ROOM_ID',
+        scenarioId: 1,
+        stageNumber: 1,
+        answer: label,
+      }
+
+      sendMessage('/games/answer', JSON.stringify(request))
+
+      // WebSocket 응답 처리 콜백 등록
+      registerCallback(
+        `/games/answer`,
+        'CHECK_ANSWER',
+        (response: CheckAnswerResponse) => {
+          if (response.isCorrect === 'CORRECT_ANSWER') {
+            router.push('/scenario/1/success') // 정답 페이지로 이동
+          } else if (response.isCorrect === 'INCORRECT_ANSWER') {
+            router.push('/scenario/1/incorrect') // 오답 페이지로 이동
+          } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
+            router.push('/scenario/1/incorrect') // 오답 페이지로 이동
+          }
+          resolve()
+        },
+      )
+    })
   }
 
   return (
@@ -179,7 +212,10 @@ export default function Draw() {
           duration={3000}
           imageSrc="/images/tiger.png"
           altText="draw-rights-icon"
-          handleDurationEnd={handleNext}
+          handleDurationEnd={() => {
+            setIsToastShow(true)
+            handleSubmit()
+          }}
         />
       )}
     </div>
