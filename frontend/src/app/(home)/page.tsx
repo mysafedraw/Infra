@@ -1,6 +1,18 @@
-import SelectCharacter from './components/SelectCharacter'
-import Splash from './components/Splash'
-import Scroll from './components/Scroll'
+// import SelectCharacter from './components/SelectCharacter'
+// import Splash from './components/Splash'
+// import Scroll from './components/Scroll'
+
+import dynamic from 'next/dynamic'
+
+const SelectCharacter = dynamic(() => import('./components/SelectCharacter'), {
+  ssr: false,
+})
+const Scroll = dynamic(() => import('./components/Scroll'), {
+  ssr: false,
+})
+const Splash = dynamic(() => import('./components/Splash'), {
+  ssr: false,
+})
 
 export interface Character {
   id: number
@@ -13,7 +25,6 @@ async function fetchCharacter(): Promise<Character[]> {
   try {
     const response = await fetch(`https://mysafedraw.site/api/avatars/list`, {
       method: 'GET',
-      cache: 'no-store',
     })
 
     if (!response.ok) {

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+
 'use client'
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
@@ -6,6 +8,7 @@ import { OrbitControls, useGLTF } from '@react-three/drei'
 import Link from 'next/link'
 import { User, useUser } from '@/app/_contexts/UserContext'
 import { Scenario } from '@/app/scenario/page'
+import { Group, Object3DEventMap } from 'three'
 
 const CHARACTER_ASSETS: Record<number, string> = {
   1: '/assets/character/dog.glb',
@@ -18,11 +21,10 @@ const CHARACTER_ASSETS: Record<number, string> = {
 }
 
 // 캐릭터 설정
-const setCharacter = (user: User | null) => {
-  console.log('user:', user)
+const useCharacter = (user: User | null) => {
   const { scene } = useThree()
-  const character = useRef<any>(null)
-  const train = useRef<any>(null)
+  const character = useRef<Group<Object3DEventMap> | null>(null)
+  const train = useRef<Group<Object3DEventMap> | null>(null)
   const [avatar, setAvatar] = useState<string | null>(null)
   const characterScene = useMemo(
     () => (avatar ? useGLTF(avatar).scene : null),
@@ -52,8 +54,10 @@ const setCharacter = (user: User | null) => {
     scene.add(train.current)
 
     return () => {
-      characterScene.remove(character.current)
-      trainScene.remove(train.current)
+      if (character && train && character.current && train.current) {
+        characterScene.remove(character.current)
+        trainScene.remove(train.current)
+      }
     }
   }, [avatar])
 
@@ -69,8 +73,9 @@ const SetBuilding = ({
 }) => {
   const { user } = useUser()
   const { camera, gl } = useThree()
-  const controls = useRef<any>()
-  const { character, train } = setCharacter(user ? user : null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const controls = useRef<any | null>(null)
+  const { character, train } = useCharacter(user ? user : null)
 
   useFrame(() => {
     controls.current.rotateSpeed = 0.3
@@ -79,8 +84,6 @@ const SetBuilding = ({
     const azimuthalAngle = controls.current.getAzimuthalAngle()
     const positiveAzimuthalAngle =
       azimuthalAngle < 0 ? azimuthalAngle + 2 * Math.PI : azimuthalAngle
-    let cyclePos = azimuthalAngle / (Math.PI * 2)
-    cyclePos = cyclePos < 0 ? 0.5 + (0.5 + cyclePos) : cyclePos
 
     if (character.current) {
       character.current.position.x = Math.sin(azimuthalAngle) * 11.4

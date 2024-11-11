@@ -1,4 +1,8 @@
-import Map from '@/app/scenario/components/Map'
+import dynamic from 'next/dynamic'
+
+const Map = dynamic(() => import('@/app/scenario/components/Map'), {
+  ssr: false,
+})
 
 export interface Scenario {
   id: number
@@ -11,7 +15,6 @@ async function fetchScenario(): Promise<Scenario[]> {
   try {
     const response = await fetch(`https://mysafedraw.site/api/scenarios`, {
       method: 'GET',
-      cache: 'no-store',
     })
 
     if (!response.ok) {

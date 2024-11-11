@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
 import { Character } from '@/app/(home)/page'
 import { useUser } from '@/app/_contexts/UserContext'
@@ -41,6 +41,7 @@ export default function SelectCharacter({
   const { setUser } = useUser()
 
   const characterScene = useMemo(() => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useGLTF(CHARACTER_ASSETS[selectedCharacter]).scene
   }, [selectedCharacter])
 
@@ -63,7 +64,8 @@ export default function SelectCharacter({
     return result.data
   }
 
-  const CharacterCanvas = ({ characterScene }: any) => (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const CharacterCanvas = () => (
     <Canvas camera={{ position: [0, 0, 0], fov: 80 }}>
       <ambientLight intensity={1.3} color="#ffffff" />
       <directionalLight position={[5, 5, 5]} intensity={3} color="#ffffff" />
@@ -129,7 +131,7 @@ export default function SelectCharacter({
           {/* 선택된 캐릭터 */}
           <div className="w-1/2 h-full pb-4">
             <div className="h-3/4">
-              <CharacterCanvas characterScene={characterScene} />
+              <CharacterCanvas />
             </div>
             <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 flex justify-center items-start text-white rounded-lg relative">
               <div className="absolute -top-[117px] -right-6 z-50">

@@ -29,6 +29,11 @@ export default function Room() {
   const [roomData, setRoomData] = useState<RoomResponse>()
   const [isInitialized, setIsInitialized] = useState(false)
 
+  const handleReceivedMessage = (message: RoomResponse) => {
+    console.log(message)
+    setRoomData(message)
+  }
+
   // 방 입장
   const handleJoinRoom = () => {
     if (!client?.connected || !roomNumber) return
@@ -58,11 +63,6 @@ export default function Room() {
     } catch (error) {
       console.error('방 초기화 중 오류 발생:', error)
     }
-  }
-
-  const handleReceivedMessage = (message: RoomResponse) => {
-    console.log(message)
-    setRoomData(message)
   }
 
   // 방 입장

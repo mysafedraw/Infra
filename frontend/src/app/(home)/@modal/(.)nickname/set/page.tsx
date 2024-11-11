@@ -25,7 +25,11 @@ export default function SetNicknameModal() {
     setUser({ ...user, nickname })
   }
 
-  const postUser = async (): Promise<any> => {
+  const postUser = async (): Promise<{
+    avatarImg: string
+    nickname: string
+    userId: string
+  }> => {
     const response = await fetch(`https://mysafedraw.site/api/users`, {
       method: 'POST',
       headers: {
@@ -56,7 +60,7 @@ export default function SetNicknameModal() {
           router.back()
         }
       } catch (error) {
-        console.error('Failed to fetch User:', error)
+        console.error('Failed to post User:', error)
       }
     }
 
