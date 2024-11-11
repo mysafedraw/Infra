@@ -1,0 +1,41 @@
+import Image from 'next/image'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useRouter } from 'next/navigation'
+
+export default function NextStepButton() {
+  const { sendMessage } = useWebSocketContext()
+  const router = useRouter()
+
+  const handleNextStep = () => {
+    const roomId = localStorage.getItem('roomId')
+    const stageNumber = localStorage.getItem('stageNumber')
+
+    if (roomId && stageNumber) {
+      const message = JSON.stringify({
+        roomId,
+        stageNumber: parseInt(stageNumber) + 1,
+      })
+
+      sendMessage('/games/start', message)
+      router.push(`/scenario/1/situation/step${parseInt(stageNumber) + 1}`)
+    } else {
+      console.warn('필요한 데이터가 localStorage에 없습니다.')
+    }
+  }
+
+  return (
+    <button
+      onClick={handleNextStep}
+      className="absolute right-6 flex items-center justify-center"
+    >
+      <Image
+        src="/images/wood-arrow.png"
+        alt="next"
+        width={241}
+        height={88}
+        className="h-20 w-auto"
+      />
+      <p className="absolute text-white text-4xl shadow-lg pr-2">다음 단계로</p>
+    </button>
+  )
+}

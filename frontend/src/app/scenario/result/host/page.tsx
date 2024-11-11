@@ -1,25 +1,27 @@
 'use client'
 
-import Image from 'next/image'
 import VotingSidebar from '@/app/scenario/result/components/VotingSidebar'
 import AllAnswers from '@/app/scenario/result/components/AllAnswers'
 import WaitingQueue from '@/app/scenario/result/host/components/WaitingQueue'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
+import NextStepButton from '@/app/scenario/result/host/components/NextStepButton'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function ScenarioResultHost() {
-  const { registerCallback } = useWebSocketContext()
   const [toastMessage, setToastMessage] = useState<string>('')
+  const { registerCallback } = useWebSocketContext()
+  const { user } = useUser()
 
   useEffect(() => {
     // ANSWER_CONFIRMED 응답을 받을 때 토스트 메시지 표시
-    const hostId = localStorage.getItem('userId')
+    const hostId = user?.userId
     if (hostId) {
       registerCallback(`/games/${hostId}`, 'ANSWER_CONFIRMED', () => {
         setToastMessage('확인된 투표 결과 전송 완료!')
       })
     }
-  }, [registerCallback])
+  }, [registerCallback, user?.userId])
 
   useEffect(() => {
     if (toastMessage) {
@@ -46,18 +48,7 @@ export default function ScenarioResultHost() {
         <h2 className="mx-auto w-2/5 h-20 bg-wood bg-cover bg-left flex items-center justify-center text-5xl text-white rounded-xl shadow-lg">
           작은 불 끄기
         </h2>
-        <button className="absolute right-6 flex items-center justify-center">
-          <Image
-            src="/images/wood-arrow.png"
-            alt="next"
-            width={241}
-            height={88}
-            className="h-20 w-auto"
-          />
-          <p className="absolute text-white text-4xl shadow-lg pr-2">
-            다음 단계로
-          </p>
-        </button>
+        <NextStepButton />
       </div>
 
       <div className="-ml-6 mr-auto bg-wood bg-cover w-72 py-3 pr-5 text-right text-4xl text-white rounded-r-lg shadow-lg">
