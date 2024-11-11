@@ -28,20 +28,16 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      user: '2학년 1반 김유경',
-      text: '햄버거 먹고 싶다',
-      time: '04:55 오후',
-      isSender: false,
-    },
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [roomNumber, setRoomNumber] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [nickname, setNickname] = useState<string | null>(null)
 
-  // 임시 데이터
-  const [userId] = useState(() => Math.random().toString(36).substring(2, 12))
-  const roomNumber = '859338'
-  const nickname = '유경'
+  useEffect(() => {
+    setRoomNumber(localStorage.getItem('roomNumber'))
+    setUserId(localStorage.getItem('userId'))
+    setNickname(localStorage.getItem('nickname'))
+  }, [])
 
   const { sendMessage: sendWebSocketMessage, registerCallback } =
     useWebSocketContext()
@@ -96,7 +92,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     sendWebSocketMessage(`/chat/send`, JSON.stringify(newMessage))
     addMessage({
       id: messages.length + 1,
-      user: nickname,
+      user: nickname || '',
       text: content,
       time: newMessage.sentAt,
       isSender: true,
