@@ -45,7 +45,7 @@ export default function Room() {
       // Situation 페이지로 이동
       router.push(`/scenario/1/situation/step1`)
     }
-  }
+
 
   // 방 입장
   const handleJoinRoom = () => {

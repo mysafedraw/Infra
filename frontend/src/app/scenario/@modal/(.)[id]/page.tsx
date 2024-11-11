@@ -1,12 +1,14 @@
 'use client'
 
 import RoomActionButton from '@/app/scenario/components/RoomActionButton'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import BackArrowIcon from '/public/icons/back-arrow.svg'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 
 export default function Scenario() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const scenarioName = searchParams.get('name')
   const { isConnected } = useWebSocketContext()
 
   const fetchCreateRoom = async () => {
@@ -49,7 +51,7 @@ export default function Scenario() {
         <span className="text-6xl text-white">나가기</span>
       </button>
       <h1 className="bg-wood shadow-md inline-block py-4 text-white px-24 text-5xl rounded-xl">
-        화재 시나리오
+        {scenarioName}
       </h1>
       <div className="flex gap-16">
         <RoomActionButton
