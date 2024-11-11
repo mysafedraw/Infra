@@ -1,10 +1,6 @@
-import dynamic from 'next/dynamic'
-
-const Splash = dynamic(() => import('./components/Splash'), { ssr: false })
-const Scroll = dynamic(() => import('./components/Scroll'), { ssr: false })
-const SelectCharcter = dynamic(() => import('./components/SelectCharacter'), {
-  ssr: false,
-})
+import SelectCharacter from './components/SelectCharacter'
+import Splash from './components/Splash'
+import Scroll from './components/Scroll'
 
 export interface Character {
   id: number
@@ -19,8 +15,6 @@ async function fetchCharacter(): Promise<Character[]> {
       method: 'GET',
       cache: 'no-store',
     })
-
-    console.log(response)
 
     if (!response.ok) {
       throw new Error('Failed to fetch character list')
@@ -41,7 +35,7 @@ export default async function Home() {
     <div className="flex flex-col bg-main-gradient w-full overflow-auto">
       <Splash />
       <Scroll />
-      <SelectCharcter characters={characters} />
+      <SelectCharacter characters={characters} />
     </div>
   )
 }
