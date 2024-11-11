@@ -8,7 +8,7 @@ import TimerSetting from '@/app/scenario/[id]/room/components/TimerSetting'
 import HostCharacter from '@/app/scenario/[id]/room/components/HostCharacter'
 import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import LoadingScreen from '@/app/_components/LoadingScreen'
 
 interface RoomResponse {
@@ -17,17 +17,35 @@ interface RoomResponse {
   currentPlayers: Student[]
 }
 
+interface GameStartResponse {
+  action: 'GAME_START'
+  situationDialogue: string
+}
+
 export default function Room() {
   const isHost = true
   const speech = '여러분, 화재 상황에 대해 \n잘 배워보아요 ^^'
 
+  const router = useRouter()
   const { roomId } = useParams()
   const roomNumber = Array.isArray(roomId) ? roomId[0] : roomId
-  const userId = '32e93a63-2c89-4f8a-8c6c-c0ef50054906'
-  const { client, isConnected, sendMessage } = useWebSocketContext()
+  const userId = 'a8861570-eb52-488f-9138-d8970c38ae86'
+  const { client, isConnected, sendMessage, registerCallback } =
+    useWebSocketContext()
 
   const [roomData, setRoomData] = useState<RoomResponse>()
   const [isInitialized, setIsInitialized] = useState(false)
+
+  const [time, setTime] = useState(30)
+
+  // 게임 시작 응답 처리
+  const handleGameStartResponse = (response: GameStartResponse) => {
+    console.log(response)
+    if (response.action === 'GAME_START') {
+      // Situation 페이지로 이동
+      router.push(`/scenario/1/situation/step1`)
+    }
+  }
 
   // 방 입장
   const handleJoinRoom = () => {
@@ -46,6 +64,13 @@ export default function Room() {
         localStorage.setItem('userId', userId)
       })
 
+      // 콜백 등록
+      registerCallback(
+        `/games/${roomNumber}`,
+        'GAME_START',
+        handleGameStartResponse,
+      )
+
       const subscribeRequest = {
         userId: userId,
         roomId: roomNumber,
@@ -58,6 +83,17 @@ export default function Room() {
     } catch (error) {
       console.error('방 초기화 중 오류 발생:', error)
     }
+  }
+
+  // 게임 시작
+  const handleGameStart = () => {
+    const startRequest = {
+      roomId: roomNumber,
+      stageNumber: 1,
+      timeLimit: time,
+    }
+
+    sendMessage('/games/start', JSON.stringify(startRequest))
   }
 
   const handleReceivedMessage = (message: RoomResponse) => {
@@ -88,18 +124,22 @@ export default function Room() {
             height={30}
             className="h-10 w-auto"
           />
+
           <h1 className="ml-6 text-4xl text-white">나가기</h1>
         </div>
         {/* 참여 인원 */}
         <div className="bg-white px-6 py-1.5 rounded-lg border-2 border-primary-500">
           <span className="text-4xl text-text">
-            참여 인원: {roomData?.currentPlayers.length} / 30
+            참여 인원: {roomData?.currentPlayers.length + 1} / 30
           </span>
         </div>
         {/* 게임 시작 (방장만) */}
         {isHost && (
           <div className="text-center">
-            <button className="right-6 flex items-center justify-center">
+            <button
+              className="right-6 flex items-center justify-center"
+              onClick={handleGameStart}
+            >
               <Image
                 src="/images/wood-arrow.png"
                 alt="game-start"
@@ -151,7 +191,7 @@ export default function Room() {
         <div
           className={`flex items-center justify-center ${isHost ? 'w-[350px]' : 'w-[100px]'}`}
         >
-          {isHost && <TimerSetting />}
+          {isHost && <TimerSetting time={time} onTimeChange={setTime} />}
         </div>
       </div>
 
