@@ -57,8 +57,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const initializeClient = async () => {
-      const roomNumber = localStorage.getItem('roomNumber')
-      const userId = localStorage.getItem('userId')
+      const roomId = localStorage.getItem('roomId')
+      const user = JSON.parse(localStorage.getItem('user') || '{}')
+      const userId = user?.userId
 
       return new Promise<Client>((resolve, reject) => {
         const wsClient = new Client({
@@ -73,14 +74,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
           console.log('WebSocket 연결 성공:', frame)
           setIsConnected(true)
 
-          if (roomNumber && userId) {
+          if (roomId && userId) {
             // 단일 구독 설정
-            wsClient.subscribe(`/games/${roomNumber}`, handleMessage)
-            wsClient.subscribe(`/chat/${roomNumber}`, handleMessage)
+            wsClient.subscribe(`/games/${roomId}`, handleMessage)
+            wsClient.subscribe(`/chat/${roomId}`, handleMessage)
             wsClient.subscribe(`/games/${userId}`, handleMessage)
-            wsClient.subscribe(`/rooms/${roomNumber}`, handleMessage)
+            wsClient.subscribe(`/rooms/${roomId}`, handleMessage)
           } else {
-            console.warn('roomNumber 또는 userId가 localStorage에 없습니다.')
+            console.warn('roomId 또는 userId가 localStorage에 없습니다.')
           }
 
           resolve(wsClient)

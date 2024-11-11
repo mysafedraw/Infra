@@ -8,6 +8,7 @@ import React, {
   useEffect,
 } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useUser } from '@/app/_contexts/UserContext'
 
 interface ChatMessage {
   id: number
@@ -28,23 +29,16 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      user: '2학년 1반 김유경',
-      text: '햄버거 먹고 싶다',
-      time: '04:55 오후',
-      isSender: false,
-    },
-  ])
-
-  // 임시 데이터
-  const [userId] = useState(() => Math.random().toString(36).substring(2, 12))
-  const roomNumber = '859338'
-  const nickname = '유경'
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const { user } = useUser()
 
   const { sendMessage: sendWebSocketMessage, registerCallback } =
     useWebSocketContext()
+
+  useEffect(() => {
+    setRoomId(localStorage.getItem('roomId'))
+  }, [])
 
   const addMessage = (message: ChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message])
@@ -57,7 +51,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       content: string
       sentAt: string
     }) => {
-      if (parsedMessage.senderId === userId) return
+      if (parsedMessage.senderId === user?.userId) return
 
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -66,28 +60,23 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
           user: parsedMessage.nickname,
           text: parsedMessage.content,
           time: parsedMessage.sentAt,
-          isSender: parsedMessage.senderId === userId,
+          isSender: parsedMessage.senderId === user?.userId,
         },
       ])
     },
-    [userId],
+    [user?.userId],
   )
 
   useEffect(() => {
-    // 콜백을 /chat/${roomNumber} 채널에 대해 등록
-    registerCallback(
-      `/chat/${roomNumber}`,
-      'CHAT_MESSAGE',
-      handleReceivedMessage,
-    )
-  }, [registerCallback, roomNumber, handleReceivedMessage])
+    registerCallback(`/chat/${roomId}`, 'CHAT_MESSAGE', handleReceivedMessage)
+  }, [registerCallback, roomId, handleReceivedMessage])
 
   const handleSendMessage = (content: string) => {
     const newMessage = {
-      senderId: userId,
-      roomId: roomNumber,
+      senderId: user?.userId,
+      roomId,
       content,
-      nickname,
+      nickname: user?.nickname,
       sentAt: new Date().toLocaleTimeString('ko-KR', {
         hour: '2-digit',
         minute: '2-digit',
@@ -96,7 +85,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     sendWebSocketMessage(`/chat/send`, JSON.stringify(newMessage))
     addMessage({
       id: messages.length + 1,
-      user: nickname,
+      user: user?.nickname || '',
       text: content,
       time: newMessage.sentAt,
       isSender: true,
