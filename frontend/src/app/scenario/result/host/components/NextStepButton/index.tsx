@@ -8,16 +8,17 @@ export default function NextStepButton() {
 
   const handleNextStep = () => {
     const roomId = localStorage.getItem('roomId')
-    const stageNumber = localStorage.getItem('stageNumber')
+    const nextStageNumber =
+      parseInt(localStorage.getItem('stageNumber') || '1') + 1
 
-    if (roomId && stageNumber) {
+    if (roomId && nextStageNumber) {
       const message = JSON.stringify({
         roomId,
-        stageNumber: parseInt(stageNumber) + 1,
+        stageNumber: nextStageNumber,
       })
 
       sendMessage('/games/start', message)
-      router.push(`/scenario/1/situation/step${parseInt(stageNumber) + 1}`)
+      router.push(`/scenario/1/situation/step${nextStageNumber}`)
     } else {
       console.warn('필요한 데이터가 localStorage에 없습니다.')
     }
