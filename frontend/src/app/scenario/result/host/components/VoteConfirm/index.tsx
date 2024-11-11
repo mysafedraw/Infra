@@ -3,12 +3,14 @@ import Chalkboard from '@/app/scenario/result/components/Chalkboard'
 import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import Spinner from '/public/icons/spinner.svg'
+import { useUser } from '@/app/_contexts/UserContext'
 
 interface VoteConfirmProps {
   onClose: () => void
 }
 
 export default function VoteConfirm({ onClose }: VoteConfirmProps) {
+  const { user } = useUser()
   const { sendMessage, registerCallback } = useWebSocketContext()
   const [isPassed, setIsPassed] = useState(false)
   const [drawingSrc, setDrawingSrc] = useState('/images/drawing.png')
@@ -19,8 +21,9 @@ export default function VoteConfirm({ onClose }: VoteConfirmProps) {
   const userId = 'user1' // 현재 투표중인 애 userId
 
   useEffect(() => {
-    const hostId = localStorage.getItem('userId')
-    setRoomId(localStorage.getItem('roomNumber'))
+    const hostId = user?.userId
+    setRoomId(localStorage.getItem('roomId'))
+
     if (hostId) {
       registerCallback(`/games/${hostId}`, 'END_VOTE', (message) => {
         setIsPassed(message.isPassed)
@@ -30,7 +33,7 @@ export default function VoteConfirm({ onClose }: VoteConfirmProps) {
     } else {
       console.warn('Host userId가 localStorage에 없습니다.')
     }
-  }, [registerCallback])
+  }, [registerCallback, user?.userId])
 
   const handleApprove = () => {
     const message = JSON.stringify({

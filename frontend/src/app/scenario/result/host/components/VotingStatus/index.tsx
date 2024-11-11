@@ -1,8 +1,10 @@
 import Chalkboard from '@/app/scenario/result/components/Chalkboard'
 import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function VotingStatus() {
+  const { user } = useUser()
   const { registerCallback } = useWebSocketContext()
   const [agreeVotes, setAgreeVotes] = useState(0)
   const [disagreeVotes, setDisagreeVotes] = useState(0)
@@ -17,18 +19,14 @@ export default function VotingStatus() {
     : 0
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId')
-    if (userId) {
-      registerCallback(`/games/${userId}`, 'VOTE', (message) => {
-        const { proCount, conCount } = message
+    const userId = user?.userId
+    registerCallback(`/games/${userId}`, 'VOTE', (message) => {
+      const { proCount, conCount } = message
 
-        setAgreeVotes(proCount)
-        setDisagreeVotes(conCount)
-      })
-    } else {
-      console.warn('userId가 localStorage에 없습니다.')
-    }
-  }, [registerCallback])
+      setAgreeVotes(proCount)
+      setDisagreeVotes(conCount)
+    })
+  }, [registerCallback, user?.userId])
 
   return (
     <div className="flex flex-col justify-center items-center m-4 w-[36rem]">

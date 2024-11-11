@@ -16,7 +16,7 @@ export default function VotingSidebar({ role }: { role: string }) {
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    setRoomId(localStorage.getItem('roomNumber'))
+    setRoomId(localStorage.getItem('roomId'))
     setUserId('user1') // 발언중인 애 userId로 바꿔야 함
   }, [])
 

@@ -19,7 +19,7 @@ interface CheckAllAnswersMessage {
 }
 
 export default function AllAnswers() {
-  const [roomNumber, setRoomNumber] = useState<string | null>(null)
+  const [roomId, setRoomId] = useState<string | null>(null)
   const [answerData, setAnswerData] = useState<AnswerData[]>([])
   const { isConnected, sendMessage, registerCallback } = useWebSocketContext()
 
@@ -35,18 +35,17 @@ export default function AllAnswers() {
   }
 
   useEffect(() => {
-    // 클라이언트 사이드에서만 localStorage 접근
-    setRoomNumber(localStorage.getItem('roomNumber'))
+    setRoomId(localStorage.getItem('roomId'))
   }, [])
 
   useEffect(() => {
     // CHECK_ALL_ANSWERS action에 대한 콜백 등록
     registerCallback(
-      `/games/${roomNumber}`,
+      `/games/${roomId}`,
       'CHECK_ALL_ANSWERS',
       handleReceivedMessage,
     )
-  }, [registerCallback, roomNumber])
+  }, [registerCallback, roomId])
 
   // WebSocket 연결이 완료된 후 /games/answers로 요청 보내기
   useEffect(() => {
@@ -54,11 +53,11 @@ export default function AllAnswers() {
       sendMessage(
         '/games/answers',
         JSON.stringify({
-          roomId: roomNumber,
+          roomId,
         }),
       )
     }
-  }, [isConnected, roomNumber, sendMessage])
+  }, [isConnected, roomId, sendMessage])
 
   return (
     <div className="grid grid-cols-3 gap-x-6">
