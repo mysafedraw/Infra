@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { ChatProvider } from '@/app/_contexts/ChatContext'
+import { WebSocketProvider } from '@/app/_contexts/WebSocketContext'
 
 export default function ScenarioLayout({
   children,
@@ -9,9 +10,11 @@ export default function ScenarioLayout({
   modal: ReactNode
 }) {
   return (
-    <ChatProvider>
-      {modal}
-      <main>{children}</main>
-    </ChatProvider>
+    <WebSocketProvider>
+      <ChatProvider>
+        {modal}
+        <main>{children}</main>
+      </ChatProvider>
+    </WebSocketProvider>
   )
 }
