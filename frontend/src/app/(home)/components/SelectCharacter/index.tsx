@@ -1,56 +1,102 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
-import Image from 'next/image'
-import SignButton from '@/app/_components/SignButton'
+import { Character } from '@/app/(home)/page'
+import { useUser } from '@/app/_contexts/UserContext'
+import { useRouter } from 'next/navigation'
+import CharacterList from '../CharacterList'
 import Link from 'next/link'
+import SignButton from '@/app/_components/SignButton'
 
-const CHARACTER_LIST = [
-  {
-    id: 1,
-    profile: '/images/character/tiger.png',
-    name: '펭펭이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/penguin.glb',
-  },
-  {
-    id: 2,
-    profile: '/images/character/tiger.png',
-    name: '돌돌이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/dog.glb',
-  },
-  {
-    id: 3,
-    profile: '/images/character/tiger.png',
-    name: '유니코드',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/unicorn.glb',
-  },
-  {
-    id: 4,
-    profile: '/images/character/tiger.png',
-    name: '야옹이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/cat.glb',
-  },
-  {
-    id: 5,
-    profile: '/images/character/tiger.png',
-    name: '호돌이',
-    personality: ['활발', '친구조아', '메롱'],
-    characterUrl: '/assets/character/dog.glb',
-  },
-]
+interface CharacterDetail {
+  assetImg: string
+  feature: string
+  name: string
+  profileImg: string
+}
 
-export default function SelectCharcter() {
-  const [selectedCharacter, setSelectedCharacter] = useState(1)
-  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
-  const { scene: characterScene } = useGLTF(
-    CHARACTER_LIST[selectedCharacter].characterUrl,
+const CHARACTER_ASSETS: Record<number, string> = {
+  1: '/assets/character/dog.glb',
+  2: '/assets/character/tiger.glb',
+  3: '/assets/character/bunny.glb',
+  4: '/assets/character/fox.glb',
+  5: '/assets/character/penguin.glb',
+  6: '/assets/character/unicorn.glb',
+  7: '/assets/character/cat.glb',
+}
+
+export default function SelectCharacter({
+  characters,
+}: {
+  characters: Character[]
+}) {
+  const router = useRouter()
+  const [selectedCharacter, setSelectedCharacter] = useState(
+    characters[0] ? characters[0].id : 1,
   )
+  const [characterDetail, setCharacterDetail] = useState('')
+  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
+  const { setUser } = useUser()
+
+  const characterScene = useMemo(() => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return useGLTF(CHARACTER_ASSETS[selectedCharacter]).scene
+  }, [selectedCharacter])
+
+  const fetchCharacterDetail = async (
+    characterId: number,
+  ): Promise<CharacterDetail> => {
+    const response = await fetch(
+      `https://mysafedraw.site/api/avatars/${characterId}`,
+      {
+        method: 'GET',
+        cache: 'no-store',
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch character detail')
+    }
+
+    const result = await response.json()
+    return result.data
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const CharacterCanvas = () => (
+    <Canvas camera={{ position: [0, 0, 0], fov: 80 }}>
+      <ambientLight intensity={1.3} color="#ffffff" />
+      <directionalLight position={[5, 5, 5]} intensity={3} color="#ffffff" />
+      <OrbitControls
+        enableZoom={true}
+        minDistance={10}
+        maxDistance={10}
+        maxPolarAngle={Math.PI / 2.3}
+        minPolarAngle={Math.PI / 2.3}
+      />
+      <primitive
+        object={characterScene}
+        dispose={null}
+        scale={[0.1, 0.1, 0.1]}
+        position={[0, -6, 0]}
+      />
+    </Canvas>
+  )
+
+  useEffect(() => {
+    const updateCharacterDetail = async () => {
+      try {
+        const detail = await fetchCharacterDetail(selectedCharacter)
+        setCharacterDetail(detail.feature)
+      } catch (error) {
+        console.error('Failed to fetch character detail:', error)
+      }
+    }
+
+    updateCharacterDetail()
+  }, [selectedCharacter])
 
   useEffect(() => {
     useGLTF.preload('/assets/background/cloud.glb')
@@ -77,81 +123,34 @@ export default function SelectCharcter() {
           className="flex w-full gap-11 justify-center"
           style={{ height: 'calc(100% - 7rem' }}
         >
-          {/* 캐릭터 고르는 창 */}
-          <div className="w-1/2 h-full bg-[rgba(256,256,256,0.8)] rounded-2xl py-10 px-10  ">
-            <div className="flex flex-col gap-14 overflow-y-auto  h-full pr-4">
-              {CHARACTER_LIST.map((character, index) => {
-                return (
-                  <div
-                    key={character.id}
-                    className="flex gap-6 items-center cursor-pointer select-none"
-                    onClick={() => {
-                      setSelectedCharacter(index)
-                    }}
-                  >
-                    <p className="w-32 h-32 aspect-square overflow-hidden rounded-full bg-secondary-600 shadow-md shrink-0">
-                      <Image
-                        src={character.profile}
-                        alt="character_profile"
-                        width={125}
-                        height={125}
-                        draggable={false}
-                      />
-                    </p>
-                    <div className="bg-white flex flex-col gap-3 justify-center shadow-md rounded-2xl px-7 py-5  w-full">
-                      <span className="text-3xl">{character.name}</span>
-                      <div className="flex gap-2 text-2xl text-gray-dark flex-wrap">
-                        {character.personality.map((personality) => (
-                          <span
-                            key={personality}
-                            className="whitespace-nowrap"
-                          >{`#${personality}`}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          {/* 선택된 캐릭터 뜨는 창 */}
+          {/* 캐릭터 리스트 */}
+          <CharacterList
+            characters={characters}
+            setSelectedCharacter={setSelectedCharacter}
+          />
+          {/* 선택된 캐릭터 */}
           <div className="w-1/2 h-full pb-4">
             <div className="h-3/4">
-              <Canvas camera={{ position: [0, 0, 0], fov: 80 }}>
-                <ambientLight intensity={1.3} color="#ffffff" />
-                <directionalLight
-                  position={[5, 5, 5]}
-                  intensity={3}
-                  color="#ffffff"
-                />
-                <OrbitControls
-                  enableZoom={true}
-                  minDistance={10}
-                  maxDistance={10}
-                  maxPolarAngle={Math.PI / 2.3}
-                  minPolarAngle={Math.PI / 2.3}
-                />
-                <primitive
-                  object={characterScene}
-                  dispose={null}
-                  scale={[0.1, 0.1, 0.1]}
-                  position={[0, -6, 0]}
-                />
-              </Canvas>
+              <CharacterCanvas />
             </div>
-            <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 py-6 flex justify-center items-center text-white rounded-lg relative">
-              <div className="absolute -top-[117px] -right-6">
+            <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 flex justify-center items-start text-white rounded-lg relative">
+              <div className="absolute -top-[117px] -right-6 z-50">
                 <Link href={'/nickname'}>
                   <SignButton
                     content="선택완료"
-                    onClick={() => console.log('캐릭터 선택 완료')}
+                    onClick={() => {
+                      setUser({
+                        nickname: '',
+                        avatarId: selectedCharacter,
+                      })
+                      router.push('/nickname')
+                    }}
                   />
                 </Link>
               </div>
 
-              <p className="text-3xl leading-normal ">
-                호돌이는 활발하고 친구가 많아. <br />
-                항상 긍정적이고 밝은 성격이지.
+              <p className="flex text-3xl leading-normal px-4 w-full overflow-y-auto h-full scrollbar-hide items-start">
+                {characterDetail}
               </p>
             </div>
           </div>

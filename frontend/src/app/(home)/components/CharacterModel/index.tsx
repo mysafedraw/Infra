@@ -3,8 +3,10 @@ import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { AnimationMixer, MathUtils, Vector3 } from 'three'
 import { useRouter } from 'next/navigation'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function CharacterModel({ url }: { url: string }) {
+  const { user } = useUser()
   const router = useRouter()
   const { scene: characterScene, animations } = useGLTF(url)
   const mixer = useRef<AnimationMixer | null>(null)
@@ -23,39 +25,40 @@ export default function CharacterModel({ url }: { url: string }) {
     characterPosition.current.set(x, y, z)
   }
 
+  // 캐릭터 이동 모션
   useEffect(() => {
-    mixer.current = new AnimationMixer(characterScene)
-    const action = mixer.current.clipAction(animations[0])
-    action.play()
+    if (animations && animations.length > 0) {
+      mixer.current = new AnimationMixer(characterScene)
+      const action = mixer.current.clipAction(animations[0])
+      action.play()
 
-    return () => {
-      mixer.current?.stopAllAction()
+      return () => {
+        mixer.current?.stopAllAction()
+      }
     }
   }, [animations, characterScene])
 
   useEffect(() => {
-    // 몇초 후에 회전하도록 수정
-    rotateCharacter(80)
+    if (user && user.avatarId && user.nickname) {
+      // rotateCharacter(80)
+      rotateCharacter(30)
+      const characterMoveTimeout = setTimeout(() => {
+        intervalId.current = setInterval(() => {
+          moveCharacter(
+            characterScene.position.x + 2,
+            characterScene.position.y,
+            characterScene.position.z,
+          )
+        }, 20)
+      }, 3000)
+      const routeTimeout = setTimeout(() => {
+        router.replace('/scenario')
+      }, 3000)
+      console.log(characterMoveTimeout, routeTimeout)
+    }
+  }, [user])
 
-    const characterMoveTimeout = setTimeout(() => {
-      intervalId.current = setInterval(() => {
-        moveCharacter(
-          characterScene.position.x + 2,
-          characterScene.position.y,
-          characterScene.position.z,
-        )
-      }, 20)
-    }, 3000)
-
-    const routeTimeout = setTimeout(() => {
-      router.push('/scenario')
-    }, 5000)
-
-    console.log(characterMoveTimeout, routeTimeout)
-  }, [])
-
-  useFrame((state, delta) => {
-    console.log(state)
+  useFrame((_, delta) => {
     if (mixer.current) {
       mixer.current.update(delta)
     }

@@ -1,58 +1,52 @@
-'use client'
+// import SelectCharacter from './components/SelectCharacter'
+// import Splash from './components/Splash'
+// import Scroll from './components/Scroll'
 
-import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
-const Splash = dynamic(() => import('./components/Splash'), { ssr: false })
-const Scroll = dynamic(() => import('./components/Scroll'), { ssr: false })
-const SelectCharcter = dynamic(() => import('./components/SelectCharacter'), {
+const SelectCharacter = dynamic(() => import('./components/SelectCharacter'), {
+  ssr: false,
+})
+const Scroll = dynamic(() => import('./components/Scroll'), {
+  ssr: false,
+})
+const Splash = dynamic(() => import('./components/Splash'), {
   ssr: false,
 })
 
-export default function Home() {
-  const [isScroll, setIsScroll] = useState(false)
+export interface Character {
+  id: number
+  avatarName: string
+  profileImg: string
+  hashTagNameList: string[]
+}
 
-  const scrollToBottomSlowly = () => {
-    const targetPosition = document.documentElement.scrollHeight
-    let currentPosition = window.scrollY
+async function fetchCharacter(): Promise<Character[]> {
+  try {
+    const response = await fetch(`https://mysafedraw.site/api/avatars/list`, {
+      method: 'GET',
+    })
 
-    const interval = setInterval(() => {
-      currentPosition += 10
-      window.scrollTo(0, currentPosition)
+    if (!response.ok) {
+      throw new Error('Failed to fetch character list')
+    }
 
-      if (currentPosition >= targetPosition) {
-        clearInterval(interval)
-        // document.body.style.overflow = 'hidden'
-      }
-    }, 16)
+    const result = await response.json()
+    return result.data
+  } catch (error) {
+    console.error('Error fetching character list:', error)
+    return []
   }
+}
 
-  useEffect(() => {
-    if (isScroll) {
-      document.body.style.position = 'static'
-      document.body.style.top = `-${window.scrollY}px`
-      document.body.style.width = '100%'
-      scrollToBottomSlowly()
-    } else {
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${window.scrollY}px`
-      document.body.style.width = '100%'
-    }
-  }, [isScroll])
-
-  useEffect(() => {
-    document.documentElement.classList.add('scrollbar-hide')
-
-    return () => {
-      document.documentElement.classList.remove('scrollbar-hide')
-    }
-  }, [])
+export default async function Home() {
+  const characters = await fetchCharacter()
 
   return (
     <div className="flex flex-col bg-main-gradient w-full overflow-auto">
-      <Splash setIsScroll={setIsScroll} />
+      <Splash />
       <Scroll />
-      <SelectCharcter />
+      <SelectCharacter characters={characters} />
     </div>
   )
 }
