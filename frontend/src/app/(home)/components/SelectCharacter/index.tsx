@@ -1,12 +1,14 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
-import Image from 'next/image'
-import SignButton from '@/app/_components/SignButton'
-import Link from 'next/link'
 import { Character } from '@/app/(home)/page'
+import { useUser } from '@/app/_contexts/UserContext'
+import { useRouter } from 'next/navigation'
+import CharacterList from '../CharacterList'
+import Link from 'next/link'
+import SignButton from '@/app/_components/SignButton'
 
 interface CharacterDetail {
   assetImg: string
@@ -25,27 +27,28 @@ const CHARACTER_ASSETS: Record<number, string> = {
   7: '/assets/character/cat.glb',
 }
 
-export default function SelectCharcter({
+export default function SelectCharacter({
   characters,
 }: {
   characters: Character[]
 }) {
+  const router = useRouter()
   const [selectedCharacter, setSelectedCharacter] = useState(
-    characters[0].id || 1,
-  ) // id
+    characters[0] ? characters[0].id : 1,
+  )
   const [characterDetail, setCharacterDetail] = useState('')
   const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
-  const { scene: characterScene } = useGLTF(
-    CHARACTER_ASSETS[
-      characters.filter((c) => c.id === selectedCharacter)[0].id
-    ],
-  )
+  const { setUser } = useUser()
+
+  const characterScene = useMemo(() => {
+    return useGLTF(CHARACTER_ASSETS[selectedCharacter]).scene
+  }, [selectedCharacter])
 
   const fetchCharacterDetail = async (
     characterId: number,
   ): Promise<CharacterDetail> => {
     const response = await fetch(
-      `http://70.12.247.148:8080/api/avatars/${characterId}`,
+      `https://mysafedraw.site/api/avatars/${characterId}`,
       {
         method: 'GET',
         cache: 'no-store',
@@ -59,6 +62,26 @@ export default function SelectCharcter({
     const result = await response.json()
     return result.data
   }
+
+  const CharacterCanvas = ({ characterScene }: any) => (
+    <Canvas camera={{ position: [0, 0, 0], fov: 80 }}>
+      <ambientLight intensity={1.3} color="#ffffff" />
+      <directionalLight position={[5, 5, 5]} intensity={3} color="#ffffff" />
+      <OrbitControls
+        enableZoom={true}
+        minDistance={10}
+        maxDistance={10}
+        maxPolarAngle={Math.PI / 2.3}
+        minPolarAngle={Math.PI / 2.3}
+      />
+      <primitive
+        object={characterScene}
+        dispose={null}
+        scale={[0.1, 0.1, 0.1]}
+        position={[0, -6, 0]}
+      />
+    </Canvas>
+  )
 
   useEffect(() => {
     const updateCharacterDetail = async () => {
@@ -98,74 +121,28 @@ export default function SelectCharcter({
           className="flex w-full gap-11 justify-center"
           style={{ height: 'calc(100% - 7rem' }}
         >
-          {/* 캐릭터 고르는 창 */}
-          <div className="w-1/2 h-full bg-[rgba(256,256,256,0.8)] rounded-2xl py-10 px-10  ">
-            <div className="flex flex-col gap-14 overflow-y-auto  h-full pr-4">
-              {characters.map((character) => {
-                return (
-                  <div
-                    key={character.id}
-                    className="flex gap-6 items-center cursor-pointer select-none"
-                    onClick={() => {
-                      setSelectedCharacter(character.id)
-                    }}
-                  >
-                    <p className="w-32 h-32 aspect-square overflow-hidden rounded-full bg-secondary-600 shadow-md shrink-0">
-                      <Image
-                        src={character.profileImg}
-                        alt="character-profile"
-                        width={125}
-                        height={125}
-                        draggable={false}
-                      />
-                    </p>
-                    <div className="bg-white flex flex-col gap-3 justify-center shadow-md rounded-2xl px-7 py-5  w-full">
-                      <span className="text-3xl">{character.avatarName}</span>
-                      <div className="flex gap-2 text-2xl text-gray-dark flex-wrap">
-                        {character.hashTagNameList.map((tag) => (
-                          <span
-                            key={tag}
-                            className="whitespace-nowrap"
-                          >{`#${tag}`}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          {/* 선택된 캐릭터 뜨는 창 */}
+          {/* 캐릭터 리스트 */}
+          <CharacterList
+            characters={characters}
+            setSelectedCharacter={setSelectedCharacter}
+          />
+          {/* 선택된 캐릭터 */}
           <div className="w-1/2 h-full pb-4">
             <div className="h-3/4">
-              <Canvas camera={{ position: [0, 0, 0], fov: 80 }}>
-                <ambientLight intensity={1.3} color="#ffffff" />
-                <directionalLight
-                  position={[5, 5, 5]}
-                  intensity={3}
-                  color="#ffffff"
-                />
-                <OrbitControls
-                  enableZoom={true}
-                  minDistance={10}
-                  maxDistance={10}
-                  maxPolarAngle={Math.PI / 2.3}
-                  minPolarAngle={Math.PI / 2.3}
-                />
-                <primitive
-                  object={characterScene}
-                  dispose={null}
-                  scale={[0.1, 0.1, 0.1]}
-                  position={[0, -6, 0]}
-                />
-              </Canvas>
+              <CharacterCanvas characterScene={characterScene} />
             </div>
             <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 flex justify-center items-start text-white rounded-lg relative">
               <div className="absolute -top-[117px] -right-6 z-50">
                 <Link href={'/nickname'}>
                   <SignButton
                     content="선택완료"
-                    onClick={() => console.log('캐릭터 선택 완료')}
+                    onClick={() => {
+                      setUser({
+                        nickname: '',
+                        avatarId: selectedCharacter,
+                      })
+                      router.push('/nickname')
+                    }}
                   />
                 </Link>
               </div>
