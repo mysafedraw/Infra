@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import DrawingBoard from '@/app/scenario/[id]/draw/components/DrawingBoard'
 import DrawTimer from '@/app/scenario/[id]/draw/components/DrawTimer'
 import Image from 'next/image'
@@ -143,16 +143,7 @@ export default function Draw() {
     }
   }
 
-  // 제출 및 타이머 종료 시 그림 전송
-  const handleSubmit = async () => {
-    if (hasSentAnswer) return
-    setHasSentAnswer(true)
-
-    const isSuccess = await fetchDraw()
-    if (isSuccess) {
-      await sendAnswerLabel()
-    }
-  }
+  // 전송한 그림 정답 확인
   const sendAnswerLabel = () => {
     return new Promise<void>((resolve) => {
       const request = {
@@ -180,6 +171,17 @@ export default function Draw() {
         },
       )
     })
+  }
+
+  // 제출 및 타이머 종료 시 그림 전송
+  const handleSubmit = async () => {
+    if (hasSentAnswer) return
+    setHasSentAnswer(true)
+
+    const isSuccess = await fetchDraw()
+    if (isSuccess) {
+      await sendAnswerLabel()
+    }
   }
 
   return (

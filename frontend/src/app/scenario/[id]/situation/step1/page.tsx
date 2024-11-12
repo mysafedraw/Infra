@@ -11,7 +11,7 @@ import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 import { useRouter } from 'next/navigation'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
-import ScenarioHeader from '@/app/scenario/[id]/situation/components/SituationHeader/page'
+import ScenarioHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
 import { useUser } from '@/app/_contexts/UserContext'
 
 interface DrawStartResponse {
@@ -55,7 +55,7 @@ function SituationStep1() {
         handleDrawingStartResponse,
       )
     }
-  }, [isConnected, handleMoveDraw])
+  }, [isConnected, handleMoveDraw, handleDrawingStartResponse])
 
   return (
     <>
@@ -134,7 +134,7 @@ function SituationStep1() {
         <div className="absolute inset-0 pointer-events-none">
           <ScenarioHeader
             title="화재 시나리오"
-            showNextButton={user?.isHost}
+            showNextButton={!!user?.isHost}
             onNext={handleMoveDraw}
           />
           <div className="absolute bottom-6 left-6 right-6">

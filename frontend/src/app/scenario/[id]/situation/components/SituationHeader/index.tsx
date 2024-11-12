@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import BackArrowIcon from '/public/icons/back-arrow.svg'
 
 interface ScenarioHeaderProps {
   title: string
@@ -19,9 +22,7 @@ export default function ScenarioHeader({
   return (
     <div className="flex flex-row items-center justify-between p-4">
       <div className="flex flex-row items-center">
-        <Image
-          src="/icons/back-arrow.svg"
-          alt="back"
+        <BackArrowIcon
           width={60}
           height={60}
           className="h-12 w-auto cursor-pointer pointer-events-auto"

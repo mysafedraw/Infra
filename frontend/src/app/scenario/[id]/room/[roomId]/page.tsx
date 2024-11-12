@@ -47,6 +47,12 @@ export default function Room() {
     }
   }
 
+  // 방 정보 설정
+  const handleReceivedMessage = (message: RoomResponse) => {
+    console.log(message)
+    setRoomData(message)
+  }
+
   // 방 입장
   const handleJoinRoom = () => {
     if (!client?.connected || !roomId) return
@@ -93,11 +99,6 @@ export default function Room() {
     }
 
     sendMessage('/games/start', JSON.stringify(startRequest))
-  }
-
-  const handleReceivedMessage = (message: RoomResponse) => {
-    console.log(message)
-    setRoomData(message)
   }
 
   // 방 입장

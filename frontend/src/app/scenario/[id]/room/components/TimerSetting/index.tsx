@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import { useState } from 'react'
 import MinusIcon from '/public/icons/minus.svg'
 import PlusIcon from '/public/icons/plus.svg'
 
