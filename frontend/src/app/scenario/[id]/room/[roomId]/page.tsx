@@ -30,8 +30,13 @@ export default function Room() {
   const { roomId: rawRoomId } = useParams()
   const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
   const { user } = useUser()
-  const { client, isConnected, sendMessage, registerCallback } =
-    useWebSocketContext()
+  const {
+    client,
+    isConnected,
+    sendMessage,
+    registerCallback,
+    initializeWebSocket,
+  } = useWebSocketContext()
 
   const [roomData, setRoomData] = useState<RoomResponse>()
   const [isInitialized, setIsInitialized] = useState(false)
@@ -44,6 +49,8 @@ export default function Room() {
     if (response.action === 'GAME_START') {
       // Situation 페이지로 이동
       router.push(`/scenario/1/situation/step1`)
+      // 스테이지 넘버 저장
+      localStorage.setItem('stageNumber', '1')
     }
   }
 
@@ -54,20 +61,18 @@ export default function Room() {
   }
 
   // 방 입장
-  const handleJoinRoom = () => {
+  const handleJoinRoom = async () => {
     if (!client?.connected || !roomId) return
 
     try {
-      // 방 데이터 구독
-      client.subscribe(`/rooms/${roomId}`, (message) => {
-        const response = JSON.parse(message.body)
-        if (response.action === 'ENTER_ROOM') {
-          handleReceivedMessage(response)
-        }
+      // localStorage 저장
+      localStorage.setItem('roomId', roomId)
 
-        // localStorage 저장
-        localStorage.setItem('roomId', roomId)
-      })
+      // WebSocket 재초기화
+      await initializeWebSocket()
+
+      // 방 데이터 콜백 등록
+      registerCallback(`/rooms/${roomId}`, 'ENTER_ROOM', handleReceivedMessage)
 
       // 콜백 등록
       registerCallback(
@@ -103,12 +108,14 @@ export default function Room() {
 
   // 방 입장
   useEffect(() => {
-    if (isConnected && !isInitialized) {
+    console.log(`roomId : ${roomId}`)
+    console.log(`client 있나요 : ${client} isConnected는요 ${isConnected}`)
+    if (isConnected && !isInitialized && roomId) {
       handleJoinRoom()
     }
-  }, [isConnected, isInitialized])
+  }, [isConnected, isInitialized, roomId])
 
-  if (!roomData || !isInitialized) {
+  if (!roomData || !isInitialized || !roomId) {
     return <LoadingScreen />
   }
 
