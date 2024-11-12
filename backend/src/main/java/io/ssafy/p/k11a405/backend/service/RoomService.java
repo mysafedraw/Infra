@@ -1,13 +1,8 @@
 package io.ssafy.p.k11a405.backend.service;
 
 import io.ssafy.p.k11a405.backend.common.RedisSubscriber;
-import io.ssafy.p.k11a405.backend.dto.RoomAction;
-import io.ssafy.p.k11a405.backend.dto.RoomEventMessage;
-import io.ssafy.p.k11a405.backend.dto.RoomResponseDTO;
-import io.ssafy.p.k11a405.backend.dto.SendChatResponseDTO;
-import io.ssafy.p.k11a405.backend.dto.game.CheckAllAnswersResponseDTO;
-import io.ssafy.p.k11a405.backend.dto.game.ExplainResponseDTO;
-import io.ssafy.p.k11a405.backend.dto.game.StartGameResponseDTO;
+import io.ssafy.p.k11a405.backend.dto.*;
+import io.ssafy.p.k11a405.backend.dto.game.*;
 import io.ssafy.p.k11a405.backend.pubsub.GenericMessagePublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +28,8 @@ public class RoomService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final GenericMessagePublisher genericMessagePublisher;
 
+    private final UserService userService;
+
     // 채팅방 구독 메서드
     public void subscribeToRoomChannel(String roomId) {
         String channelName = "rooms:" + roomId;
@@ -44,14 +41,14 @@ public class RoomService {
 
     public RoomResponseDTO createRoom(String ownerId) {
         Random random = new Random(System.currentTimeMillis());
-        String roomId = String.valueOf(random.nextLong() % 1000000L);
+        String roomId = String.valueOf(Math.abs(random.nextLong() % 1000000L));
         String roomKey = "rooms:" + roomId;
 
         // Redis에 방 정보 저장
         stringRedisTemplate.opsForHash().put(roomKey, "roomId", roomId);
         stringRedisTemplate.opsForHash().put(roomKey, "hostId", ownerId);
 
-        subscribeChannelsOnRoom(roomId);
+        subscribeChannelsOnRoom(roomId, ownerId);
 
         // 방 정보에 방장 세션 ID 포함
 //        String ownerSessionId = stringRedisTemplate.opsForHash().get("session:user", ownerId).toString();
@@ -64,10 +61,20 @@ public class RoomService {
 //        // Redis에 유저 입장 시간 기록
         addUser(roomId, userId);
 
-        // 입장 메시지를 Redis 채널에 발행
-        RoomEventMessage entryMessage = new RoomEventMessage(userId, roomId, RoomAction.ENTER_ROOM);
+        String hostId = getHostId(roomId);
+
+        List<String> userIds = getAllUsersInRoom(roomId);
+        List<UserResponseDTO> users = userIds.stream()
+                .filter(id -> !hostId.equals(id))
+                .map(userService::getUserInfoByUserId).toList();
+
+        UserResponseDTO host = userService.getUserInfoByUserId(hostId);
+
+        EnterRoomResponseDTO enterRoomResponseDTO = new EnterRoomResponseDTO(host, users, RoomAction.ENTER_ROOM);
+
         String channelName = "rooms:" + roomId;
-        genericMessagePublisher.publishString(channelName, entryMessage);
+        // 입장 메시지를 Redis 채널에 발행
+        genericMessagePublisher.publishString(channelName, enterRoomResponseDTO);
     }
 
     public void leaveRoom(String roomId, String userId) {
@@ -94,8 +101,12 @@ public class RoomService {
     public void addUser(String roomId, String userId) {
         // Redis에 유저 입장 시간 기록
         String userKey = "rooms:" + roomId + ":users";
+        String personalKey = "user:" + userId;
         long entryTime = System.currentTimeMillis() / 1000;
         stringRedisTemplate.opsForZSet().add(userKey, userId, entryTime);
+        stringRedisTemplate.opsForHash().put(personalKey, "score", "0");
+
+        redisSubscriber.subscribeToChannel(personalKey, VoteResponseDTO.class, "/games/" + userId);
     }
 
     public void leaveUser(String roomId, String userId) {
@@ -103,16 +114,26 @@ public class RoomService {
         stringRedisTemplate.opsForZSet().remove(userKey, userId);
     }
 
-    private void subscribeChannelsOnRoom(String roomId) {
+    public String getHostId(String roomId) {
+        String key = "rooms:" + roomId;
+        return String.valueOf(stringRedisTemplate.opsForHash().get(key, "hostId"));
+    }
+
+    private void subscribeChannelsOnRoom(String roomId, String hostId) {
         String channelName = "rooms:" + roomId;
         String chatChannel = "chat:" + roomId;
         String gameStartChannel = "games:" + roomId + ":start";
         String gameExplainQueue = "games:" + roomId + ":explainQueue";
         String gameAllAnswersChannel = "games:" + roomId + ":allAnswers";
-        redisSubscriber.subscribeToChannel(channelName, RoomEventMessage.class, "/rooms/" + roomId);
+        String voteEndChannel = "games:" + roomId + ":voteEnded";
+        String startDrawingChannel = "games:" + roomId + ":startDrawing";
+        redisSubscriber.subscribeToChannel(channelName, EnterRoomResponseDTO.class, "/rooms/" + roomId);
+//        redisSubscriber.subscribeToChannel(channelName, RoomEventMessage.class, "/rooms/" + roomId);
         redisSubscriber.subscribeToChannel(chatChannel, SendChatResponseDTO.class, "/chat/" + roomId);
         redisSubscriber.subscribeToChannel(gameStartChannel, StartGameResponseDTO.class, "/games/" + roomId);
         redisSubscriber.subscribeToChannel(gameExplainQueue, ExplainResponseDTO.class, "/games/" + roomId);
         redisSubscriber.subscribeToChannel(gameAllAnswersChannel, CheckAllAnswersResponseDTO.class, "/games/" + roomId);
+        redisSubscriber.subscribeToChannel(voteEndChannel, EndVoteResponseDTO.class, "/games/" + hostId);
+        redisSubscriber.subscribeToChannel(startDrawingChannel, StartDrawingResponseDTO.class, "/games/" + roomId);
     }
 }

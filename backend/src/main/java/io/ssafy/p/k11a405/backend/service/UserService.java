@@ -5,6 +5,8 @@ import io.ssafy.p.k11a405.backend.dto.UserResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -40,7 +42,7 @@ public class UserService {
         return getUserInfoByUserId(userId);
     }
 
-    private UserResponseDTO getUserInfoByUserId(String userId) {
+    public UserResponseDTO getUserInfoByUserId(String userId) {
         String userKey = generateUserKey(userId);
         String nickname = String.valueOf(stringRedisTemplate.opsForHash().get(userKey, nicknameField));
         String profileImg = String.valueOf(stringRedisTemplate.opsForHash().get(userKey, avatarProfileImgField));
@@ -49,5 +51,10 @@ public class UserService {
 
     public String generateUserKey(String userId) {
         return "user:" + userId;
+    }
+
+    public Set<String> getUserIdsInRoom(String roomId) {
+        String roomKey = "rooms:" + roomId + ":users";
+        return stringRedisTemplate.opsForZSet().range(roomKey, 0, -1);
     }
 }
