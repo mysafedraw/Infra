@@ -2,51 +2,48 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nginx-ingress
-  namespace: default
+  namespace: dev
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
-  ingressClassName: nginx  # IngressClass 추가
+  ingressClassName: nginx
   tls:
   - hosts:
-      - k8s.mysafedraw.site
-      - www.k8s.mysafedraw.site
-      - jenkins.k8s.mysafedraw.site
+      - mysafedraw.site
+      - www.mysafedraw.site
+      - jenkins.mysafedraw.site
     secretName: tls-secret
   rules:
-  - host: k8s.mysafedraw.site
+  - host: mysafedraw.site
     http:
       paths:
-      - path: /api2(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api2
+        pathType: Prefix
         backend:
           service:
             name: ai-service
             port:
               number: 8000
-      - path: /api(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /api
+        pathType: Prefix
         backend:
           service:
             name: springboot-service
             port:
               number: 8080
-      - path: /(.*)
-        pathType: ImplementationSpecific
+      - path: /
+        pathType: Prefix
         backend:
           service:
-            name: nextjs-service
+            name: frontend-service
             port:
               number: 3000
-
-  - host: jenkins.k8s.mysafedraw.site
+  - host: jenkins.mysafedraw.site
     http:
       paths:
-      - path: /(.*)
-        pathType: ImplementationSpecific
+      - path: /
+        pathType: Prefix
         backend:
           service:
             name: jenkins-service
