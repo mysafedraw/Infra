@@ -13,9 +13,10 @@ import { useEffect } from 'react'
 export default function ScenarioResultParticipant() {
   const { registerCallback } = useWebSocketContext()
   const router = useRouter()
-  const stageNumber = parseInt(localStorage.getItem('stageNumber') || '1') // 기본값 1 설정
 
   useEffect(() => {
+    const stageNumber = parseInt(localStorage.getItem('stageNumber') || '1') // 기본값 1 설정
+
     const handleGameStart = () => {
       router.push(`/scenario/1/situation/step${stageNumber + 1}`)
     }
@@ -25,7 +26,7 @@ export default function ScenarioResultParticipant() {
       'GAME_START',
       handleGameStart,
     )
-  }, [])
+  }, [registerCallback, router])
 
   return (
     <div className="p-6 flex flex-col items-center">
