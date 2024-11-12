@@ -8,8 +8,9 @@ import TimerSetting from '@/app/scenario/[id]/room/components/TimerSetting'
 import HostCharacter from '@/app/scenario/[id]/room/components/HostCharacter'
 import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import LoadingScreen from '@/app/_components/LoadingScreen'
+import { useUser } from '@/app/_contexts/UserContext'
 
 interface RoomResponse {
   action: 'ENTER_ROOM'
@@ -17,43 +18,72 @@ interface RoomResponse {
   currentPlayers: Student[]
 }
 
+interface GameStartResponse {
+  action: 'GAME_START'
+  situationDialogue: string
+}
+
 export default function Room() {
-  const isHost = true
   const speech = '여러분, 화재 상황에 대해 \n잘 배워보아요 ^^'
 
-  const { roomId } = useParams()
-  const roomNumber = Array.isArray(roomId) ? roomId[0] : roomId
-  const userId = '32e93a63-2c89-4f8a-8c6c-c0ef50054906'
-  const { client, isConnected, sendMessage } = useWebSocketContext()
+  const router = useRouter()
+  const { roomId: rawRoomId } = useParams()
+  const roomId = Array.isArray(rawRoomId) ? rawRoomId[0] : rawRoomId || ''
+  const { user } = useUser()
+  const {
+    client,
+    isConnected,
+    sendMessage,
+    registerCallback,
+    initializeWebSocket,
+  } = useWebSocketContext()
 
   const [roomData, setRoomData] = useState<RoomResponse>()
   const [isInitialized, setIsInitialized] = useState(false)
 
+  const [time, setTime] = useState(30)
+
+  // 게임 시작 응답 처리
+  const handleGameStartResponse = (response: GameStartResponse) => {
+    console.log(response)
+    if (response.action === 'GAME_START') {
+      // Situation 페이지로 이동
+      router.push(`/scenario/1/situation/step1`)
+      // 스테이지 넘버 저장
+      localStorage.setItem('stageNumber', '1')
+    }
+  }
+
+  // 방 정보 설정
   const handleReceivedMessage = (message: RoomResponse) => {
     console.log(message)
     setRoomData(message)
   }
 
   // 방 입장
-  const handleJoinRoom = () => {
-    if (!client?.connected || !roomNumber) return
+  const handleJoinRoom = async () => {
+    if (!client?.connected || !roomId) return
 
     try {
-      // 방 데이터 구독
-      client.subscribe(`/rooms/${roomNumber}`, (message) => {
-        const response = JSON.parse(message.body)
-        if (response.action === 'ENTER_ROOM') {
-          handleReceivedMessage(response)
-        }
+      // localStorage 저장
+      localStorage.setItem('roomId', roomId)
 
-        // localStorage 저장
-        localStorage.setItem('roomNumber', roomNumber)
-        localStorage.setItem('userId', userId)
-      })
+      // WebSocket 재초기화
+      await initializeWebSocket()
+
+      // 방 데이터 콜백 등록
+      registerCallback(`/rooms/${roomId}`, 'ENTER_ROOM', handleReceivedMessage)
+
+      // 콜백 등록
+      registerCallback(
+        `/games/${roomId}`,
+        'GAME_START',
+        handleGameStartResponse,
+      )
 
       const subscribeRequest = {
-        userId: userId,
-        roomId: roomNumber,
+        userId: user?.userId,
+        roomId: roomId,
       }
 
       // 방 입장 요청 전송
@@ -65,14 +95,27 @@ export default function Room() {
     }
   }
 
+  // 게임 시작
+  const handleGameStart = () => {
+    const startRequest = {
+      roomId: roomId,
+      stageNumber: 1,
+      timeLimit: time,
+    }
+
+    sendMessage('/games/start', JSON.stringify(startRequest))
+  }
+
   // 방 입장
   useEffect(() => {
-    if (isConnected && !isInitialized) {
+    console.log(`roomId : ${roomId}`)
+    console.log(`client 있나요 : ${client} isConnected는요 ${isConnected}`)
+    if (isConnected && !isInitialized && roomId) {
       handleJoinRoom()
     }
-  }, [isConnected, isInitialized])
+  }, [isConnected, isInitialized, roomId])
 
-  if (!roomData || !isInitialized) {
+  if (!roomData || !isInitialized || !roomId) {
     return <LoadingScreen />
   }
 
@@ -88,18 +131,22 @@ export default function Room() {
             height={30}
             className="h-10 w-auto"
           />
+
           <h1 className="ml-6 text-4xl text-white">나가기</h1>
         </div>
         {/* 참여 인원 */}
         <div className="bg-white px-6 py-1.5 rounded-lg border-2 border-primary-500">
           <span className="text-4xl text-text">
-            참여 인원: {roomData?.currentPlayers.length} / 30
+            참여 인원: {roomData?.currentPlayers.length + 1} / 30
           </span>
         </div>
         {/* 게임 시작 (방장만) */}
-        {isHost && (
+        {user?.isHost && (
           <div className="text-center">
-            <button className="right-6 flex items-center justify-center">
+            <button
+              className="right-6 flex items-center justify-center"
+              onClick={handleGameStart}
+            >
               <Image
                 src="/images/wood-arrow.png"
                 alt="game-start"
@@ -128,7 +175,7 @@ export default function Room() {
         </div>
         {/* 방장 캐릭터 */}
         <HostCharacter host={roomData?.host} />
-        {!isHost && (
+        {!user?.isHost && (
           <div className="-ml-16">
             <div className="relative bg-white p-6 rounded-2xl shadow-md">
               {/* 왼쪽 중앙 꼬리 모양 */}
@@ -149,9 +196,9 @@ export default function Room() {
         )}
         {/* 그림 그리는 시간 설정(방장) */}
         <div
-          className={`flex items-center justify-center ${isHost ? 'w-[350px]' : 'w-[100px]'}`}
+          className={`flex items-center justify-center ${user?.isHost ? 'w-[350px]' : 'w-[100px]'}`}
         >
-          {isHost && <TimerSetting />}
+          {user?.isHost && <TimerSetting time={time} onTimeChange={setTime} />}
         </div>
       </div>
 

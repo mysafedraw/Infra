@@ -20,7 +20,9 @@ interface StoredUser {
   avatarImg?: string
 }
 
-export interface User extends UserPayload, StoredUser {}
+export interface User extends UserPayload, StoredUser {
+  isHost?: boolean
+}
 
 interface UserContextType {
   user: User | undefined

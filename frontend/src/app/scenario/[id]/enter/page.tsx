@@ -3,10 +3,12 @@
 import { useRouter } from 'next/navigation'
 import SignButton from '@/app/_components/SignButton'
 import { useState } from 'react'
+import { User, useUser } from '@/app/_contexts/UserContext'
 
 export default function Enter() {
   const router = useRouter()
   const [roomId, setRoomId] = useState<string>('')
+  const { user, setUser } = useUser()
 
   const handleRoomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setRoomId(e.target.value)
@@ -18,6 +20,7 @@ export default function Enter() {
     }
 
     router.push(`/scenario/1/room/${roomId}`)
+    setUser({ ...user, isHost: false } as User) // isHost 저장
   }
 
   return (
