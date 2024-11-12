@@ -69,9 +69,16 @@ const config: Config = {
         smallPing: {
           '75%, 100%': { transform: 'scale(1.2)', opacity: '0' },
         },
+        slideInOut: {
+          '0%': { transform: 'translateX(-100%)', opacity: '0' },
+          '20%': { transform: 'translateX(0)', opacity: '1' },
+          '80%': { transform: 'translateX(0)', opacity: '1' },
+          '100%': { transform: 'translateX(-100%)', opacity: '0' },
+        },
       },
       animation: {
         'small-ping': 'smallPing 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+        'slide-in-out': 'slideInOut 3s ease forwards',
       },
     },
   },
