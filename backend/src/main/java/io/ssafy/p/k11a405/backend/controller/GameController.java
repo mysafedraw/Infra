@@ -16,7 +16,10 @@ public class GameController {
 
     @MessageMapping("/start")
     public void startGame(StartGameRequestDTO startGameRequestDTO) {
-        gameService.startGame(startGameRequestDTO);
+        String roomId = startGameRequestDTO.roomId();
+        Integer stageNumber = startGameRequestDTO.stageNumber();
+        Integer timeLimit = startGameRequestDTO.timeLimit();
+        gameService.startGame(roomId, stageNumber, timeLimit);
     }
 
     @MessageMapping("/explanation-queue")
@@ -53,5 +56,14 @@ public class GameController {
     @MessageMapping("/confirm")
     public void confirmAnswer(ConfirmRequestDTO confirmRequestDTO) {
         gameService.confirmAnswer(confirmRequestDTO.userId(), confirmRequestDTO.isConfirmed(), confirmRequestDTO.roomId());
+    }
+
+    @MessageMapping("/vote/end")
+    public void endVote(EndVoteRequestDTO endVoteRequestDTO) {gameService.endVote(endVoteRequestDTO.roomId(), endVoteRequestDTO.userId());
+    }
+
+    @MessageMapping("/drawing/start")
+    public void startDrawing(StartDrawingRequestDTO startDrawingRequestDTO) {
+        gameService.startDrawing(startDrawingRequestDTO.roomId());
     }
 }
