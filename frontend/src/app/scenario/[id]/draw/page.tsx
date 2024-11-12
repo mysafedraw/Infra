@@ -25,22 +25,25 @@ export default function Draw() {
   const scenario =
     '헉 콘센트에 불이 붙었어!\n초기에 빨리 진압해야 할 텐데... 지금 필요한 건.....'
 
+  const router = useRouter()
   const [canvasData, setCanvasData] = useState<(() => string) | null>(null)
   const [question, setQuestion] = useState<string>('...')
   const [isToastShow, setIsToastShow] = useState(false)
   const [label, setLabel] = useState<string>('')
-  const router = useRouter()
-  const drawTime = 20
+  const [endTime, setEndTime] = useState<number | null>(null)
   const { sendMessage, registerCallback } = useWebSocketContext()
-
   const { user } = useUser()
+
   const [roomId, setRoomId] = useState<string | null>(null)
   const [stageNumber, setStageNumber] = useState<string | null>(null)
+  const [isTimeEnded, setIsTimeEnded] = useState(false) // 타이머 종료 상태
+  const [hasSentAnswer, setHasSentAnswer] = useState(false) // 답변이 전송되었는지
 
-  // roomId, stageNumber 가져오기
+  // roomId, stageNumber, endTime 가져오기
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
     setStageNumber(localStorage.getItem('stageNumber'))
+    setEndTime(Number(localStorage.getItem('endTime')))
   }, [])
 
   const getParticle = (word: string): string => {
@@ -52,12 +55,14 @@ export default function Draw() {
 
   // 예측 결과를 받아와 한글로 변환
   const handlePrediction = (prediction: DrawResponse) => {
+    if (isTimeEnded) return
+
     if (prediction) {
       const translatedLabel = DRAW_TYPES[prediction.label] || prediction.label
       if (prediction?.probability >= 35) {
         const particle = getParticle(translatedLabel)
         setQuestion(`${translatedLabel}${particle} 그린 건가요?`)
-        setLabel(translatedLabel)
+        setLabel(prediction.label)
       } else {
         setQuestion(`...`)
         setLabel('')
@@ -72,7 +77,7 @@ export default function Draw() {
 
   // 그림을 전송
   const fetchDraw = async (): Promise<boolean> => {
-    if (!canvasData) return false
+    if (!canvasData || hasSentAnswer) return false
 
     const currentCanvasData = canvasData()
 
@@ -138,21 +143,23 @@ export default function Draw() {
     }
   }
 
-  // 제출 버튼 클릭
+  // 제출 및 타이머 종료 시 그림 전송
   const handleSubmit = async () => {
+    if (hasSentAnswer) return
+    setHasSentAnswer(true)
+
     const isSuccess = await fetchDraw()
     if (isSuccess) {
       await sendAnswerLabel()
     }
   }
-
   const sendAnswerLabel = () => {
     return new Promise<void>((resolve) => {
       const request = {
         roomId: roomId,
         scenarioId: 1,
         stageNumber: stageNumber,
-        answer: label,
+        answer: DRAW_TYPES[label],
       }
 
       sendMessage('/games/answer', JSON.stringify(request))
@@ -163,9 +170,9 @@ export default function Draw() {
         'CHECK_ANSWER',
         (response: CheckAnswerResponse) => {
           if (response.isCorrect === 'CORRECT_ANSWER') {
-            router.push('/scenario/1/success') // 정답 페이지로 이동
+            router.push(`/scenario/1/situation/success/${label}`) // 정답 상호작용 페이지로 이동
           } else if (response.isCorrect === 'INCORRECT_ANSWER') {
-            router.push('/scenario/1/incorrect') // 오답 페이지로 이동
+            router.push(`/scenario/1/situation/fail/${label}`) // 오답 상호작용 페이지로 이동
           } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
             router.push('/scenario/1/incorrect') // 오답 페이지로 이동
           }
@@ -188,10 +195,14 @@ export default function Draw() {
         <DrawingBoard
           onPrediction={handlePrediction}
           onDrawSubmit={handleDrawSubmit}
+          isTimerEnded={isTimeEnded}
         />
         <DrawTimer
-          initialTime={drawTime}
-          handleTimeEnd={() => setIsToastShow(true)}
+          initialTime={((endTime ?? Date.now()) - Date.now()) / 1000}
+          handleTimeEnd={() => {
+            setIsTimeEnded(true)
+            handleSubmit()
+          }}
         />
       </div>
       <div className="flex mt-4">
@@ -222,8 +233,7 @@ export default function Draw() {
           imageSrc="/images/tiger.png"
           altText="draw-rights-icon"
           handleDurationEnd={() => {
-            setIsToastShow(true)
-            handleSubmit()
+            setIsToastShow(false)
           }}
         />
       )}

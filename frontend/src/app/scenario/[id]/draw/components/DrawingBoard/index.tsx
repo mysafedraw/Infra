@@ -23,9 +23,11 @@ type EventType = React.MouseEvent | React.Touch | MouseEvent | Touch
 export default function DrawingBoard({
   onPrediction,
   onDrawSubmit,
+  isTimerEnded,
 }: {
   onPrediction: (prediction: DrawResponse) => void
   onDrawSubmit: (getCanvas: () => string) => void
+  isTimerEnded: boolean
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -87,6 +89,8 @@ export default function DrawingBoard({
 
   // 마우스/터치 이벤트 좌표 -> 캔버스 좌표로 변환
   const predictDrawing = useCallback(async () => {
+    if (isTimerEnded || strokes.length === 0) return
+
     try {
       const response = await fetch('https://mysafedraw.site/api2/predict', {
         method: 'POST',
@@ -114,7 +118,7 @@ export default function DrawingBoard({
     } catch (error) {
       console.error('예측 중 오류 발생:', error)
     }
-  }, [strokes, onPrediction, predictions])
+  }, [strokes, onPrediction, predictions, isTimerEnded])
 
   useEffect(() => {
     const interval = setInterval(() => {
