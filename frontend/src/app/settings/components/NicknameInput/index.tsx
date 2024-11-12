@@ -1,30 +1,95 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function NicknameInput() {
-  const [nickname, setNickname] = useState<string>('햄벅유경')
+  const [nickname, setNickname] = useState<string>('')
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const { user, setUser } = useUser()
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setNickname(e.target.value)
+  useEffect(() => {
+    if (user) {
+      setNickname(user.nickname)
+    }
+  }, [user])
+
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newNickname = e.target.value
+    // 10자 제한
+    if (newNickname.length <= 10) {
+      setNickname(newNickname)
+    }
+  }
+
+  const handleNicknameUpdate = async () => {
+    if (user?.userId && nickname) {
+      try {
+        const response = await fetch(
+          'https://mysafedraw.site/api/users/nickname',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: user.userId,
+              nickname,
+            }),
+          },
+        )
+        if (response.ok) {
+          setUser((prevUser) =>
+            prevUser ? { ...prevUser, nickname } : prevUser,
+          )
+          setIsEditing(false)
+        } else {
+          console.error('Failed to update nickname')
+        }
+      } catch (error) {
+        console.error('Error updating nickname:', error)
+      }
+    }
+  }
+
+  const focusInput = () => {
+    setIsEditing(true)
+    inputRef.current?.focus()
+  }
 
   return (
     <div className="relative grid grid-cols-[1fr_3fr] items-center">
       <label className="text-4xl">닉네임</label>
-      <input
-        type="text"
-        value={nickname}
-        onChange={handleNicknameChange}
-        className="w-full px-6 py-3 bg-gray-white border border-gray-dark hover:outline-primary-500 focus:outline-primary-500 rounded-xl text-3xl"
-      />
-      <Image
-        src="/icons/pencil.svg"
-        alt="edit"
-        width={32}
-        height={32}
-        className="absolute right-4"
-      />
+      <div className="flex items-center h-full">
+        <div className="relative w-full">
+          <input
+            type="text"
+            value={nickname}
+            onChange={handleNicknameChange}
+            onFocus={() => setIsEditing(true)}
+            onBlur={() => setIsEditing(false)}
+            className="w-full px-6 py-3 bg-gray-white border border-gray-dark hover:outline-primary-500 focus:outline-primary-500 rounded-xl text-3xl"
+          />
+          {!isEditing && (
+            <Image
+              src="/icons/pencil.svg"
+              alt="edit"
+              width={32}
+              height={32}
+              className="absolute top-4 right-4 cursor-pointer"
+              onClick={focusInput}
+            />
+          )}
+        </div>
+        <button
+          onClick={handleNicknameUpdate}
+          className={`h-full bg-primary-500 text-3xl rounded-lg transition-all duration-300 overflow-hidden text-nowrap ${isEditing ? 'w-28 ml-2' : 'w-0'}`}
+        >
+          변경
+        </button>
+      </div>
     </div>
   )
 }
