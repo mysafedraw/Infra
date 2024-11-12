@@ -1,7 +1,6 @@
 export const DRAW_TYPES: Record<string, string> = {
   'wine bottle': '물',
-  bucket: '양동이',
-  toilet: '화장실 변기',
+  bucket: '물양동이',
   'cell phone': '핸드폰',
   book: '엘리베이터',
   ambulance: '구급차',
@@ -11,7 +10,6 @@ export const DRAW_TYPES: Record<string, string> = {
   stairs: '계단',
   telephone: '전화기',
   flashlight: '손전등',
-  'garden hose': '샤워기',
   square: '손수건',
   backpack: '마스크',
 }

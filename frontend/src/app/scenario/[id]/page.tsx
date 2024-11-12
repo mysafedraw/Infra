@@ -4,22 +4,24 @@ import RoomActionButton from '@/app/scenario/components/RoomActionButton'
 import { useRouter, useSearchParams } from 'next/navigation'
 import BackArrowIcon from '/public/icons/back-arrow.svg'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { User, useUser } from '@/app/_contexts/UserContext'
 
 export default function Scenario() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const scenarioName = searchParams.get('name')
   const { isConnected } = useWebSocketContext()
+  const { user, setUser } = useUser()
 
   const fetchCreateRoom = async () => {
     try {
-      const response = await fetch('http://70.12.247.148:8080/api/rooms', {
+      const response = await fetch('http://localhost:8080/api/rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          hostId: 'a8861570-eb52-488f-9138-d8970c38ae86',
+          hostId: user?.userId,
         }),
       })
 
@@ -28,6 +30,7 @@ export default function Scenario() {
 
       if (result && result?.roomId) {
         router.push(`/scenario/1/room/${result.roomId}`)
+        setUser({ ...user, isHost: true } as User)
       }
     } catch (error) {
       console.error('방 생성 중 오류 발생:', error)
