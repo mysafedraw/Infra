@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: letsencrypt-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: k8s.mysafedraw.site
+      http:
+        paths:
+        - path: /.well-known/acme-challenge/(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: ingress-nginx-controller
+              port:
+                number: 80
