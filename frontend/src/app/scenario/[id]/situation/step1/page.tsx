@@ -17,6 +17,7 @@ import { useUser } from '@/app/_contexts/UserContext'
 interface DrawStartResponse {
   action: 'DRAWING_START'
   endTime: number
+  timeLimit: number
 }
 
 function SituationStep1() {
@@ -45,6 +46,8 @@ function SituationStep1() {
   const handleDrawingStartResponse = (response: DrawStartResponse) => {
     console.log(response)
     router.push('/scenario/1/draw')
+    localStorage.setItem('endTime', String(response.endTime))
+    localStorage.setItem('timeLimit', String(response.timeLimit))
   }
 
   useEffect(() => {

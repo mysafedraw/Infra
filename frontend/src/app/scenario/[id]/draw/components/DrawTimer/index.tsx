@@ -1,5 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import AlarmClockIcon from '/public/icons/alarm-clock.svg'
+
+const calculateProgress = (
+  endTime: number | null,
+  initialTime: number,
+): number => {
+  if (!endTime) return 100
+  const remaining = Math.max(0, endTime - Date.now())
+  return (remaining / (initialTime * 1000)) * 100
+}
 
 export default function DrawTimer({
   initialTime,
@@ -8,38 +17,42 @@ export default function DrawTimer({
   initialTime: number
   handleTimeEnd?: () => void
 }) {
-  const [progress, setProgress] = useState(100)
+  const endTime = useMemo(() => {
+    return Number(localStorage.getItem('endTime')) || null
+  }, [])
+
+  const getInitialProgress = useCallback(() => {
+    return calculateProgress(endTime, initialTime)
+  }, [endTime, initialTime])
+
+  const [progress, setProgress] = useState(getInitialProgress)
   const [time, setTime] = useState(initialTime)
   const [isWarning, setIsWarning] = useState(false)
   const [isBlinking, setIsBlinking] = useState(false)
   const [isTimeEnded, setIsTimeEnded] = useState(false)
 
-  // 메인 타이머 로직
+  const updateProgress = useCallback(() => {
+    if (!endTime) return false
+
+    const remaining = Math.max(0, endTime - Date.now())
+    const newProgress = (remaining / (initialTime * 1000)) * 100
+    const newTime = Math.ceil(remaining / 1000)
+
+    setProgress(newProgress)
+    setTime(newTime)
+    setIsWarning(remaining <= 10000)
+
+    if (newProgress <= 0) {
+      setIsTimeEnded(true)
+      localStorage.removeItem('endTime')
+      handleTimeEnd?.()
+      return false
+    }
+    return true
+  }, [endTime, initialTime, handleTimeEnd])
+
   useEffect(() => {
     if (isTimeEnded) return
-
-    const startTime = Date.now()
-    const endTime = startTime + initialTime * 1000
-
-    const updateProgress = () => {
-      const now = Date.now()
-      const remaining = Math.max(0, endTime - now)
-      const newProgress = (remaining / (initialTime * 1000)) * 100
-      const newTime = Math.ceil(remaining / 1000)
-
-      setProgress(newProgress)
-      setTime(newTime)
-
-      // 10초 남았을 때 경고 상태로
-      setIsWarning(remaining <= 10000)
-
-      if (newProgress <= 0) {
-        setIsTimeEnded(true)
-        handleTimeEnd?.()
-        return false
-      }
-      return true
-    }
 
     // 초기 상태 설정
     updateProgress()
@@ -54,8 +67,11 @@ export default function DrawTimer({
 
     return () => {
       clearInterval(progressInterval)
+      if (isTimeEnded) {
+        localStorage.removeItem('endTime')
+      }
     }
-  }, [initialTime, handleTimeEnd, isTimeEnded])
+  }, [updateProgress, isTimeEnded])
 
   // 깜빡임 효과를 위한 별도의 useEffect
   useEffect(() => {

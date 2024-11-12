@@ -149,23 +149,31 @@ export default function Draw() {
       const request = {
         roomId: roomId,
         scenarioId: 1,
-        stageNumber: stageNumber,
+        stageNumber: Number(stageNumber),
         answer: DRAW_TYPES[label],
+        userId: user?.userId,
       }
 
       sendMessage('/games/answer', JSON.stringify(request))
 
       // WebSocket 응답 처리 콜백 등록
       registerCallback(
-        `/games/answer`,
+        `/games/${user?.userId}`,
         'CHECK_ANSWER',
         (response: CheckAnswerResponse) => {
+          // 정답 상호작용 페이지로 이동
           if (response.isCorrect === 'CORRECT_ANSWER') {
-            router.push(`/scenario/1/situation/success/${label}`) // 정답 상호작용 페이지로 이동
+            router.push(
+              `/scenario/1/situation/step${stageNumber}/success/${label}`,
+            )
+            // 오답 페이지로 이동
           } else if (response.isCorrect === 'INCORRECT_ANSWER') {
-            router.push(`/scenario/1/situation/fail/${label}`) // 오답 상호작용 페이지로 이동
+            router.push(`/scenario/1/step${stageNumber}/fail`)
+            // 오답 상호작용 페이지로 이동
           } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
-            router.push('/scenario/1/incorrect') // 오답 페이지로 이동
+            router.push(
+              `/scenario/1/situation/step${stageNumber}/fail/${label}`,
+            )
           }
           resolve()
         },
