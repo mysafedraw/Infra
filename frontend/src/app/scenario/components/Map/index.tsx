@@ -156,7 +156,10 @@ export default function Map({ scenarios }: { scenarios: Scenario[] }) {
       {isVisible ? (
         <div className="flex flex-col absolute bg-[#ffee34] border-[4px] border-[#fff38b] top-10 left-1/2 -translate-x-1/2 z-10 shadow-custom-inset px-7 pt-7 pb-3 gap-4 rounded-lg text-white w-full max-w-[42rem] shadow-button-active">
           <div className="flex gap-8 w-full">
-            <img src="/images/map.png" className="w-40 h-32" />
+            <img
+              src={scenarios[selectedScenario]?.imgUrl}
+              className="w-40 h-32"
+            />
             <div className="flex flex-col gap-3">
               <h1 className="text-stroke text-4xl">
                 {scenarios[selectedScenario]?.name}
