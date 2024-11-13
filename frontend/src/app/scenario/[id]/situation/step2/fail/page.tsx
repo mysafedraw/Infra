@@ -7,10 +7,12 @@ import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import { useRouter } from 'next/navigation'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
+import { useUser } from '@/app/_contexts/UserContext'
 
 function Fail() {
   const router = useRouter()
   const [fireScale, setFireScale] = useState(5)
+  const { user } = useUser()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,7 +21,7 @@ function Fail() {
 
     setTimeout(() => {
       clearInterval(interval)
-      router.push(`/scenario/result/host`)
+      router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
     }, 6000)
   }, [])
 
