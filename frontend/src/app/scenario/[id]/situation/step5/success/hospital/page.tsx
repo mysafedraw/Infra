@@ -1,10 +1,9 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import StoryLayout from '../../../components/StoryLayout'
-import ModelLoader from '../../../components/ModelLoader'
-import { Html } from '@react-three/drei'
-import ARController from '../../../components/ARController'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
+import ARController from '@/app/scenario/[id]/situation/components/ARController'
 
 export default function HospitalScene() {
   const speechText = '내가 병원에 빨리 데려다줘서 친구가 살 수 있을 것 같아!!'
@@ -39,17 +38,6 @@ export default function HospitalScene() {
             scale={[0.025, 0.025, 0.025]}
             rotation={[-0.5, 0.5, 0]}
           />
-          {/* <Html
-            position={[-2, 2, 0]}
-            transform
-            style={{
-              pointerEvents: 'none',
-            }}
-          >
-            <p className="bg-[rgba(124,124,124,0.5)] opacity-70 py-3 px-10 whitespace-nowrap text-2xl rounded-full text-gray-800">
-              켁켁...
-            </p>
-          </Html> */}
         </>
         <ModelLoader
           path="/assets/scenario/hospital.glb"

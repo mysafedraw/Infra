@@ -1,9 +1,9 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import StoryLayout from '../../components/StoryLayout'
-import ModelLoader from '../../components/ModelLoader'
-import ARController from '../../components/ARController'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
+import ARController from '@/app/scenario/[id]/situation/components/ARController'
 
 export default function FailSituation() {
   const speechText = '친구가 여우별로 떠났어..'

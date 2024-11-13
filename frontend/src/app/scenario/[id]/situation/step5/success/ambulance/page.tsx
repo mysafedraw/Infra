@@ -1,13 +1,12 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import StoryLayout from '../../../components/StoryLayout'
-import ModelLoader from '../../../components/ModelLoader'
-import { Html } from '@react-three/drei'
-import ARController from '../../../components/ARController'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
+import ARController from '@/app/scenario/[id]/situation/components/ARController'
 
 export default function AmbulanceScene() {
-  const speechText = '내가 병원에 빨리 데려다줘서 친구가 살 수 있을 것 같아!!'
+  const speechText = '내가 구급차를 빨리 불러서 친구가 살 수 있을 것 같아!'
   return (
     <StoryLayout speechText={speechText} isSpeechVisible>
       <Canvas
@@ -38,17 +37,6 @@ export default function AmbulanceScene() {
             scale={[0.025, 0.025, 0.025]}
             rotation={[-0.5, 0.5, 0]}
           />
-          {/* <Html
-            position={[-2, 2, 0]}
-            transform
-            style={{
-              pointerEvents: 'none',
-            }}
-          >
-            <p className="bg-[rgba(124,124,124,0.5)] opacity-70 py-3 px-10 whitespace-nowrap text-2xl rounded-full text-gray-800">
-              켁켁...
-            </p>
-          </Html> */}
         </>
         <pointLight
           position={[0, 2, 0]}
@@ -59,7 +47,6 @@ export default function AmbulanceScene() {
         />
         <ModelLoader
           path="/assets/scenario/ambulance.glb"
-          // position={[2, -1, 0]}
           position={[2, -1, 0]}
           scale={[2.6, 2.6, 2.6]}
           rotation={[0.4, 0.5, 0]}
