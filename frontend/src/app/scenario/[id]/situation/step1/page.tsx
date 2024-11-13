@@ -2,7 +2,7 @@
 /* eslint-disable react/no-unknown-property */
 'use client'
 
-import { useState, Suspense, useEffect } from 'react'
+import { useState, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import Head from 'next/head'
@@ -10,18 +10,8 @@ import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 import ScenarioHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
-import { useRouter } from 'next/navigation'
-import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
-import { useUser } from '@/app/_contexts/UserContext'
-
-interface DrawStartResponse {
-  action: 'DRAWING_START'
-  endTime: number
-  timeLimit: number
-}
 
 function SituationStep1() {
-  const [showFire] = useState(true)
   const [speechText] = useState(
     '헉 저기에 불이 붙었어! \n 초기에 빨리 진압해야 할 텐데... 지금 필요한 건',
   )
@@ -54,7 +44,7 @@ function SituationStep1() {
             <pointLight
               position={[0, 2, 0]}
               intensity={2}
-              color="#ff7700"
+              color="#ffffff"
               distance={10}
               decay={2}
             />

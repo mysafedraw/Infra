@@ -6,12 +6,12 @@ import { useState, Suspense, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import Head from 'next/head'
-import Image from 'next/image'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
+import SituationHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
 
 function Step1SucccessExtinguisher() {
   const [showFire] = useState(true)
@@ -55,7 +55,7 @@ function Step1SucccessExtinguisher() {
             <pointLight
               position={[0, 2, 0]}
               intensity={2}
-              color="#ff7700"
+              color="#ffffff"
               distance={10}
               decay={2}
             />
@@ -101,19 +101,7 @@ function Step1SucccessExtinguisher() {
           </ARController>
         </Canvas>
         <div className="absolute inset-0 pointer-events-none">
-          <div className="flex flex-row items-center p-4">
-            <Image
-              src="/icons/back-arrow.svg"
-              alt="back"
-              width={60}
-              height={60}
-              className="h-12 w-auto cursor-pointer pointer-events-auto"
-              onClick={() => router.back()}
-            />
-            <div className="bg-white border-primary-500 border-4 p-4 px-12 rounded-3xl ml-4">
-              <h3 className="text-2xl font-bold">화재 시나리오</h3>
-            </div>
-          </div>
+          <SituationHeader title="화재 시나리오" />
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-end">
               <CharacterDialogue speechText={speechText} />
