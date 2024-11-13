@@ -49,7 +49,7 @@ export default function SelectCharacter({
     characterId: number,
   ): Promise<CharacterDetail> => {
     const response = await fetch(
-      `https://mysafedraw.site/api/avatars/${characterId}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/avatars/${characterId}`,
       {
         method: 'GET',
         cache: 'no-store',

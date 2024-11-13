@@ -28,9 +28,8 @@ export default function Draw() {
   const router = useRouter()
   const [canvasData, setCanvasData] = useState<(() => string) | null>(null)
   const [question, setQuestion] = useState<string>('...')
-  const [isToastShow, setIsToastShow] = useState(false)
   const [label, setLabel] = useState<string>('')
-  const [endTime, setEndTime] = useState<number | null>(null)
+
   const { sendMessage, registerCallback } = useWebSocketContext()
   const { user } = useUser()
 
@@ -39,11 +38,10 @@ export default function Draw() {
   const [isTimeEnded, setIsTimeEnded] = useState(false) // 타이머 종료 상태
   const [hasSentAnswer, setHasSentAnswer] = useState(false) // 답변이 전송되었는지
 
-  // roomId, stageNumber, endTime 가져오기
+  // roomId, stageNumber 가져오기
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
     setStageNumber(localStorage.getItem('stageNumber'))
-    setEndTime(Number(localStorage.getItem('endTime')))
   }, [])
 
   const getParticle = (word: string): string => {
@@ -126,10 +124,13 @@ export default function Draw() {
     formData.append('userId', user?.userId || '')
 
     try {
-      const response = await fetch('http://localhost:8080/images/answer', {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/images/answer`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      )
 
       if (response.ok) {
         return true
@@ -150,7 +151,7 @@ export default function Draw() {
         roomId: roomId,
         scenarioId: 1,
         stageNumber: Number(stageNumber),
-        answer: DRAW_TYPES[label],
+        answer: DRAW_TYPES[label] ?? '',
         userId: user?.userId,
       }
 
@@ -164,15 +165,15 @@ export default function Draw() {
           // 정답 상호작용 페이지로 이동
           if (response.isCorrect === 'CORRECT_ANSWER') {
             router.push(
-              `/scenario/1/situation/step${stageNumber}/success/${label}`,
+              `/scenario/1/situation/step${stageNumber}/success/${label.trim()}`,
             )
             // 오답 페이지로 이동
           } else if (response.isCorrect === 'INCORRECT_ANSWER') {
-            router.push(`/scenario/1/step${stageNumber}/fail`)
+            router.push(`/scenario/1/situation/step${stageNumber}/fail`)
             // 오답 상호작용 페이지로 이동
           } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
             router.push(
-              `/scenario/1/situation/step${stageNumber}/fail/${label}`,
+              `/scenario/1/situation/step${stageNumber}/fail/${label.trim()}`,
             )
           }
           resolve()
@@ -208,7 +209,6 @@ export default function Draw() {
           isTimerEnded={isTimeEnded}
         />
         <DrawTimer
-          initialTime={((endTime ?? Date.now()) - Date.now()) / 1000}
           handleTimeEnd={() => {
             setIsTimeEnded(true)
             handleSubmit()
@@ -236,15 +236,12 @@ export default function Draw() {
           </p>
         </button>
       </div>
-      {isToastShow && (
+      {isTimeEnded && (
         <CommonToast
           message="시간이 끝났어요"
           duration={3000}
           imageSrc="/images/tiger.png"
           altText="draw-rights-icon"
-          handleDurationEnd={() => {
-            setIsToastShow(false)
-          }}
         />
       )}
     </div>

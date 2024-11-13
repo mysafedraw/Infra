@@ -69,7 +69,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
     return new Promise<void>((resolve, reject) => {
       const wsClient = new Client({
-        brokerURL: 'http://localhost:8080/ws-stomp',
+        brokerURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}/ws-stomp`,
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,

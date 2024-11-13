@@ -11,6 +11,7 @@ import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useParams, useRouter } from 'next/navigation'
 import LoadingScreen from '@/app/_components/LoadingScreen'
 import { useUser } from '@/app/_contexts/UserContext'
+import BackArrowIcon from '/public/icons/back-arrow.svg'
 
 interface RoomResponse {
   action: 'ENTER_ROOM'
@@ -54,12 +55,6 @@ export default function Room() {
     }
   }
 
-  // 방 정보 설정
-  const handleReceivedMessage = (message: RoomResponse) => {
-    console.log(message)
-    setRoomData(message)
-  }
-
   // 방 입장
   const handleJoinRoom = async () => {
     if (!client?.connected || !roomId) return
@@ -72,7 +67,13 @@ export default function Room() {
       await initializeWebSocket()
 
       // 방 데이터 콜백 등록
-      registerCallback(`/rooms/${roomId}`, 'ENTER_ROOM', handleReceivedMessage)
+      registerCallback(
+        `/rooms/${roomId}`,
+        'ENTER_ROOM',
+        (message: RoomResponse) => {
+          setRoomData(message)
+        },
+      )
 
       // 콜백 등록
       registerCallback(
@@ -108,8 +109,6 @@ export default function Room() {
 
   // 방 입장
   useEffect(() => {
-    console.log(`roomId : ${roomId}`)
-    console.log(`client 있나요 : ${client} isConnected는요 ${isConnected}`)
     if (isConnected && !isInitialized && roomId) {
       handleJoinRoom()
     }
@@ -119,21 +118,31 @@ export default function Room() {
     return <LoadingScreen />
   }
 
+  // 방 나가기
+  const handleLeaveRoom = () => {
+    // 콜백 등록
+    registerCallback(`/rooms/${roomId}`, 'LEAVE_ROOM', () => {
+      localStorage.removeItem('roomId')
+      router.push(`/scenario`)
+    })
+
+    sendMessage(
+      '/rooms/leave',
+      JSON.stringify({ roomId: roomId, userId: user?.userId }),
+    )
+  }
+
   return (
     <div className="w-full min-h-screen bg-secondary-500 p-6 flex flex-col">
       <div className="h-[10%] flex justify-between items-center">
         {/* 나가기 */}
-        <div className="flex items-center drop-shadow-md mb-10">
-          <Image
-            src="/icons/back-arrow.svg"
-            alt="back"
-            width={30}
-            height={30}
-            className="h-10 w-auto"
-          />
-
+        <button
+          className="flex items-center drop-shadow-md mb-10 hover:-translate-x-3 transition-all duration-400 ease-in-out cursor-pointer"
+          onClick={handleLeaveRoom}
+        >
+          <BackArrowIcon />
           <h1 className="ml-6 text-4xl text-white">나가기</h1>
-        </div>
+        </button>
         {/* 참여 인원 */}
         <div className="bg-white px-6 py-1.5 rounded-lg border-2 border-primary-500">
           <span className="text-4xl text-text">
