@@ -30,7 +30,7 @@ export default function Draw() {
   const [question, setQuestion] = useState<string>('...')
   const [isToastShow, setIsToastShow] = useState(false)
   const [label, setLabel] = useState<string>('')
-  const [endTime, setEndTime] = useState<number | null>(null)
+
   const { sendMessage, registerCallback } = useWebSocketContext()
   const { user } = useUser()
 
@@ -39,11 +39,10 @@ export default function Draw() {
   const [isTimeEnded, setIsTimeEnded] = useState(false) // 타이머 종료 상태
   const [hasSentAnswer, setHasSentAnswer] = useState(false) // 답변이 전송되었는지
 
-  // roomId, stageNumber, endTime 가져오기
+  // roomId, stageNumber 가져오기
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
     setStageNumber(localStorage.getItem('stageNumber'))
-    setEndTime(Number(localStorage.getItem('endTime')))
   }, [])
 
   const getParticle = (word: string): string => {
@@ -168,7 +167,7 @@ export default function Draw() {
             )
             // 오답 페이지로 이동
           } else if (response.isCorrect === 'INCORRECT_ANSWER') {
-            router.push(`/scenario/1/step${stageNumber}/fail`)
+            router.push(`/scenario/1/situation/step${stageNumber}/fail`)
             // 오답 상호작용 페이지로 이동
           } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
             router.push(
@@ -208,7 +207,6 @@ export default function Draw() {
           isTimerEnded={isTimeEnded}
         />
         <DrawTimer
-          initialTime={((endTime ?? Date.now()) - Date.now()) / 1000}
           handleTimeEnd={() => {
             setIsTimeEnded(true)
             handleSubmit()
