@@ -6,10 +6,14 @@ import Spinner from '/public/icons/spinner.svg'
 import { useUser } from '@/app/_contexts/UserContext'
 
 interface VoteConfirmProps {
+  votingUserId: string
   onClose: () => void
 }
 
-export default function VoteConfirm({ onClose }: VoteConfirmProps) {
+export default function VoteConfirm({
+  votingUserId,
+  onClose,
+}: VoteConfirmProps) {
   const { user } = useUser()
   const { sendMessage, registerCallback } = useWebSocketContext()
   const [isPassed, setIsPassed] = useState(false)
@@ -18,7 +22,6 @@ export default function VoteConfirm({ onClose }: VoteConfirmProps) {
   const [roomId, setRoomId] = useState<string | null>(null)
 
   const color = isPassed ? 'green' : 'red'
-  const userId = 'user1' // 현재 투표중인 애 userId
 
   useEffect(() => {
     const hostId = user?.userId
@@ -37,7 +40,7 @@ export default function VoteConfirm({ onClose }: VoteConfirmProps) {
 
   const handleApprove = () => {
     const message = JSON.stringify({
-      userId,
+      userId: votingUserId,
       roomId,
       isConfirmed: true,
     })
@@ -47,7 +50,8 @@ export default function VoteConfirm({ onClose }: VoteConfirmProps) {
 
   const handleReject = () => {
     const message = JSON.stringify({
-      userId,
+      userId: votingUserId,
+      roomId,
       isConfirmed: false,
     })
     sendMessage('/games/confirm', message)
