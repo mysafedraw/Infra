@@ -11,6 +11,7 @@ import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useParams, useRouter } from 'next/navigation'
 import LoadingScreen from '@/app/_components/LoadingScreen'
 import { useUser } from '@/app/_contexts/UserContext'
+import { useLiveKit } from '@/app/_contexts/LiveKitContext'
 
 interface RoomResponse {
   action: 'ENTER_ROOM'
@@ -42,6 +43,8 @@ export default function Room() {
   const [isInitialized, setIsInitialized] = useState(false)
 
   const [time, setTime] = useState(30)
+
+  const { voiceRoom, createVoiceRoom } = useLiveKit()
 
   // 게임 시작 응답 처리
   const handleGameStartResponse = (response: GameStartResponse) => {
@@ -104,6 +107,11 @@ export default function Room() {
     }
 
     sendMessage('/games/start', JSON.stringify(startRequest))
+
+    // 음성 채팅 방 생성 (음성 채팅 방이 생성되지 않은 경우)
+    if (!voiceRoom && user?.userId) {
+      createVoiceRoom(roomId, user.userId).then()
+    }
   }
 
   // 방 입장
