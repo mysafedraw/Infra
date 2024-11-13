@@ -14,6 +14,10 @@ interface ModelLoaderProps {
   receiveShadow?: boolean // 그림자 수신 설정
   onLoad?: (model: THREE.Group) => void // 모델이 로드될 때 실행할 콜백
   onClick?: () => void // 클릭 이벤트 핸들러
+  animation?: {
+    timeScale: number
+    loop: number
+  }
 }
 
 export default function ModelLoader({
@@ -25,6 +29,10 @@ export default function ModelLoader({
   receiveShadow = true,
   onLoad,
   onClick,
+  animation = {
+    timeScale: 1,
+    loop: Infinity,
+  },
 }: ModelLoaderProps) {
   const { scene: originalScene, animations } = useGLTF(path)
   const scene = originalScene.clone()
@@ -35,9 +43,9 @@ export default function ModelLoader({
     if (scene && animations.length > 0) {
       mixerRef.current = new THREE.AnimationMixer(scene)
       const action = mixerRef.current.clipAction(animations[0])
-      action.setLoop(THREE.LoopRepeat, Infinity)
+      action.setLoop(THREE.LoopRepeat, animation.loop)
       action.clampWhenFinished = true
-      action.timeScale = 1
+      action.timeScale = animation.timeScale
       action.play()
 
       scene.traverse((child) => {
