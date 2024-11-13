@@ -8,6 +8,7 @@ import SuccessStep2 from '@/app/scenario/[id]/situation/step2/components/Success
 import { useRouter } from 'next/navigation'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import { ReportingState } from '../../success/page'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function Step2({
   reportingState,
@@ -25,6 +26,7 @@ export default function Step2({
   const { scene: phoneScene, animations } = useGLTF(phoneUrl)
   const mixer = useRef<AnimationMixer | null>(null)
   const [isFire, setIsFire] = useState(true)
+  const { user } = useUser()
 
   useEffect(() => {
     if (phoneScene && animations.length) {
@@ -59,8 +61,8 @@ export default function Step2({
     if (!isFire) {
       setSpeech(`와 소방차가 불을 꺼줬어!! 다행이야!!`)
       setTimeout(() => {
-        router.push(`/scenario/result/host`)
-      }, 4000)
+        router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
+      }, 6000)
     }
   }, [isFire])
 

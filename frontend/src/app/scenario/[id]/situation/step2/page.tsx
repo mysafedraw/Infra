@@ -4,26 +4,14 @@ import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
-import { useRouter } from 'next/navigation'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
 function SituationStep2() {
-  const router = useRouter()
   const speechText =
     '이번에는 불이 엄청 크게 붙었네. 내가 끌 수 없을 것 같아.  어떻게 해야 할까?'
 
-  const handleMoveDraw = () => {
-    router.push('/scenario/draw/1')
-  }
-
   return (
     <StoryLayout speechText={speechText} isSpeechVisible>
-      <button
-        className="fixed top-10 right-10 bg-red-100 z-50"
-        onClick={handleMoveDraw}
-      >
-        그림그리기로 넘어가는 버튼
-      </button>
       <Canvas
         camera={{
           position: [0, 2, 5],

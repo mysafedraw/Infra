@@ -1,19 +1,20 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
+import SituationHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
+
+interface StoryLayoutProp {
+  speechText?: string
+  children: React.ReactNode
+  isSpeechVisible?: boolean
+  showNextButton?: boolean
+}
 
 export default function StoryLayout({
   speechText = '이번에는 불이 엄청 크게 붙었네. 내가 끌 수 없을 것 같아. 어떻게 해야 할까?',
   children,
   isSpeechVisible = false,
-}: {
-  speechText?: string
-  children: React.ReactNode
-  isSpeechVisible?: boolean
-}) {
-  const router = useRouter()
-
+  showNextButton = false,
+}: StoryLayoutProp) {
   return (
     <div>
       <Head>
@@ -25,16 +26,11 @@ export default function StoryLayout({
       <main>{children}</main>
       <div className="absolute inset-0 pointer-events-none">
         <div className="flex flex-row items-center p-4">
-          <Image
-            src="/icons/back-arrow.svg"
-            alt="back"
-            width={60}
-            height={60}
-            className="h-12 w-auto cursor-pointer pointer-events-auto"
-            onClick={() => router.back()}
-          />
-          <div className="bg-white border-primary-500 border-4 p-4 px-12 rounded-3xl ml-4">
-            <h3 className="text-2xl font-bold">화재 시나리오</h3>
+          <div className="absolute inset-0 pointer-events-none">
+            <SituationHeader
+              title="화재 시나리오"
+              showNextButton={showNextButton}
+            />
           </div>
         </div>
         {isSpeechVisible ? (
