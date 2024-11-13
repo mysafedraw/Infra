@@ -62,7 +62,7 @@ export default function Step2({
       setSpeech(`와 소방차가 불을 꺼줬어!! 다행이야!!`)
       setTimeout(() => {
         router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
-      }, 4000)
+      }, 6000)
     }
   }, [isFire])
 
