@@ -23,9 +23,12 @@ export interface Character {
 
 async function fetchCharacter(): Promise<Character[]> {
   try {
-    const response = await fetch(`https://mysafedraw.site/api/avatars/list`, {
-      method: 'GET',
-    })
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/avatars/list`,
+      {
+        method: 'GET',
+      },
+    )
 
     if (!response.ok) {
       throw new Error('Failed to fetch character list')
