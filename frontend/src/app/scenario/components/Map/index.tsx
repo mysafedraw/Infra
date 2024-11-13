@@ -5,10 +5,10 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
-import Link from 'next/link'
 import { User, useUser } from '@/app/_contexts/UserContext'
 import { Scenario } from '@/app/scenario/page'
 import { Group, Object3DEventMap } from 'three'
+import ScenarioPopup from '../ScenarioPopup'
 
 const CHARACTER_ASSETS: Record<number, string> = {
   1: '/assets/character/dog.glb',
@@ -154,35 +154,12 @@ export default function Map({ scenarios }: { scenarios: Scenario[] }) {
   return (
     <div className="w-full h-full bg-[#c9f1ff]">
       {isVisible ? (
-        <div className="flex flex-col absolute bg-[#ffee34] border-[4px] border-[#fff38b] top-10 left-1/2 -translate-x-1/2 z-10 shadow-custom-inset px-7 pt-7 pb-3 gap-4 rounded-lg text-white w-full max-w-[42rem] shadow-button-active">
-          <div className="flex gap-8 w-full">
-            <img
-              src={scenarios[selectedScenario]?.imgUrl}
-              className="w-40 h-32"
-            />
-            <div className="flex flex-col gap-3">
-              <h1 className="text-stroke text-4xl">
-                {scenarios[selectedScenario]?.name}
-              </h1>
-              <div className="text-text text-2xl">
-                <p>{scenarios[selectedScenario]?.description}</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex w-full justify-end">
-            <Link
-              href={{
-                pathname: `/scenario/${scenarios[selectedScenario].id}`,
-                query: { name: scenarios[selectedScenario].name },
-              }}
-            >
-              <button className="flex gap-1 text-primary-950">
-                <p>시나리오 참여하기</p>
-                <span>→</span>
-              </button>
-            </Link>
-          </div>
-        </div>
+        <ScenarioPopup
+          imgUrl={scenarios[selectedScenario]?.imgUrl}
+          name={scenarios[selectedScenario]?.name}
+          description={scenarios[selectedScenario]?.description}
+          id={scenarios[selectedScenario]?.id}
+        />
       ) : null}
 
       <Canvas camera={{ position: [2, 2, 2], fov: 70 }}>
