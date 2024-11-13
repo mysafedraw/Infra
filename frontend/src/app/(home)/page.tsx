@@ -25,6 +25,7 @@ async function fetchCharacter(): Promise<Character[]> {
   try {
     const response = await fetch(`https://mysafedraw.site/api/avatars/list`, {
       method: 'GET',
+      cache: 'no-store',
     })
 
     if (!response.ok) {
