@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import CharacterDialogue from '@/app/scenario/components/CharacterDialogue'
+import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 
 export default function StoryLayout({
   speechText = '이번에는 불이 엄청 크게 붙었네. 내가 끌 수 없을 것 같아. 어떻게 해야 할까?',

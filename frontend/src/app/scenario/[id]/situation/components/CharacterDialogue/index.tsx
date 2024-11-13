@@ -15,7 +15,7 @@ export default function CharacterDialogue({
           <div className="absolute right-[-11px] top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-t-4 border-r-4 border-primary-600 rotate-45"></div>
         </div>
         <Image
-          src={user?.avatarImg}
+          src={user?.avatarImg ? user?.avatarImg : ''}
           alt="character-dialogue"
           width={200}
           height={200}
