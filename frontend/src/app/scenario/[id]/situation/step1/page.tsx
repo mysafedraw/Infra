@@ -9,7 +9,7 @@ import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 
-function SituationStep1() {
+function Step1() {
   return (
     <StoryLayout
       speechText={
@@ -50,21 +50,22 @@ function SituationStep1() {
               castShadow
             />
 
+            {/* 작은 불 */}
             <Suspense fallback={null}>
               <ModelLoader
-                path="/assets/scenario/fire.glb"
-                position={[-26, -1, -10]}
-                scale={[8, 8, 8]}
+                path="/assets/scenario/fire2.glb"
+                position={[2, 3, 0]}
+                scale={[6, 6, 6]}
               />
               <ModelLoader
-                path="/assets/scenario/fire.glb"
-                position={[-24, -1, -10]}
-                scale={[8, 8, 8]}
+                path="/assets/scenario/fire2.glb"
+                position={[4, 3, 0]}
+                scale={[6, 6, 6]}
               />
               <ModelLoader
-                path="/assets/scenario/fire.glb"
-                position={[-25, -1, -10]}
-                scale={[8, 8, 8]}
+                path="/assets/scenario/fire2.glb"
+                position={[3, 3, 0]}
+                scale={[6, 6, 6]}
               />
             </Suspense>
           </ARController>
@@ -74,4 +75,4 @@ function SituationStep1() {
   )
 }
 
-export default dynamic(() => Promise.resolve(SituationStep1), { ssr: false })
+export default dynamic(() => Promise.resolve(Step1), { ssr: false })

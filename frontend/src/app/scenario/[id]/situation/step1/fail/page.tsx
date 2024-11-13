@@ -14,11 +14,13 @@ import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 function Step1Fail() {
   const router = useRouter()
   const { user } = useUser()
-  const [fireScale, setFireScale] = useState(8)
+  const [fireScale, setFireScale] = useState(6)
+  const [showMoreFire, setShowMoreFire] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
       setFireScale((prev) => prev + 0.1)
+      setShowMoreFire(true)
     }, 500)
 
     setTimeout(() => {
@@ -70,30 +72,34 @@ function Step1Fail() {
             <Suspense fallback={null}>
               <>
                 <ModelLoader
-                  path="/assets/scenario/fire.glb"
-                  position={[-30, -1, -10]}
+                  path="/assets/scenario/fire2.glb"
+                  position={[2, 3, 0]}
                   scale={[fireScale, fireScale, fireScale]}
                 />
                 <ModelLoader
-                  path="/assets/scenario/fire.glb"
-                  position={[-26, -1, -10]}
+                  path="/assets/scenario/fire2.glb"
+                  position={[4, 3, 0]}
                   scale={[fireScale, fireScale, fireScale]}
                 />
                 <ModelLoader
-                  path="/assets/scenario/fire.glb"
-                  position={[-24, -1, -10]}
+                  path="/assets/scenario/fire2.glb"
+                  position={[3, 3, 0]}
                   scale={[fireScale, fireScale, fireScale]}
                 />
-                <ModelLoader
-                  path="/assets/scenario/fire.glb"
-                  position={[-30, -1, -10]}
-                  scale={[fireScale, fireScale, fireScale]}
-                />
-                <ModelLoader
-                  path="/assets/scenario/fire.glb"
-                  position={[-20, -1, -10]}
-                  scale={[fireScale, fireScale, fireScale]}
-                />
+                {showMoreFire && (
+                  <>
+                    <ModelLoader
+                      path="/assets/scenario/fire2.glb"
+                      position={[2, 4, 0]}
+                      scale={[fireScale, fireScale, fireScale]}
+                    />
+                    <ModelLoader
+                      path="/assets/scenario/fire2.glb"
+                      position={[3, 4, 0]}
+                      scale={[fireScale, fireScale, fireScale]}
+                    />
+                  </>
+                )}
               </>
             </Suspense>
           </ARController>
