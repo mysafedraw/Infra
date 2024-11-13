@@ -13,7 +13,7 @@ function SituationStep2() {
   const [currentAnimationIndex, setCurrentAnimationIndex] = useState(0) // 3일 경우 119 입력 완료
   const [reportingState, setReportingState] = useState<ReportingState>('ready')
   const [speech, setSpeech] = useState(
-    '"와! 빠르게 119에 신고한 덕분에 벌써 소방차가 오고 있어!"',
+    '와! 빠르게 119에 신고한 덕분에 벌써 소방차가 오고 있어!',
   )
 
   useEffect(() => {
