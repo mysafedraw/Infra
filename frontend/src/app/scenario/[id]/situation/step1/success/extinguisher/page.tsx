@@ -5,17 +5,14 @@
 import { useState, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
-import Head from 'next/head'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
-import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
-import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
-import SituationHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 
 function Step1SucccessExtinguisher() {
   const [showFire, setShowFire] = useState(true)
-  const [showExtinguisher] = useState(true)
   const [speechText, setSpeechText] = useState('소화기로 빨리 불을 꺼야해!')
   const router = useRouter()
   const { user } = useUser()
@@ -30,18 +27,12 @@ function Step1SucccessExtinguisher() {
       alert('소화기를 이용해서 불이 꺼졌습니다!')
       setTimeout(() => {
         router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
-      }, 10000)
+      }, 6000)
     }, 500)
   }
 
   return (
-    <>
-      <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-      </Head>
+    <StoryLayout speechText={speechText} isSpeechVisible>
       <div className="fixed inset-0">
         <Canvas
           camera={{
@@ -94,28 +85,17 @@ function Step1SucccessExtinguisher() {
                   />
                 </>
               )}
-              {showExtinguisher && (
-                <ModelLoader
-                  path="/assets/scenario/fire_extinguisher.glb"
-                  position={[12, 0, 0]}
-                  scale={[0.2, 0.2, 0.2]}
-                  onClick={handleExtinguisherClick}
-                />
-              )}
             </Suspense>
           </ARController>
+          <ModelLoader
+            path="/assets/scenario/fire_extinguisher.glb"
+            position={[12, 0, 0]}
+            scale={[0.2, 0.2, 0.2]}
+            onClick={handleExtinguisherClick}
+          />
         </Canvas>
-        <div className="absolute inset-0 pointer-events-none">
-          <SituationHeader title="화재 시나리오" />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex items-end">
-              <CharacterDialogue speechText={speechText} />
-            </div>
-          </div>
-        </div>
-        -
       </div>
-    </>
+    </StoryLayout>
   )
 }
 

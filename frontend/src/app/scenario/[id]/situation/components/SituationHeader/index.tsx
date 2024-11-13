@@ -65,12 +65,10 @@ export default function SituationHeader({
     <div className="flex flex-row items-center justify-between p-4">
       <div className="flex flex-row items-center">
         <BackArrowIcon
-          width={60}
-          height={60}
-          className="h-12 w-auto cursor-pointer pointer-events-auto"
+          className="cursor-pointer pointer-events-auto"
           onClick={() => router.back()}
         />
-        <div className="bg-white border-primary-500 border-4 p-4 px-12 rounded-3xl ml-4">
+        <div className="bg-white border-primary-500 border-4 p-4 px-11 rounded-3xl ml-4">
           <h3 className="text-4xl">{title}</h3>
         </div>
       </div>

@@ -5,36 +5,36 @@
 import { useState, Suspense, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
-import Head from 'next/head'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
-import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
-import SituationHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 
-function Step1SucccessExtinguisher() {
-  const [showFire] = useState(true)
-  const [speechText] = useState(
-    '으악 불이 더 커지고 있어! 그 물건은 불을 끄는 데 전혀 도움이 되지 않은 것 같아!',
-  )
+function Step1Fail() {
   const router = useRouter()
   const { user } = useUser()
+  const [fireScale, setFireScale] = useState(8)
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      setFireScale((prev) => prev + 0.1)
+    }, 500)
+
     setTimeout(() => {
+      clearInterval(interval)
+
       router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
-    }, 10000)
+    }, 6000)
   }, [])
 
   return (
-    <>
-      <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-      </Head>
+    <StoryLayout
+      speechText={
+        '으악 불이 더 커지고 있어!\n 그 물건은 불을 끄는 데 전혀 도움이 되지 않은 것 같아!'
+      }
+      isSpeechVisible
+    >
       <div className="fixed inset-0">
         <Canvas
           camera={{
@@ -68,52 +68,41 @@ function Step1SucccessExtinguisher() {
             />
 
             <Suspense fallback={null}>
-              {showFire && (
-                <>
-                  <ModelLoader
-                    path="/assets/scenario/fire.glb"
-                    position={[-30, -1, -10]}
-                    scale={[8, 8, 8]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire.glb"
-                    position={[-26, -1, -10]}
-                    scale={[8, 8, 8]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire.glb"
-                    position={[-24, -1, -10]}
-                    scale={[8, 8, 8]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire.glb"
-                    position={[-30, -1, -10]}
-                    scale={[8, 8, 8]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire.glb"
-                    position={[-20, -1, -10]}
-                    scale={[8, 8, 8]}
-                  />
-                </>
-              )}
+              <>
+                <ModelLoader
+                  path="/assets/scenario/fire.glb"
+                  position={[-30, -1, -10]}
+                  scale={[fireScale, fireScale, fireScale]}
+                />
+                <ModelLoader
+                  path="/assets/scenario/fire.glb"
+                  position={[-26, -1, -10]}
+                  scale={[fireScale, fireScale, fireScale]}
+                />
+                <ModelLoader
+                  path="/assets/scenario/fire.glb"
+                  position={[-24, -1, -10]}
+                  scale={[fireScale, fireScale, fireScale]}
+                />
+                <ModelLoader
+                  path="/assets/scenario/fire.glb"
+                  position={[-30, -1, -10]}
+                  scale={[fireScale, fireScale, fireScale]}
+                />
+                <ModelLoader
+                  path="/assets/scenario/fire.glb"
+                  position={[-20, -1, -10]}
+                  scale={[fireScale, fireScale, fireScale]}
+                />
+              </>
             </Suspense>
           </ARController>
         </Canvas>
-        <div className="absolute inset-0 pointer-events-none">
-          <SituationHeader title="화재 시나리오" />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex items-end">
-              <CharacterDialogue speechText={speechText} />
-            </div>
-          </div>
-        </div>
-        -
       </div>
-    </>
+    </StoryLayout>
   )
 }
 
-export default dynamic(() => Promise.resolve(Step1SucccessExtinguisher), {
+export default dynamic(() => Promise.resolve(Step1Fail), {
   ssr: false,
 })

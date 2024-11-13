@@ -2,28 +2,22 @@
 /* eslint-disable react/no-unknown-property */
 'use client'
 
-import { useState, Suspense } from 'react'
+import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
-import Head from 'next/head'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
-import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
-import ScenarioHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 
 function SituationStep1() {
-  const [speechText] = useState(
-    '헉 저기에 불이 붙었어! \n 초기에 빨리 진압해야 할 텐데... 지금 필요한 건',
-  )
-
   return (
-    <>
-      <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-      </Head>
+    <StoryLayout
+      speechText={
+        '헉 저기에 불이 붙었어! \n 초기에 빨리 진압해야 할 텐데... 지금 필요한 건'
+      }
+      isSpeechVisible
+      showNextButton
+    >
       <div className="fixed inset-0">
         <Canvas
           camera={{
@@ -75,17 +69,8 @@ function SituationStep1() {
             </Suspense>
           </ARController>
         </Canvas>
-
-        <div className="absolute inset-0 pointer-events-none">
-          <ScenarioHeader title="화재 시나리오" showNextButton={true} />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex items-end">
-              <CharacterDialogue speechText={speechText} />
-            </div>
-          </div>
-        </div>
       </div>
-    </>
+    </StoryLayout>
   )
 }
 

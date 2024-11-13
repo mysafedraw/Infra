@@ -5,13 +5,11 @@
 import { useState, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
-import Head from 'next/head'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
-import CharacterDialogue from '@/app/scenario/[id]/situation/components/CharacterDialogue'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
-import SituationHeader from '@/app/scenario/[id]/situation/components/SituationHeader'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 
 function BucketScene() {
   const [showFire, setShowFire] = useState(true)
@@ -26,7 +24,6 @@ function BucketScene() {
 
     // 성공 후 알림과 페이지 이동
     setTimeout(() => {
-      alert('물을 부어서 불이 꺼졌습니다!')
       setTimeout(() => {
         router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
       }, 10000)
@@ -34,13 +31,7 @@ function BucketScene() {
   }
 
   return (
-    <>
-      <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-      </Head>
+    <StoryLayout speechText={speechText} isSpeechVisible>
       <div className="fixed inset-0">
         <Canvas
           camera={{
@@ -113,16 +104,6 @@ function BucketScene() {
             </Suspense>
           </ARController>
         </Canvas>
-
-        <div className="absolute inset-0 pointer-events-none">
-          <SituationHeader title="화재 시나리오" />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex items-end">
-              <CharacterDialogue speechText={speechText} />
-            </div>
-          </div>
-        </div>
-
         {/* 드래그 가이드 */}
         <div className="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2">
           <div className="bg-orange-400 text-white px-6 py-3 rounded-full animate-bounce">
@@ -130,7 +111,7 @@ function BucketScene() {
           </div>
         </div>
       </div>
-    </>
+    </StoryLayout>
   )
 }
 
