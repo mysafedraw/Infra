@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
-import ARController from '@/app/scenario/components/ARController'
-import Step2 from '@/app/scenario/situation/step2/components/Success'
-import StoryLayout from '@/app/scenario/components/StoryLayout'
+import ARController from '@/app/scenario/[id]/situation/components/ARController'
+import Step2 from '@/app/scenario/[id]/situation/step2/components/Success'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 
 export type ReportingState = 'ready' | 'processing' | 'complete'
 

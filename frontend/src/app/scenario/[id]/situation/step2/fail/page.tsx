@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
-import ARController from '@/app/scenario/components/ARController'
-import ModelLoader from '@/app/scenario/components/ModelLoader'
+import ARController from '@/app/scenario/[id]/situation/components/ARController'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import { useRouter } from 'next/navigation'
-import StoryLayout from '@/app/scenario/components/StoryLayout'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 
 function Fail() {
   const router = useRouter()

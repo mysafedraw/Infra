@@ -2,10 +2,10 @@
 
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
-import ARController from '@/app/scenario/components/ARController'
-import StoryLayout from '@/app/scenario/components/StoryLayout'
+import ARController from '@/app/scenario/[id]/situation/components/ARController'
+import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import { useRouter } from 'next/navigation'
-import ModelLoader from '@/app/scenario/components/ModelLoader'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
 function SituationStep2() {
   const router = useRouter()
