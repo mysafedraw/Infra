@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react/no-unknown-property */
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Html, useGLTF } from '@react-three/drei'
 import { AnimationMixer, LoopOnce } from 'three'
-import SuccessStep2 from '@/app/scenario/situation/step2/components/SuccessStep2'
+import SuccessStep2 from '@/app/scenario/[id]/situation/step2/components/SuccessStep2'
 import { useRouter } from 'next/navigation'
-import ModelLoader from '@/app/scenario/components/ModelLoader'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import { ReportingState } from '../../success/page'
 
 export default function Step2({
