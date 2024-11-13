@@ -15,15 +15,18 @@ export default function Scenario() {
 
   const fetchCreateRoom = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/rooms', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/rooms`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            hostId: user?.userId,
+          }),
         },
-        body: JSON.stringify({
-          hostId: user?.userId,
-        }),
-      })
+      )
 
       const result = await response.json()
       console.log(result)

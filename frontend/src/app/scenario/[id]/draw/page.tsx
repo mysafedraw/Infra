@@ -28,7 +28,6 @@ export default function Draw() {
   const router = useRouter()
   const [canvasData, setCanvasData] = useState<(() => string) | null>(null)
   const [question, setQuestion] = useState<string>('...')
-  const [isToastShow, setIsToastShow] = useState(false)
   const [label, setLabel] = useState<string>('')
 
   const { sendMessage, registerCallback } = useWebSocketContext()
@@ -125,10 +124,13 @@ export default function Draw() {
     formData.append('userId', user?.userId || '')
 
     try {
-      const response = await fetch('http://localhost:8080/images/answer', {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/images/answer`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      )
 
       if (response.ok) {
         return true
@@ -149,7 +151,7 @@ export default function Draw() {
         roomId: roomId,
         scenarioId: 1,
         stageNumber: Number(stageNumber),
-        answer: DRAW_TYPES[label],
+        answer: DRAW_TYPES[label] ?? '',
         userId: user?.userId,
       }
 
@@ -234,15 +236,12 @@ export default function Draw() {
           </p>
         </button>
       </div>
-      {isToastShow && (
+      {isTimeEnded && (
         <CommonToast
           message="시간이 끝났어요"
           duration={3000}
           imageSrc="/images/tiger.png"
           altText="draw-rights-icon"
-          handleDurationEnd={() => {
-            setIsToastShow(false)
-          }}
         />
       )}
     </div>
