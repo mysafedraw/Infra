@@ -36,9 +36,9 @@ export default function AnswerBoard({
         <Image
           src={characterImage}
           alt="character"
-          width={435}
-          height={574}
-          className="w-32 object-contain"
+          width={120}
+          height={176}
+          className="h-44 w-auto object-contain"
         />
       </div>
     </div>
