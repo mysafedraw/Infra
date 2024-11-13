@@ -15,6 +15,7 @@ async function fetchScenario(): Promise<Scenario[]> {
   try {
     const response = await fetch(`https://mysafedraw.site/api/scenarios`, {
       method: 'GET',
+      cache: 'no-store',
     })
 
     if (!response.ok) {
