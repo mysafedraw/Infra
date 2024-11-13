@@ -6,6 +6,21 @@ pipeline {
     }
 
     stages {
+        stage('.env file copy') {
+            steps {
+                script {
+                    dir('frontend') {
+                        withCredentials([file(credentialsId: 'frontend.env', variable: 'ENV')]) {
+                            sh '''
+                            # application.yml 파일을 현재 작업 디렉토리로 복사
+                            cp $ENV ./.env
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
