@@ -26,7 +26,7 @@ export default function SetNicknameModal() {
   }
 
   const postUser = async (): Promise<{
-    avatarImg: string
+    avatarsImg: string
     nickname: string
     userId: string
   }> => {
@@ -57,7 +57,7 @@ export default function SetNicknameModal() {
           const userInfo = await postUser()
           setUser({
             ...user,
-            avatarImg: userInfo.avatarImg,
+            avatarImg: userInfo.avatarsImg,
             userId: userInfo.userId,
           })
           router.back()

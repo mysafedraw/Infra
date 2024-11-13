@@ -17,6 +17,7 @@ async function fetchScenario(): Promise<Scenario[]> {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/scenarios`,
       {
         method: 'GET',
+        cache: 'no-store',
       },
     )
 

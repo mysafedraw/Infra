@@ -27,6 +27,7 @@ async function fetchCharacter(): Promise<Character[]> {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/avatars/list`,
       {
         method: 'GET',
+        cache: 'no-store',
       },
     )
 
