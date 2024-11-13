@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 
 interface User {
-  userId: number
+  userId: string
   nickname: string
   isCorrect: string
   drawingSrc: string
@@ -28,7 +28,10 @@ export default function AllAnswers() {
       id: user.userId,
       isCorrect: user.isCorrect === 'CORRECT_ANSWER',
       nickname: user.nickname,
-      characterImage: user.avatarsImgSrc,
+      characterImage:
+        user.avatarsImgSrc === 'null'
+          ? '/images/tiger.png'
+          : user.avatarsImgSrc,
       drawingImage: user.drawingSrc,
     }))
     setAnswerData(newAnswerData)
@@ -60,7 +63,7 @@ export default function AllAnswers() {
   }, [isConnected, roomId, sendMessage])
 
   return (
-    <div className="grid grid-cols-3 gap-x-6">
+    <div className="grid grid-cols-3 gap-x-6 mt-4">
       {answerData.map((data) => (
         <ScoredBoard key={data.id} data={data} />
       ))}

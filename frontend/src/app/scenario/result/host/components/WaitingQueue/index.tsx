@@ -3,17 +3,11 @@
 import ExplainQueueBoard from '@/app/scenario/result/host/components/ExplainQueueBoard'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
-
-interface AnswerData {
-  id: number
-  isCorrect: boolean
-  nickname: string
-  characterImage: string
-  drawingImage: string
-}
+import { AnswerData } from '@/app/scenario/result/types/answerTypes'
+import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
 
 interface User {
-  userId: number
+  userId: string
   nickname: string
   isCorrect: string
   drawingSrc: string
@@ -29,14 +23,18 @@ export default function WaitingQueue() {
   const [waitingData, setWaitingData] = useState<AnswerData[]>([])
   const [roomId, setRoomId] = useState<string | null>(null)
 
-  const { registerCallback } = useWebSocketContext()
+  const { registerCallback, sendMessage } = useWebSocketContext()
+  const { setSpeakingRightInfo } = useSpeakingRight()
 
   const handleReceivedMessage = (message: AddExplainQueueMessage) => {
     const newWaitingData: AnswerData[] = message.waitingQueue.map((user) => ({
       id: user.userId,
       isCorrect: false,
       nickname: user.nickname,
-      characterImage: user.avatarsImgSrc,
+      characterImage:
+        user.avatarsImgSrc === 'null'
+          ? '/images/tiger.png'
+          : user.avatarsImgSrc,
       drawingImage: user.drawingSrc,
     }))
     setWaitingData(newWaitingData)
@@ -47,6 +45,12 @@ export default function WaitingQueue() {
   }, [])
 
   useEffect(() => {
+    registerCallback(`/games/${roomId}`, 'HAVE_A_SAY', (message) => {
+      setSpeakingRightInfo(message)
+    })
+  }, [registerCallback, roomId, setSpeakingRightInfo])
+
+  useEffect(() => {
     // ADD_EXPLAIN_QUEUE action에 대한 콜백 등록
     registerCallback(
       `/games/${roomId}`,
@@ -55,11 +59,23 @@ export default function WaitingQueue() {
     )
   }, [registerCallback, roomId])
 
+  const handleGrantSpeakingRight = (userId: string) => {
+    if (roomId) {
+      // /games/say 엔드포인트로 발언권 요청을 전송
+      const message = JSON.stringify({ roomId, userId })
+      sendMessage('/games/say', message)
+    } else {
+      console.error('roomId를 찾을 수 없습니다.')
+    }
+  }
+
   return (
-    <button className="flex gap-x-6 w-full overflow-x-auto overflow-y-hidden mt-4 ps-1">
+    <div className="flex mr-auto gap-x-6 overflow-y-hidden overflow-x-auto w-full mt-2">
       {waitingData.map((data) => (
-        <ExplainQueueBoard key={data.id} data={data} />
+        <button onClick={() => handleGrantSpeakingRight(data.id)} key={data.id}>
+          <ExplainQueueBoard data={data} />
+        </button>
       ))}
-    </button>
+    </div>
   )
 }

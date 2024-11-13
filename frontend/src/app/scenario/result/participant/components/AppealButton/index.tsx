@@ -4,55 +4,100 @@ import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
 import { useUser } from '@/app/_contexts/UserContext'
 import { useLiveKit } from '@/app/_contexts/LiveKitContext'
+import SpeakingRightsToast from '@/app/scenario/result/participant/components/SpeakingRightsToast'
+
+const BUTTON_CONFIG_MAP = {
+  hasSpeakingRight: {
+    text: '발언 중이에요 🎙',
+    style: 'bg-secondary-200 border-secondary-500',
+  },
+  hasSpoken: {
+    text: '발언은 한 번씩만 할 수 있어요 🙅‍♂️',
+    style: 'bg-gray-medium border-gray-dark',
+  },
+  isWaiting: {
+    text: '발언 순서를 기다리고 있어요 ⏱',
+    style: 'bg-gray-medium border-gray-dark',
+  },
+  default: {
+    text: '억울해요 😢',
+    style: 'bg-secondary-200 border-secondary-500 hover:bg-secondary-400',
+  },
+}
 
 export default function AppealButton() {
   const { user } = useUser()
   const { sendMessage, registerCallback } = useWebSocketContext()
-  const { voiceRoom, joinVoiceRoom } = useLiveKit()
+  const { joinVoiceRoom } = useLiveKit()
   const [roomId, setRoomId] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState(false) // 발언 순서를 기다리는 상태
+  const [hasSpeakingRight, setHasSpeakingRight] = useState(false) // 발언권이 있는 상태
+  const [hasSpoken, setHasSpoken] = useState(false) // 발언권이 회수된 상태
 
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
 
-    registerCallback(`/games/${roomId}`, 'ADD_EXPLAIN_QUEUE', () => {
-      setIsWaiting(true)
+    registerCallback(`/games/${roomId}`, 'ADD_EXPLAIN_QUEUE', (message) => {
+      const { waitingQueue } = message
+
+      const isUserInQueue = waitingQueue.some(
+        (queueItem: { userId: string }) => queueItem.userId === user?.userId,
+      )
+
+      setIsWaiting(isUserInQueue)
     })
-  }, [registerCallback, roomId])
+
+    // 발언권을 얻었을 때 상태 업데이트
+    registerCallback(`/games/${roomId}`, 'HAVE_A_SAY', (message) => {
+      const { userId } = message
+      if (userId === user?.userId) {
+        setHasSpeakingRight(true)
+        setIsWaiting(false) // 발언권을 얻었으므로 대기 상태 해제
+      }
+    })
+
+    // 발언권이 회수되었을 때 상태 업데이트
+    registerCallback(`/games/${roomId}`, 'REMOVE_SPEAKING_RIGHT', (message) => {
+      const { userId } = message
+      if (userId === user?.userId) {
+        setHasSpeakingRight(false)
+        setHasSpoken(true) // 발언권이 회수되면 발언 완료 상태로 설정
+      }
+    })
+  }, [registerCallback, roomId, user?.userId])
 
   const handleAppeal = async () => {
     // 음성 채팅 참여
     await joinVoiceRoom(roomId!, user?.userId || '')
 
-    // 마이크 음소거 설정 (발언권을 받기 전까지)
-    voiceRoom?.localParticipant.audioTrackPublications.forEach(
-      (publication) => {
-        if (publication.track) {
-          publication.track.mute()
-        }
-      },
-    )
-
+    // 발언 대기 중 상태 설정
     const message = JSON.stringify({ roomId, userId: user?.userId })
     sendMessage('/games/explanation-queue', message)
+    setIsWaiting(true)
   }
 
+  const { text, style } =
+    (hasSpeakingRight && BUTTON_CONFIG_MAP.hasSpeakingRight) ||
+    (hasSpoken && BUTTON_CONFIG_MAP.hasSpoken) ||
+    (isWaiting && BUTTON_CONFIG_MAP.isWaiting) ||
+    BUTTON_CONFIG_MAP.default
+
   return (
-    <button
-      onClick={handleAppeal}
-      disabled={isWaiting}
-      className={`${
-        isWaiting
-          ? 'bg-gray-medium border-gray-dark'
-          : 'bg-secondary-200 border-secondary-500'
-      } border-2 w-full py-3 rounded-xl ${isWaiting ? '' : 'hover:bg-secondary-400'}`}
-    >
-      <p className="text-3xl">
-        {isWaiting ? '발언 순서를 기다리고 있어요 ⏱' : '억울해요 😢'}
-      </p>
-      <p className="text-xl">
-        차례가 되면 마이크를 켜고 의견을 이야기할 수 있어요
-      </p>
-    </button>
+    <>
+      <button
+        onClick={handleAppeal}
+        disabled={isWaiting || hasSpoken || hasSpeakingRight}
+        className={`${style} border-2 w-full py-3 rounded-xl`}
+      >
+        <p className="text-3xl">{text}</p>
+        {!hasSpoken && !hasSpeakingRight && (
+          <p className="text-xl">
+            차례가 되면 마이크를 켜고 의견을 이야기할 수 있어요
+          </p>
+        )}
+      </button>
+
+      {hasSpeakingRight && <SpeakingRightsToast />}
+    </>
   )
 }
