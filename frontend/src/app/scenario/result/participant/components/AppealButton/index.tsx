@@ -3,12 +3,12 @@
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
 import { useUser } from '@/app/_contexts/UserContext'
-import { useLiveKit } from '@/app/_contexts/LiveKitContext'
 import SpeakingRightsToast from '@/app/scenario/result/participant/components/SpeakingRightsToast'
+import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
 
 const BUTTON_CONFIG_MAP = {
   hasSpeakingRight: {
-    text: '발언 중이에요 🎙',
+    text: '발언 중이에요 📣',
     style: 'bg-secondary-200 border-secondary-500',
   },
   hasSpoken: {
@@ -28,11 +28,11 @@ const BUTTON_CONFIG_MAP = {
 export default function AppealButton() {
   const { user } = useUser()
   const { sendMessage, registerCallback } = useWebSocketContext()
-  const { joinVoiceRoom } = useLiveKit()
   const [roomId, setRoomId] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState(false) // 발언 순서를 기다리는 상태
   const [hasSpeakingRight, setHasSpeakingRight] = useState(false) // 발언권이 있는 상태
   const [hasSpoken, setHasSpoken] = useState(false) // 발언권이 회수된 상태
+  const { setSpeakingRightInfo } = useSpeakingRight()
 
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
@@ -49,6 +49,7 @@ export default function AppealButton() {
 
     // 발언권을 얻었을 때 상태 업데이트
     registerCallback(`/games/${roomId}`, 'HAVE_A_SAY', (message) => {
+      setSpeakingRightInfo(message)
       const { userId } = message
       if (userId === user?.userId) {
         setHasSpeakingRight(true)
@@ -57,19 +58,22 @@ export default function AppealButton() {
     })
 
     // 발언권이 회수되었을 때 상태 업데이트
-    registerCallback(`/games/${roomId}`, 'REMOVE_SPEAKING_RIGHT', (message) => {
-      const { userId } = message
-      if (userId === user?.userId) {
+    registerCallback(`/games/${roomId}`, 'REVOKE_A_SAY', () => {
+      setSpeakingRightInfo(null)
+      if (hasSpeakingRight) {
         setHasSpeakingRight(false)
         setHasSpoken(true) // 발언권이 회수되면 발언 완료 상태로 설정
       }
     })
-  }, [registerCallback, roomId, user?.userId])
+  }, [
+    hasSpeakingRight,
+    registerCallback,
+    roomId,
+    setSpeakingRightInfo,
+    user?.userId,
+  ])
 
   const handleAppeal = async () => {
-    // 음성 채팅 참여
-    await joinVoiceRoom(roomId!, user?.userId || '')
-
     // 발언 대기 중 상태 설정
     const message = JSON.stringify({ roomId, userId: user?.userId })
     sendMessage('/games/explanation-queue', message)

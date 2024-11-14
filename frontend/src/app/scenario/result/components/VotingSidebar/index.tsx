@@ -7,6 +7,7 @@ import VotingStatus from '@/app/scenario/result/host/components/VotingStatus'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import VoteConfirm from '@/app/scenario/result/host/components/VoteConfirm'
 import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function VotingSidebar({ role }: { role: string }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -16,10 +17,17 @@ export default function VotingSidebar({ role }: { role: string }) {
   const [roomId, setRoomId] = useState<string | null>(null)
 
   const { speakingRightInfo } = useSpeakingRight()
+  const { user } = useUser()
 
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
   }, [speakingRightInfo?.userId])
+
+  useEffect(() => {
+    if (speakingRightInfo && speakingRightInfo.userId !== user?.userId) {
+      setIsOpen(true)
+    }
+  }, [speakingRightInfo])
 
   const handleEndVote = () => {
     const message = JSON.stringify({
