@@ -1,5 +1,6 @@
 'use client'
 
+import { useThrottle } from '@/app/_hooks/useThrottle'
 import { useRef, useState, useEffect, useCallback } from 'react'
 
 // 좌표
@@ -92,7 +93,7 @@ export default function DrawingBoard({
     if (isTimerEnded || strokes.length === 0) return
 
     try {
-      const response = await fetch('https://mysafedraw.site/api2/predict', {
+      const response = await fetch('/api2/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,23 +113,16 @@ export default function DrawingBoard({
 
       setPredictions(resultPredictions)
 
-      if (onPrediction) {
-        onPrediction(predictions[0])
+      if (onPrediction && resultPredictions.length > 0) {
+        onPrediction(resultPredictions[0])
       }
     } catch (error) {
       console.error('예측 중 오류 발생:', error)
     }
-  }, [strokes, onPrediction, predictions, isTimerEnded])
+  }, [strokes, onPrediction, isTimerEnded])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (strokes.length > 0) {
-        predictDrawing()
-      }
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [strokes, predictDrawing])
+  // 쓰로틀된 예측 함수
+  const throttledPredict = useThrottle(predictDrawing, 1000)
 
   const getCoordinates = useCallback((event: EventType): Point => {
     if (!canvasRef.current) return { x: 0, y: 0 }
@@ -166,17 +160,24 @@ export default function DrawingBoard({
 
       context.lineTo(point.x / scale, point.y / scale)
       context.stroke()
+
+      // 쓰로틀된 예측 실행
+      if (!isTimerEnded) {
+        throttledPredict()
+      }
     },
-    [context, scale, isDrawing, strokes],
+    [context, scale, isDrawing, strokes, throttledPredict, isTimerEnded],
   )
 
   // 그리기 종료
   const stopDrawing = useCallback(() => {
+    if (!isDrawing) return
+
     setIsDrawing(false)
     if (context) {
       context.closePath()
     }
-  }, [context])
+  }, [context, isDrawing])
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {

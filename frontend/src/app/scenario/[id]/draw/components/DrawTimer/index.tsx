@@ -1,41 +1,33 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import AlarmClockIcon from '/public/icons/alarm-clock.svg'
 
-const calculateProgress = (
-  endTime: number | null,
-  initialTime: number,
-): number => {
-  if (!endTime) return 100
-  const remaining = Math.max(0, endTime - Date.now())
-  return (remaining / (initialTime * 1000)) * 100
-}
-
 export default function DrawTimer({
-  initialTime,
   handleTimeEnd,
 }: {
-  initialTime: number
   handleTimeEnd?: () => void
 }) {
-  const endTime = useMemo(() => {
-    return Number(localStorage.getItem('endTime')) || null
+  const timeLimit = useMemo(() => {
+    return Number(localStorage.getItem('timeLimit') || 0)
   }, [])
 
-  const getInitialProgress = useCallback(() => {
-    return calculateProgress(endTime, initialTime)
-  }, [endTime, initialTime])
+  const getEndTime = () => Number(localStorage.getItem('endTime') || 0)
 
-  const [progress, setProgress] = useState(getInitialProgress)
-  const [time, setTime] = useState(initialTime)
+  const calculateProgress = useCallback(() => {
+    const remaining = Math.max(0, getEndTime() - Date.now())
+    return (remaining / (timeLimit * 1000)) * 100
+  }, [timeLimit])
+
+  const [progress, setProgress] = useState(calculateProgress())
+  const [time, setTime] = useState(
+    Math.ceil((getEndTime() - Date.now()) / 1000),
+  )
   const [isWarning, setIsWarning] = useState(false)
   const [isBlinking, setIsBlinking] = useState(false)
   const [isTimeEnded, setIsTimeEnded] = useState(false)
 
   const updateProgress = useCallback(() => {
-    if (!endTime) return false
-
-    const remaining = Math.max(0, endTime - Date.now())
-    const newProgress = (remaining / (initialTime * 1000)) * 100
+    const remaining = Math.max(0, getEndTime() - Date.now())
+    const newProgress = (remaining / (timeLimit * 1000)) * 100
     const newTime = Math.ceil(remaining / 1000)
 
     setProgress(newProgress)
@@ -44,12 +36,11 @@ export default function DrawTimer({
 
     if (newProgress <= 0) {
       setIsTimeEnded(true)
-      localStorage.removeItem('endTime')
       handleTimeEnd?.()
       return false
     }
     return true
-  }, [endTime, initialTime, handleTimeEnd])
+  }, [timeLimit, handleTimeEnd])
 
   useEffect(() => {
     if (isTimeEnded) return

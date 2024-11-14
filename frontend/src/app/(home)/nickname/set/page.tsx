@@ -30,14 +30,17 @@ export default function SetNickname() {
     nickname: string
     userId: string
   }> => {
-    const response = await fetch(`https://mysafedraw.site/api/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(user),
       },
-      body: JSON.stringify(user),
-    })
+    )
 
     if (!response.ok) {
       throw new Error('Failed to post user')
