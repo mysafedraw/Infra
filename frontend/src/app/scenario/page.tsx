@@ -13,9 +13,13 @@ export interface Scenario {
 
 async function fetchScenario(): Promise<Scenario[]> {
   try {
-    const response = await fetch(`https://mysafedraw.site/api/scenarios`, {
-      method: 'GET',
-    })
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/scenarios`,
+      {
+        method: 'GET',
+        cache: 'no-store',
+      },
+    )
 
     if (!response.ok) {
       throw new Error('Failed to fetch scenarios')
