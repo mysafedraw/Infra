@@ -12,9 +12,11 @@ interface ModelLoaderProps {
   rotation?: [number, number, number] // 모델 회전
   castShadow?: boolean // 그림자 설정
   receiveShadow?: boolean // 그림자 수신 설정
+  opacity?: boolean // 애니메이션 투명 여부
   onLoad?: (model: THREE.Group) => void // 모델이 로드될 때 실행할 콜백
   onClick?: () => void // 클릭 이벤트 핸들러
   animation?: {
+    // 애니메이션 작동 여부
     timeScale: number
     loop: number
   }
@@ -27,6 +29,7 @@ export default function ModelLoader({
   rotation = [0, 0, 0],
   castShadow = true,
   receiveShadow = true,
+  opacity = false,
   onLoad,
   onClick,
   animation = {
@@ -69,6 +72,17 @@ export default function ModelLoader({
   useFrame((_, delta) => {
     if (mixerRef.current) {
       mixerRef.current.update(delta)
+    }
+    if (modelRef.current && opacity) {
+      modelRef.current.traverse((child) => {
+        if (
+          child instanceof THREE.Mesh &&
+          child.material instanceof THREE.MeshStandardMaterial
+        ) {
+          child.material.transparent = true
+          child.material.opacity = Math.max(0, child.material.opacity - 0.005)
+        }
+      })
     }
   })
 
