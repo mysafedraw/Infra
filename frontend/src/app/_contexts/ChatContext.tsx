@@ -15,6 +15,7 @@ interface ChatMessage {
   user: string
   text: string
   time: string
+  avatarImg: string
   isSender: boolean
 }
 
@@ -50,6 +51,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       nickname: string
       content: string
       sentAt: string
+      avatarsImgSrc: string
     }) => {
       if (parsedMessage.senderId === user?.userId) return
 
@@ -60,6 +62,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
           user: parsedMessage.nickname,
           text: parsedMessage.content,
           time: parsedMessage.sentAt,
+          avatarImg: parsedMessage.avatarsImgSrc,
           isSender: parsedMessage.senderId === user?.userId,
         },
       ])
@@ -88,6 +91,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       user: user?.nickname || '',
       text: content,
       time: newMessage.sentAt,
+      avatarImg: user?.avatarImg || '/images/tiger.png',
       isSender: true,
     })
   }
