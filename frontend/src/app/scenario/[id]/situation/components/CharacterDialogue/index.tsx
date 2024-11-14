@@ -14,13 +14,15 @@ export default function CharacterDialogue({
           <p className="text-3xl text-gray-800">{speechText}</p>
           <div className="absolute right-[-11px] top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-t-4 border-r-4 border-primary-600 rotate-45"></div>
         </div>
-        <Image
-          src={user?.avatarImg ? user?.avatarImg : ''}
-          alt="character-dialogue"
-          width={200}
-          height={200}
-          className="w-48 h-auto relative z-10"
-        />
+        {user?.avatarImg ? (
+          <Image
+            src={user?.avatarImg}
+            alt="character-dialogue"
+            width={200}
+            height={200}
+            className="w-48 h-auto relative z-10"
+          />
+        ) : null}
       </div>
     </div>
   )
