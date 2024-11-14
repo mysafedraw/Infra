@@ -4,6 +4,9 @@ import React, { createContext, useContext, useRef, useState } from 'react'
 import {
   createLocalAudioTrack,
   LocalAudioTrack,
+  Participant,
+  RemoteParticipant,
+  RemoteTrack,
   RemoteTrackPublication,
   Room,
   RoomEvent,
@@ -18,6 +21,7 @@ interface LiveKitContextProps {
   joinVoiceRoom: (roomName: string, participantName: string) => Promise<void>
   leaveVoiceRoom: () => Promise<void>
   toggleMicrophone: () => void
+  muteMicrophone: () => void
   enableMicForSpeakingRights: (
     roomName: string,
     participantName: string,
@@ -67,51 +71,87 @@ export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 음성 채팅 방에 참여하는 함수
   const joinVoiceRoom = async (roomName: string, participantName: string) => {
-    if (voiceRoomRef.current) return
+    if (voiceRoomRef.current) return // 이미 참여 중이면 리턴
 
     const voiceRoom = new Room()
     voiceRoomRef.current = voiceRoom
 
+    // 트랙 구독 이벤트 등록
     voiceRoom.on(
       RoomEvent.TrackSubscribed,
-      (track, publication, participant) => {
-        if (track.kind === 'audio') {
-          setRemoteAudioTracks((prev) => [
-            ...prev,
-            {
-              trackPublication: publication,
-              participantIdentity: participant.identity,
-            },
-          ])
+      (
+        _track: RemoteTrack,
+        publication: RemoteTrackPublication,
+        participant: RemoteParticipant,
+      ) => {
+        // 오디오 트랙이 구독된 경우, 오디오 요소에 연결하여 출력
+        if (_track.kind === 'audio') {
+          const audioElement = new Audio()
+          audioElement.srcObject = new MediaStream([_track.mediaStreamTrack]) // 오디오 트랙을 오디오 요소에 연결
+          audioElement.play().catch((error) => {
+            console.error('Audio play error:', error)
+          })
         }
+
+        setRemoteAudioTracks((prev) => [
+          ...prev,
+          {
+            trackPublication: publication,
+            participantIdentity: participant.identity,
+          },
+        ])
       },
     )
 
-    voiceRoom.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
-      setRemoteAudioTracks((prev) =>
-        prev.filter(
-          (track) => track.trackPublication.trackSid !== publication.trackSid,
-        ),
-      )
+    // 트랙 구독 해제 이벤트 등록
+    voiceRoom.on(
+      RoomEvent.TrackUnsubscribed,
+      (_track: RemoteTrack, publication: RemoteTrackPublication) => {
+        setRemoteAudioTracks((prev) =>
+          prev.filter(
+            (track) => track.trackPublication.trackSid !== publication.trackSid,
+          ),
+        )
+      },
+    )
+
+    // 참가자 연결 및 연결 해제 이벤트 등록
+    voiceRoom.on(RoomEvent.ParticipantConnected, (participant: Participant) => {
+      console.log(`Participant connected: ${participant.identity}`)
     })
+
+    voiceRoom.on(
+      RoomEvent.ParticipantDisconnected,
+      (participant: Participant) => {
+        console.log(`Participant disconnected: ${participant.identity}`)
+      },
+    )
 
     try {
       const token = await getToken(roomName, participantName)
       await voiceRoom.connect(LIVEKIT_URL, token)
 
-      // 로컬 오디오 트랙을 생성하지만 바로 발행하지 않음 (청취자 모드로만 입장)
+      // 로컬 오디오 트랙을 생성하고 트랙 발행 및 뮤트 설정
       const audioTrack = await createLocalAudioTrack()
       localAudioTrackRef.current = audioTrack
+      await voiceRoom.localParticipant.publishTrack(audioTrack)
+      await audioTrack.mute() // 음소거 상태로 시작
       setIsMuted(true)
 
-      console.log(
-        'Successfully connected to the voice chat room as a listener.',
+      console.log('Local audio track published and muted:', audioTrack)
+      console.log('Connected to voice room as a listener.')
+      console.log('Current room name:', voiceRoomRef.current?.name)
+
+      // 현재 연결된 원격 참가자들 로그 출력
+      const participants = Array.from(
+        voiceRoomRef.current.remoteParticipants.values(),
       )
+      console.log('Remote participants:')
+      participants.forEach((participant) => {
+        console.log(`Participant ID: ${participant.identity}`)
+      })
     } catch (error) {
-      console.error(
-        'Error connecting to the voice chat room:',
-        (error as Error).message,
-      )
+      console.error('Error connecting to voice room:', (error as Error).message)
       await leaveVoiceRoom()
     }
   }
@@ -158,12 +198,22 @@ export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
+  // 마이크 음소거
+  const muteMicrophone = () => {
+    if (localAudioTrackRef.current) {
+      localAudioTrackRef.current.mute()
+      setIsMuted(true)
+      console.log('Microphone has been muted.')
+    }
+  }
+
   return (
     <LiveKitContext.Provider
       value={{
         joinVoiceRoom,
         leaveVoiceRoom,
         toggleMicrophone,
+        muteMicrophone,
         enableMicForSpeakingRights,
         isMuted,
         remoteAudioTracks,
