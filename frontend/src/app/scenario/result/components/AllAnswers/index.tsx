@@ -26,15 +26,15 @@ export default function AllAnswers() {
   const { user } = useUser()
 
   const handleReceivedMessage = (message: CheckAllAnswersMessage) => {
-    const newAnswerData = message.users.map((user: User) => ({
-      id: user.userId,
-      isCorrect: user.isCorrect === 'CORRECT_ANSWER',
-      nickname: user.nickname,
+    const newAnswerData = message.users.map((userData: User) => ({
+      id: userData.userId,
+      isCorrect: userData.isCorrect === 'CORRECT_ANSWER',
+      nickname: userData.nickname,
       characterImage:
-        user.avatarsImgSrc === 'null'
+        userData.avatarsImgSrc === 'null'
           ? '/images/tiger.png'
-          : user.avatarsImgSrc,
-      drawingImage: user.drawingSrc,
+          : userData.avatarsImgSrc,
+      drawingImage: userData.drawingSrc,
     }))
     setAnswerData(newAnswerData)
   }
