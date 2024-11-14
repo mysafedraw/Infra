@@ -29,14 +29,15 @@ export default function Draw() {
   const [canvasData, setCanvasData] = useState<(() => string) | null>(null)
   const [question, setQuestion] = useState<string>('...')
   const [label, setLabel] = useState<string>('')
+  const [showRetryToast, setShowRetryToast] = useState(false)
 
   const { sendMessage, registerCallback } = useWebSocketContext()
   const { user } = useUser()
 
   const [roomId, setRoomId] = useState<string | null>(null)
   const [stageNumber, setStageNumber] = useState<string | null>(null)
-  const [isTimeEnded, setIsTimeEnded] = useState(false) // 타이머 종료 상태
-  const [hasSentAnswer, setHasSentAnswer] = useState(false) // 답변이 전송되었는지
+  const [isTimeEnded, setIsTimeEnded] = useState(false)
+  const [hasSentAnswer, setHasSentAnswer] = useState(false)
 
   // roomId, stageNumber 가져오기
   useEffect(() => {
@@ -73,7 +74,7 @@ export default function Draw() {
     setCanvasData(() => getCanvas)
   }, [])
 
-  // 그림을 전송
+  // 그림을 서버에 전송
   const fetchDraw = async (): Promise<boolean> => {
     if (!canvasData || hasSentAnswer) return false
 
@@ -93,7 +94,6 @@ export default function Draw() {
       tempContext.clearRect(0, 0, tempCanvas.width, tempCanvas.height)
       tempContext.drawImage(img, 0, 0)
 
-      // 이미지 픽셀 데이터를 가져와 선 색상을 흰색으로 변경
       const imageData = tempContext.getImageData(
         0,
         0,
@@ -125,7 +125,7 @@ export default function Draw() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/images/answer`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/images/answer`,
         {
           method: 'POST',
           body: formData,
@@ -144,8 +144,11 @@ export default function Draw() {
     }
   }
 
-  // 전송한 그림 정답 확인
-  const sendAnswerLabel = () => {
+  // 그림 정답 확인 및 처리
+  const handleAnswerProcess = async (isTimeEnd: boolean = false) => {
+    if (hasSentAnswer) return
+
+    // 정답 확인 로직
     return new Promise<void>((resolve) => {
       const request = {
         roomId: roomId,
@@ -157,24 +160,40 @@ export default function Draw() {
 
       sendMessage('/games/answer', JSON.stringify(request))
 
-      // WebSocket 응답 처리 콜백 등록
       registerCallback(
         `/games/${user?.userId}`,
         'CHECK_ANSWER',
-        (response: CheckAnswerResponse) => {
-          // 정답 상호작용 페이지로 이동
-          if (response.isCorrect === 'CORRECT_ANSWER') {
-            router.push(
-              `/scenario/1/situation/step${stageNumber}/success/${label.trim()}`,
-            )
-            // 오답 페이지로 이동
-          } else if (response.isCorrect === 'INCORRECT_ANSWER') {
-            router.push(`/scenario/1/situation/step${stageNumber}/fail`)
-            // 오답 상호작용 페이지로 이동
-          } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
-            router.push(
-              `/scenario/1/situation/step${stageNumber}/fail/${label.trim()}`,
-            )
+        async (response: CheckAnswerResponse) => {
+          if (response.isCorrect === 'INCORRECT_ANSWER') {
+            if (!isTimeEnd) {
+              setShowRetryToast(true)
+              setTimeout(() => setShowRetryToast(false), 1000)
+              resolve()
+              return
+            }
+          }
+
+          // CORRECT_ANSWER나 PROHIBITED_ANSWER인 경우, 또는 시간 종료 시
+          const isSuccess = await fetchDraw()
+          if (isSuccess) {
+            setHasSentAnswer(true)
+
+            const moveLabel = label.replace(/\s/g, '')
+
+            // 정답 상호작용 페이지로 이동
+            if (response.isCorrect === 'CORRECT_ANSWER') {
+              router.push(
+                `/scenario/1/situation/step${stageNumber}/success/${moveLabel}`,
+              )
+              // 오답 상호작용 페이지로 이동
+            } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
+              router.push(
+                `/scenario/1/situation/step${stageNumber}/fail/${moveLabel}`,
+              )
+              // 오답 페이지로 이동
+            } else if (response.isCorrect === 'INCORRECT_ANSWER') {
+              router.push(`/scenario/1/situation/step${stageNumber}/fail`)
+            }
           }
           resolve()
         },
@@ -182,15 +201,15 @@ export default function Draw() {
     })
   }
 
-  // 제출 및 타이머 종료 시 그림 전송
+  // 제출 버튼
   const handleSubmit = async () => {
-    if (hasSentAnswer) return
-    setHasSentAnswer(true)
+    await handleAnswerProcess(false)
+  }
 
-    const isSuccess = await fetchDraw()
-    if (isSuccess) {
-      await sendAnswerLabel()
-    }
+  // 타이머 종료
+  const handleTimeEnd = async () => {
+    setIsTimeEnded(true)
+    await handleAnswerProcess(true)
   }
 
   return (
@@ -208,12 +227,7 @@ export default function Draw() {
           onDrawSubmit={handleDrawSubmit}
           isTimerEnded={isTimeEnded}
         />
-        <DrawTimer
-          handleTimeEnd={() => {
-            setIsTimeEnded(true)
-            handleSubmit()
-          }}
-        />
+        <DrawTimer handleTimeEnd={handleTimeEnd} />
       </div>
       <div className="flex mt-4">
         <div className="flex justify-center w-full">
@@ -242,6 +256,15 @@ export default function Draw() {
           duration={3000}
           imageSrc="/images/tiger.png"
           altText="draw-rights-icon"
+        />
+      )}
+
+      {showRetryToast && (
+        <CommonToast
+          message="다시 생각해보세요"
+          duration={1000}
+          imageSrc="/images/tiger.png"
+          altText="draw-retry-icon"
         />
       )}
     </div>
