@@ -12,7 +12,8 @@ pipeline {
                     dir('frontend') {
                         withCredentials([file(credentialsId: 'frontend.env', variable: 'ENV')]) {
                             sh '''
-                            # application.yml 파일을 현재 작업 디렉토리로 복사
+                            # .env 파일을 현재 작업 디렉토리로 복사
+                            chmod 777 .  # 현재 디렉토리에 쓰기 권한 부여
                             cp $ENV ./.env
                             '''
                         }
