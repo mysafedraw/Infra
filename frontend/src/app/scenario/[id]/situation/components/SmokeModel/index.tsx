@@ -7,7 +7,7 @@ export default function SmokeModel({
 }: {
   position: number[]
 }) {
-  const smokeTexture: any = useTexture('/images/texture/smoke.png')
+  const smokeTexture = useTexture('/images/texture/smoke.png')
 
   const smokeParticles = useMemo(() => {
     const particles = []
