@@ -32,25 +32,6 @@ export default function SituationStep5() {
           intensity={4}
           color="#ffffff"
         />
-        <>
-          <ModelLoader
-            path="/assets/scenario/penguin-sick.glb"
-            position={[1.5, -1, 0]}
-            scale={[0.03, 0.03, 0.03]}
-            rotation={[-0.2, 0.2, 0]}
-          />
-          <Html
-            position={[1, 1.5, 0]}
-            transform
-            style={{
-              pointerEvents: 'none',
-            }}
-          >
-            <p className="bg-[rgba(124,124,124,0.5)] opacity-70 py-3 px-10 whitespace-nowrap text-2xl rounded-full text-gray-800">
-              켁켁...
-            </p>
-          </Html>
-        </>
 
         <ARController>
           <ambientLight intensity={0.5} />
@@ -68,6 +49,26 @@ export default function SituationStep5() {
             intensity={1}
             castShadow
           />
+
+          <>
+            <ModelLoader
+              path="/assets/scenario/penguin-sick.glb"
+              position={[1.5, -1, 0]}
+              scale={[0.03, 0.03, 0.03]}
+              rotation={[-0.2, 0.2, 0]}
+            />
+            <Html
+              position={[1, 1.5, 0]}
+              transform
+              style={{
+                pointerEvents: 'none',
+              }}
+            >
+              <p className="bg-[rgba(124,124,124,0.5)] opacity-70 py-3 px-10 whitespace-nowrap text-2xl rounded-full text-gray-800">
+                켁켁...
+              </p>
+            </Html>
+          </>
         </ARController>
       </Canvas>
     </StoryLayout>
