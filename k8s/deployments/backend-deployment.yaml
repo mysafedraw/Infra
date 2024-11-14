@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-app
+  name: backend-app
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend-app
+      app: backend-app
   template:
     metadata:
       labels:
-        app: frontend-app
+        app: backend-app
     spec:
       containers:
-      - name: frontend-app
-        image: dongwonkwon/frontend-image:latest
+      - name: backend-app
+        image: dongwonkwon/backend-image:latest
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
         env:
         - name: TZ
           value: "Asia/Seoul"
