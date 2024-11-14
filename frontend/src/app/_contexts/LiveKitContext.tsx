@@ -1,158 +1,172 @@
 'use client'
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
-import { Room as LiveKitRoom, createLocalAudioTrack } from 'livekit-client'
-import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
-import { useUser } from '@/app/_contexts/UserContext'
+import React, { createContext, useContext, useRef, useState } from 'react'
+import {
+  createLocalAudioTrack,
+  LocalAudioTrack,
+  RemoteTrackPublication,
+  Room,
+  RoomEvent,
+} from 'livekit-client'
+
+interface TrackInfo {
+  trackPublication: RemoteTrackPublication
+  participantIdentity: string
+}
 
 interface LiveKitContextProps {
-  voiceRoom?: LiveKitRoom
-  createVoiceRoom: (roomId: string, userId: string) => Promise<void>
-  joinVoiceRoom: (roomId: string, userId: string) => Promise<void>
-  toggleMute: (userId: string, mute: boolean) => void // 특정 사용자의 마이크 상태를 제어
-  isHostMuted: boolean
-  setIsHostMuted: React.Dispatch<React.SetStateAction<boolean>>
+  joinVoiceRoom: (roomName: string, participantName: string) => Promise<void>
+  leaveVoiceRoom: () => Promise<void>
+  toggleMicrophone: () => void
+  enableMicForSpeakingRights: (
+    roomName: string,
+    participantName: string,
+  ) => Promise<void>
+  isMuted: boolean
+  remoteAudioTracks: TrackInfo[]
 }
 
 const LiveKitContext = createContext<LiveKitContextProps | undefined>(undefined)
 
+const APPLICATION_SERVER_URL = 'https://26ed-211-192-252-94.ngrok-free.app/api/'
+const LIVEKIT_URL = 'wss://26ed-211-192-252-94.ngrok-free.app/livekit'
+
 export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [voiceRoom, setVoiceRoom] = useState<LiveKitRoom | undefined>(undefined)
-  const { speakingRightInfo } = useSpeakingRight()
-  const { user } = useUser()
-  const [isHostMuted, setIsHostMuted] = useState(true) // 방장의 마이크 상태를 저장
+  const [isMuted, setIsMuted] = useState(true)
+  const [remoteAudioTracks, setRemoteAudioTracks] = useState<TrackInfo[]>([])
+  const voiceRoomRef = useRef<Room | undefined>(undefined)
+  const localAudioTrackRef = useRef<LocalAudioTrack | undefined>(undefined)
 
-  const APPLICATION_SERVER_URL =
-    'https://0580-211-192-252-94.ngrok-free.app/api/'
-  const LIVEKIT_URL = 'wss://0580-211-192-252-94.ngrok-free.app/livekit'
-
-  const getToken = async (roomId: string, userId: string) => {
-    const response = await fetch(`${APPLICATION_SERVER_URL}audio/token`, {
+  const getToken = async (roomName: string, participantName: string) => {
+    const response = await fetch(APPLICATION_SERVER_URL + 'audio/token', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        roomId: roomId,
-        userId: userId,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roomId: roomName, userId: participantName }),
     })
 
     if (!response.ok) {
       const error = await response.json()
       throw new Error(`Failed to get token: ${error.errorMessage}`)
     }
-
     const data = await response.json()
     return data.audioAccessToken
   }
 
-  // 새로운 방 생성 함수
-  const createVoiceRoom = async (roomId: string, userId: string) => {
-    const newRoom = new LiveKitRoom()
-    try {
-      const token = await getToken(roomId, userId)
-      await newRoom.connect(LIVEKIT_URL, token)
-      setVoiceRoom(newRoom)
-
-      const audioTrack = await createLocalAudioTrack()
-      await newRoom.localParticipant.publishTrack(audioTrack)
-
-      // 방장 초기 입장 시 음소거 설정
-      audioTrack.mute()
-      setIsHostMuted(true)
-
-      console.log('음성 채팅 방이 성공적으로 생성되었습니다.')
-    } catch (error) {
-      console.error('음성 채팅 방 생성 중 오류 발생:', error)
-      await newRoom.disconnect()
+  // 음성 채팅 방을 떠나는 함수
+  const leaveVoiceRoom = async () => {
+    if (voiceRoomRef.current) {
+      await voiceRoomRef.current.disconnect()
+      voiceRoomRef.current = undefined
+      localAudioTrackRef.current = undefined
+      setRemoteAudioTracks([])
+      console.log('음성 채팅 방을 떠났습니다.')
     }
   }
 
-  // 기존 방에 참여하는 함수
-  const joinVoiceRoom = async (roomId: string, userId: string) => {
-    if (voiceRoom) return // 이미 방에 참여 중이면 중복 참여 방지
+  // 음성 채팅 방에 참여하는 함수
+  const joinVoiceRoom = async (roomName: string, participantName: string) => {
+    if (voiceRoomRef.current) return
 
-    const newRoom = new LiveKitRoom()
+    const voiceRoom = new Room()
+    voiceRoomRef.current = voiceRoom
+
+    voiceRoom.on(
+      RoomEvent.TrackSubscribed,
+      (track, publication, participant) => {
+        if (track.kind === 'audio') {
+          setRemoteAudioTracks((prev) => [
+            ...prev,
+            {
+              trackPublication: publication,
+              participantIdentity: participant.identity,
+            },
+          ])
+        }
+      },
+    )
+
+    voiceRoom.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
+      setRemoteAudioTracks((prev) =>
+        prev.filter(
+          (track) => track.trackPublication.trackSid !== publication.trackSid,
+        ),
+      )
+    })
+
     try {
-      const token = await getToken(roomId, userId)
-      await newRoom.connect(LIVEKIT_URL, token)
-      setVoiceRoom(newRoom)
+      const token = await getToken(roomName, participantName)
+      await voiceRoom.connect(LIVEKIT_URL, token)
 
+      // 로컬 오디오 트랙을 생성하지만 바로 발행하지 않음 (청취자 모드로만 입장)
       const audioTrack = await createLocalAudioTrack()
-      await newRoom.localParticipant.publishTrack(audioTrack)
+      localAudioTrackRef.current = audioTrack
+      setIsMuted(true)
 
-      // 참여자는 기본적으로 음소거 상태로 시작
-      audioTrack.mute()
-
-      console.log(`참여자 ${userId}가 음성 채팅 방에 입장했습니다.`)
-    } catch (error) {
-      console.error('음성 채팅 방 참여 중 오류 발생:', error)
-      await newRoom.disconnect()
-    }
-  }
-
-  // 특정 사용자의 마이크 음소거/해제 함수
-  const toggleMute = useCallback(
-    (targetUserId: string, mute: boolean) => {
       console.log(
-        `toggleMute called with targetUserId: ${targetUserId}, mute: ${mute}`,
+        'Successfully connected to the voice chat room as a listener.',
       )
-
-      voiceRoom?.localParticipant.audioTrackPublications.forEach(
-        (publication) => {
-          if (
-            publication.track &&
-            voiceRoom.localParticipant.identity === targetUserId
-          ) {
-            if (mute) {
-              publication.track.mute()
-              console.log(`${targetUserId} 뮤트함`)
-            } else {
-              publication.track.unmute()
-              console.log(`${targetUserId} 뮤트 해제함`)
-            }
-          }
-        },
+    } catch (error) {
+      console.error(
+        'Error connecting to the voice chat room:',
+        (error as Error).message,
       )
-      // 방장의 경우 상태 업데이트
-      if (user?.userId === targetUserId) {
-        setIsHostMuted(mute)
-      }
-    },
-    [
-      user?.userId,
-      voiceRoom?.localParticipant.audioTrackPublications,
-      voiceRoom?.localParticipant.identity,
-    ],
-  )
+      await leaveVoiceRoom()
+    }
+  }
 
-  // 발언권 상태에 따른 마이크 제어
-  useEffect(() => {
-    if (voiceRoom) {
-      if (speakingRightInfo?.userId) {
-        toggleMute(speakingRightInfo.userId, false)
+  // 발언권 부여 후 마이크 켜기
+  const enableMicForSpeakingRights = async (
+    roomName: string,
+    participantName: string,
+  ) => {
+    if (!voiceRoomRef.current) {
+      console.log('Room not connected. Attempting to join the room.')
+
+      // 방에 참여
+      await joinVoiceRoom(roomName, participantName)
+
+      if (!voiceRoomRef.current) {
+        console.warn('Failed to join the room. Cannot enable the microphone.')
+        return
       }
     }
-  }, [speakingRightInfo, toggleMute, voiceRoom])
+
+    if (localAudioTrackRef.current) {
+      // 로컬 오디오 트랙 발행 (마이크 켜기)
+      await voiceRoomRef.current.localParticipant.publishTrack(
+        localAudioTrackRef.current,
+      )
+      await localAudioTrackRef.current.unmute()
+      setIsMuted(false)
+      console.log('Microphone enabled for speaking rights.')
+    }
+  }
+
+  // 마이크 음소거/해제 함수
+  const toggleMicrophone = () => {
+    if (localAudioTrackRef.current) {
+      if (isMuted) {
+        localAudioTrackRef.current.unmute()
+        console.log('마이크 켬')
+      } else {
+        localAudioTrackRef.current.mute()
+        console.log('마이크 끔')
+      }
+      setIsMuted((prev) => !prev)
+    }
+  }
 
   return (
     <LiveKitContext.Provider
       value={{
-        voiceRoom,
-        createVoiceRoom,
         joinVoiceRoom,
-        toggleMute,
-        isHostMuted,
-        setIsHostMuted,
+        leaveVoiceRoom,
+        toggleMicrophone,
+        enableMicForSpeakingRights,
+        isMuted,
+        remoteAudioTracks,
       }}
     >
       {children}
@@ -162,7 +176,8 @@ export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useLiveKit = () => {
   const context = useContext(LiveKitContext)
-  if (!context)
+  if (!context) {
     throw new Error('useLiveKit must be used within LiveKitProvider')
+  }
   return context
 }

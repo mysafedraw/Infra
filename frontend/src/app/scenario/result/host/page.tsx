@@ -7,28 +7,35 @@ import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
 import NextStepButton from '@/app/scenario/result/host/components/NextStepButton'
 import { useUser } from '@/app/_contexts/UserContext'
+import { useLiveKit } from '@/app/_contexts/LiveKitContext'
 
 export default function ScenarioResultHost() {
   const [toastMessage, setToastMessage] = useState<string>('')
+  const [isVoiceRoomJoined, setIsVoiceRoomJoined] = useState(false)
   const { registerCallback } = useWebSocketContext()
   const { user } = useUser()
+  const { joinVoiceRoom, toggleMicrophone, isMuted } = useLiveKit()
 
   useEffect(() => {
-    // ANSWER_CONFIRMED 응답을 받을 때 토스트 메시지 표시
     const hostId = user?.userId
     if (hostId) {
       registerCallback(`/games/${hostId}`, 'ANSWER_CONFIRMED', () => {
-        setToastMessage('확인된 투표 결과 전송 완료!')
+        setToastMessage('투표 결과 전송 완료!')
       })
     }
   }, [registerCallback, user?.userId])
 
   useEffect(() => {
     if (toastMessage) {
-      const timer = setTimeout(() => setToastMessage(''), 3000) // 3초 후 메시지 자동 제거
+      const timer = setTimeout(() => setToastMessage(''), 3000)
       return () => clearTimeout(timer)
     }
   }, [toastMessage])
+
+  const handleStartVoiceDiscussion = async () => {
+    await joinVoiceRoom('VoiceDiscussionRoom', user?.userId || '')
+    setIsVoiceRoomJoined(true)
+  }
 
   return (
     <div className="p-6 flex flex-col items-center">
@@ -51,10 +58,41 @@ export default function ScenarioResultHost() {
         <NextStepButton />
       </div>
 
-      <div className="-ml-6 mr-auto bg-wood bg-cover w-72 py-3 pr-5 text-right text-4xl text-white rounded-r-lg shadow-lg">
-        발언 대기 목록
+      <div className="flex self-start">
+        <div className="-ml-6 mr-auto bg-wood bg-cover w-72 py-3 pr-5 text-right text-4xl text-white rounded-r-lg shadow-lg">
+          발언 대기 목록
+        </div>
+        {/* 마이크 상태에 따라 버튼을 다르게 표시 */}
+        {isVoiceRoomJoined && (
+          <button
+            onClick={toggleMicrophone}
+            className={`ml-4 rounded-xl px-4 border-2 text-2xl ${
+              isMuted
+                ? 'bg-gray-medium border-gray-dark text-red-600'
+                : 'bg-primary-300 border-primary-500 text-lime-600'
+            }`}
+          >
+            {isMuted ? '방장 마이크 꺼짐 🔈❌' : '방장 마이크 켜짐 🔊'}
+          </button>
+        )}
       </div>
-      <WaitingQueue />
+
+      <div className="flex w-full">
+        {!isVoiceRoomJoined && (
+          <button
+            onClick={handleStartVoiceDiscussion}
+            className="bg-secondary-300 border-2 border-secondary-500 w-full py-10 rounded-xl mt-4 hover:bg-secondary-500"
+          >
+            <p className="text-4xl">음성 토론 시작하기📣 </p>
+            <p className="text-2xl text-secondary-950 mt-1">
+              이 버튼을 누르면 발언 대기 중인 목록이 보여요
+            </p>
+          </button>
+        )}
+        <div className={`w-full ${!isVoiceRoomJoined && 'hidden'}`}>
+          <WaitingQueue />
+        </div>
+      </div>
 
       <div className="-ml-6 mr-auto mt-6 bg-wood bg-cover w-72 py-3 pr-5 text-right text-4xl text-white rounded-r-lg shadow-lg mb-4">
         전체 답변

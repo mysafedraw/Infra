@@ -45,6 +45,8 @@ export default function VoteConfirm({
       isConfirmed: true,
     })
     sendMessage('/games/confirm', message)
+    const revokeMessage = JSON.stringify({ roomId, userId: votingUserId })
+    sendMessage('/games/say-revoke', revokeMessage)
     onClose()
   }
 
@@ -55,6 +57,8 @@ export default function VoteConfirm({
       isConfirmed: false,
     })
     sendMessage('/games/confirm', message)
+    const revokeMessage = JSON.stringify({ roomId, userId: votingUserId })
+    sendMessage('/games/say-revoke', revokeMessage)
     onClose()
   }
 

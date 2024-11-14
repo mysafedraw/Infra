@@ -8,14 +8,20 @@ import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useUser } from '@/app/_contexts/UserContext'
+import { useLiveKit } from '@/app/_contexts/LiveKitContext'
 import { AnswerData } from '@/app/scenario/result/types/answerTypes'
+import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
 
 export default function ScenarioResultParticipant() {
   const router = useRouter()
   const { sendMessage, registerCallback } = useWebSocketContext()
+  const { joinVoiceRoom } = useLiveKit()
   const { user } = useUser()
   const [roomId, setRoomId] = useState<string | null>(null)
+  const [isListening, setIsListening] = useState(false)
   const [myDrawing, setMyDrawing] = useState<AnswerData>()
+  const { speakingRightInfo } = useSpeakingRight()
+
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
   }, [])
@@ -47,8 +53,33 @@ export default function ScenarioResultParticipant() {
     registerCallback(`/games/${roomId}`, 'GAME_START', handleGameStart)
   }, [registerCallback, roomId, router])
 
+  useEffect(() => {
+    if (speakingRightInfo && speakingRightInfo.userId !== user?.userId) {
+      setIsListening(true)
+    } else {
+      setIsListening(false)
+    }
+  }, [speakingRightInfo, user?.userId])
+
+  const handleListen = async () => {
+    if (roomId && user?.userId) {
+      await joinVoiceRoom(roomId, user.userId) // listener로 방 참여
+    }
+  }
+
   return (
     <div className="p-6 flex flex-col items-center">
+      <span className="absolute top-9 left-6 animate-bounce">
+        {isListening && (
+          <button
+            onClick={handleListen}
+            className="inline-flex items-center px-5 py-4 h-full text-3xl shadow rounded-lg text-sky-500 bg-white ring-2 ring-secondary-500"
+          >
+            진행 중인 발언 듣기📣
+          </button>
+        )}
+      </span>
+
       <h2 className="mb-4 w-2/5 bg-wood bg-cover bg-left text-5xl text-white text-center py-4 rounded-xl shadow-lg">
         작은 불 끄기
       </h2>
