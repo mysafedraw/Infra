@@ -4,6 +4,7 @@ import ScoredBoard from '@/app/scenario/result/components/ScoredBoard'
 import { AnswerData } from '@/app/scenario/result/types/answerTypes'
 import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useUser } from '@/app/_contexts/UserContext'
 
 interface User {
   userId: string
@@ -22,6 +23,7 @@ export default function AllAnswers() {
   const [roomId, setRoomId] = useState<string | null>(null)
   const [answerData, setAnswerData] = useState<AnswerData[]>([])
   const { isConnected, sendMessage, registerCallback } = useWebSocketContext()
+  const { user } = useUser()
 
   const handleReceivedMessage = (message: CheckAllAnswersMessage) => {
     const newAnswerData = message.users.map((user: User) => ({
@@ -64,9 +66,11 @@ export default function AllAnswers() {
 
   return (
     <div className="grid grid-cols-3 gap-x-6 mt-4">
-      {answerData.map((data) => (
-        <ScoredBoard key={data.id} data={data} />
-      ))}
+      {answerData
+        .filter((data) => data.id !== user?.userId)
+        .map((data) => (
+          <ScoredBoard key={data.id} data={data} />
+        ))}
     </div>
   )
 }
