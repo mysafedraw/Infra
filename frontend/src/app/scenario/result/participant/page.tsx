@@ -15,10 +15,10 @@ import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
 export default function ScenarioResultParticipant() {
   const router = useRouter()
   const { sendMessage, registerCallback } = useWebSocketContext()
-  const { joinVoiceRoom } = useLiveKit()
+  const { joinVoiceRoom, leaveVoiceRoom } = useLiveKit()
   const { user } = useUser()
   const [roomId, setRoomId] = useState<string | null>(null)
-  const [isListening, setIsListening] = useState(false)
+  const [isListening, setIsListening] = useState(false) // 음성채팅 참여 상태
   const [myDrawing, setMyDrawing] = useState<AnswerData>()
   const { speakingRightInfo } = useSpeakingRight()
 
@@ -27,8 +27,7 @@ export default function ScenarioResultParticipant() {
   }, [])
 
   useEffect(() => {
-    const message = JSON.stringify({ userId: user?.userId })
-    sendMessage('/games/my-drawing', message)
+    sendMessage('/games/my-drawing', JSON.stringify({ userId: user?.userId }))
 
     registerCallback(`/games/${user?.userId}`, 'MY_DRAWING', (message) => {
       const { userId, nickname, isCorrect, drawingSrc, avatarsImgSrc } = message
@@ -54,31 +53,42 @@ export default function ScenarioResultParticipant() {
   }, [registerCallback, roomId, router])
 
   useEffect(() => {
-    if (speakingRightInfo && speakingRightInfo.userId !== user?.userId) {
+    if (speakingRightInfo && speakingRightInfo.userId === user?.userId) {
       setIsListening(true)
-    } else {
-      setIsListening(false)
     }
   }, [speakingRightInfo, user?.userId])
 
   const handleListen = async () => {
-    if (roomId && user?.userId) {
-      await joinVoiceRoom(roomId, user.userId) // listener로 방 참여
+    if (isListening) {
+      // 음성 채팅방 나가기
+      await leaveVoiceRoom()
+      setIsListening(false)
+    } else {
+      // 음성 채팅방 참여
+      if (roomId && user?.userId) {
+        await joinVoiceRoom(roomId, user.userId)
+        setIsListening(true)
+      }
     }
   }
 
   return (
     <div className="p-6 flex flex-col items-center">
-      <span className="absolute top-9 left-6 animate-bounce">
-        {isListening && (
+      {/* 음성 채팅방 참여 중일 때만 버튼 표시 */}
+      {speakingRightInfo?.userId !== user?.userId && (
+        <span className="absolute top-9 left-6">
           <button
             onClick={handleListen}
-            className="inline-flex items-center px-5 py-4 h-full text-3xl shadow rounded-lg text-sky-500 bg-white ring-2 ring-secondary-500"
+            className={`inline-flex items-center px-5 py-4 h-full text-3xl shadow rounded-lg ${
+              isListening
+                ? 'text-gray-dark bg-white ring-2 ring-gray-dark'
+                : 'text-sky-500 bg-white ring-2 ring-secondary-500 animate-bounce'
+            }`}
           >
-            진행 중인 발언 듣기📣
+            {isListening ? '음성 채팅방 나가기 ❌' : '음성 채팅방 참여하기 📣'}
           </button>
-        )}
-      </span>
+        </span>
+      )}
 
       <h2 className="mb-4 w-2/5 bg-wood bg-cover bg-left text-5xl text-white text-center py-4 rounded-xl shadow-lg">
         작은 불 끄기

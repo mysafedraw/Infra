@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useUser } from '@/app/_contexts/UserContext'
 import SpeakingRightsToast from '@/app/scenario/result/participant/components/SpeakingRightsToast'
 import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
+import { useLiveKit } from '@/app/_contexts/LiveKitContext'
 
 const BUTTON_CONFIG_MAP = {
   hasSpeakingRight: {
@@ -33,6 +34,7 @@ export default function AppealButton() {
   const [hasSpeakingRight, setHasSpeakingRight] = useState(false) // 발언권이 있는 상태
   const [hasSpoken, setHasSpoken] = useState(false) // 발언권이 회수된 상태
   const { setSpeakingRightInfo } = useSpeakingRight()
+  const { muteMicrophone } = useLiveKit()
 
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
@@ -63,6 +65,7 @@ export default function AppealButton() {
       if (hasSpeakingRight) {
         setHasSpeakingRight(false)
         setHasSpoken(true) // 발언권이 회수되면 발언 완료 상태로 설정
+        muteMicrophone() // 마이크 음소거
       }
     })
   }, [

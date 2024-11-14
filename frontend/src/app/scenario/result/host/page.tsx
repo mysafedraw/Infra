@@ -15,6 +15,11 @@ export default function ScenarioResultHost() {
   const { registerCallback } = useWebSocketContext()
   const { user } = useUser()
   const { joinVoiceRoom, toggleMicrophone, isMuted } = useLiveKit()
+  const [roomId, setRoomId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setRoomId(localStorage.getItem('roomId'))
+  }, [])
 
   useEffect(() => {
     const hostId = user?.userId
@@ -33,8 +38,10 @@ export default function ScenarioResultHost() {
   }, [toastMessage])
 
   const handleStartVoiceDiscussion = async () => {
-    await joinVoiceRoom('VoiceDiscussionRoom', user?.userId || '')
-    setIsVoiceRoomJoined(true)
+    if (roomId && user?.userId) {
+      await joinVoiceRoom(roomId, user.userId)
+      setIsVoiceRoomJoined(true)
+    }
   }
 
   return (
@@ -83,7 +90,7 @@ export default function ScenarioResultHost() {
             onClick={handleStartVoiceDiscussion}
             className="bg-secondary-300 border-2 border-secondary-500 w-full py-10 rounded-xl mt-4 hover:bg-secondary-500"
           >
-            <p className="text-4xl">음성 토론 시작하기📣 </p>
+            <p className="text-4xl">음성 토론 시작하기📣</p>
             <p className="text-2xl text-secondary-950 mt-1">
               이 버튼을 누르면 발언 대기 중인 목록이 보여요
             </p>

@@ -51,7 +51,7 @@ export default function WaitingQueue() {
       setGrantedUserId(message.userId) // 발언권 부여된 사용자 ID 저장
     })
 
-    registerCallback(`/games/${roomId}`, 'REVOKE_A_SAY', (message) => {
+    registerCallback(`/games/${roomId}`, 'REVOKE_A_SAY', () => {
       setSpeakingRightInfo(null)
       setGrantedUserId(null)
     })
