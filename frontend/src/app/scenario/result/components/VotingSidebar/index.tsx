@@ -27,7 +27,7 @@ export default function VotingSidebar({ role }: { role: string }) {
     if (speakingRightInfo && speakingRightInfo.userId !== user?.userId) {
       setIsOpen(true)
     }
-  }, [speakingRightInfo])
+  }, [speakingRightInfo, user?.userId])
 
   const handleEndVote = () => {
     const message = JSON.stringify({
