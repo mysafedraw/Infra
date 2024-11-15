@@ -42,7 +42,7 @@ function Step3Fail() {
     setTimeout(() => {
       clearInterval(interval)
 
-      //router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
+      router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
     }, 6000)
   }, [])
   return (
