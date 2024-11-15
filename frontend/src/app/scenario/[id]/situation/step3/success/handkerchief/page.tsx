@@ -73,9 +73,9 @@ function Step3SucccessHandkerchief() {
             <Suspense fallback={null}>
               {showSmoke && (
                 <>
-                  <SmokeModel position={[-2, -2, -2]} />
-                  <SmokeModel position={[-1, -3, -1]} />
-                  <SmokeModel position={[-3, -2, -3]} />
+                  <SmokeModel position={[0, -1, 0]} />
+                  <SmokeModel position={[-1, -0.5, 0]} />
+                  <SmokeModel position={[-0.5, 0, 0]} />
                 </>
               )}
             </Suspense>

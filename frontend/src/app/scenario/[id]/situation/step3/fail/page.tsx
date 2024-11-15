@@ -2,19 +2,37 @@
 /* eslint-disable react/no-unknown-property */
 'use client'
 
-import { Suspense, useEffect, useReducer, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import SmokeModel from '@/app/scenario/[id]/situation/components/SmokeModel'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
+import ActionScene from '@/app/scenario/[id]/situation/components/ActionScene'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
 function Step3Fail() {
   const router = useRouter()
   const { user } = useUser()
   const [showMoreSmoke, setShowMoreSmoke] = useState(false)
+
+  const [avatarUrl, setAvatarUrl] = useState<string>('')
+
+  useEffect(() => {
+    if (user?.avatarImg) {
+      const match = user.avatarImg.match(/\/([^/]+)\.png$/)
+      console.log(match)
+      if (match) {
+        if (match[1] === 'cat' || match[1] === 'fox') {
+          setAvatarUrl(`/assets/scenario/unicorn-sick.glb`)
+        } else {
+          setAvatarUrl(`/assets/scenario/${match[1]}.glb`)
+        }
+      }
+    }
+  }, [user])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,7 +42,7 @@ function Step3Fail() {
     setTimeout(() => {
       clearInterval(interval)
 
-      router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
+      //router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
     }, 6000)
   }, [])
   return (
@@ -68,18 +86,25 @@ function Step3Fail() {
             />
             {/* 연기 */}
             <Suspense fallback={null}>
-              <SmokeModel position={[-2, -2, -2]} />
-              <SmokeModel position={[-1, -3, -1]} />
-              <SmokeModel position={[-3, -2, -3]} />
+              <SmokeModel position={[0, -1, 0]} />
+              <SmokeModel position={[-1, -0.5, 0]} />
+              <SmokeModel position={[-0.5, 0, 0]} />
               {showMoreSmoke && (
                 <>
-                  <SmokeModel position={[-4, -2, -3]} />
-                  <SmokeModel position={[0, -1, -3]} />
-                  <SmokeModel position={[1, -1, -3]} />
+                  <SmokeModel position={[1, -1, 0]} />
+                  <SmokeModel position={[0.5, 1, 0]} />
                 </>
               )}
             </Suspense>
           </ARController>
+          <ActionScene>
+            <ModelLoader
+              path={avatarUrl}
+              position={[1, -0.5, 0]}
+              scale={[0.025, 0.025, 0.025]}
+              rotation={[-0.2, 0.2, 0]}
+            />
+          </ActionScene>
         </Canvas>
       </div>
     </StoryLayout>

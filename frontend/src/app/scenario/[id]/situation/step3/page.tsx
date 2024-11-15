@@ -2,7 +2,7 @@
 /* eslint-disable react/no-unknown-property */
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
@@ -10,6 +10,9 @@ import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import SmokeModel from '@/app/scenario/[id]/situation/components/SmokeModel'
 
 function Step3() {
+  useEffect(() => {
+    localStorage.setItem('stageNumber', '3')
+  }, [])
   return (
     <StoryLayout
       speechText={
@@ -21,7 +24,7 @@ function Step3() {
       <div className="fixed inset-0">
         <Canvas
           camera={{
-            position: [0, 0, 0],
+            position: [0, 0, 5],
             near: 0.1,
             far: 2000,
             fov: 75,
@@ -52,9 +55,9 @@ function Step3() {
 
             {/* 연기 */}
             <Suspense fallback={null}>
-              <SmokeModel position={[-2, -2, -2]} />
-              <SmokeModel position={[-1, -3, -1]} />
-              <SmokeModel position={[-3, -2, -3]} />
+              <SmokeModel position={[0, -1, 0]} />
+              <SmokeModel position={[-1, -0.5, 0]} />
+              <SmokeModel position={[-0.5, 0, 0]} />
             </Suspense>
           </ARController>
         </Canvas>
