@@ -32,8 +32,8 @@ interface LiveKitContextProps {
 
 const LiveKitContext = createContext<LiveKitContextProps | undefined>(undefined)
 
-const APPLICATION_SERVER_URL = 'https://26ed-211-192-252-94.ngrok-free.app/api/'
-const LIVEKIT_URL = 'wss://26ed-211-192-252-94.ngrok-free.app/livekit'
+const APPLICATION_SERVER_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/`
+const LIVEKIT_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/livekit`
 
 export const LiveKitProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
