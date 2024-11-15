@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import BackArrowIcon from '/public/icons/back-arrow.svg'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { User, useUser } from '@/app/_contexts/UserContext'
+import Image from 'next/image'
 
 export default function Scenario() {
   const router = useRouter()
@@ -64,12 +65,32 @@ export default function Scenario() {
           bgColor="bg-secondary-500"
           label={'방 만들기'}
           onClick={handleCreateRoom}
-        />
+        >
+          <Image
+            src="/images/character/bunny.png"
+            width={80}
+            height={200}
+            alt="character"
+          />
+        </RoomActionButton>
         <RoomActionButton
           bgColor="bg-primary-500"
           label={'방 접속하기'}
           onClick={() => router.push('/scenario/1/enter')}
-        />
+        >
+          <Image
+            src="/images/character/fox.png"
+            width={100}
+            height={200}
+            alt="character"
+          />
+          <Image
+            src="/images/character/fox.png"
+            width={100}
+            height={200}
+            alt="character"
+          />
+        </RoomActionButton>
       </div>
     </div>
   )
