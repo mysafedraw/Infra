@@ -5,9 +5,14 @@ import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import { Canvas } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
+import { useEffect } from 'react'
 
 export default function SituationStep5() {
   const speechText = '앗! 친구가 연기를 마셨는지 힘들어해요! 어떡하지?'
+
+  useEffect(() => {
+    localStorage.setItem('stageNumber', '5')
+  }, [])
 
   return (
     <StoryLayout speechText={speechText} isSpeechVisible>

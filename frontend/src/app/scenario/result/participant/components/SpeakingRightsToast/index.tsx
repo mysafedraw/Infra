@@ -1,20 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useUser } from '@/app/_contexts/UserContext'
+import { useLiveKit } from '@/app/_contexts/LiveKitContext'
 
 export default function SpeakingRightsToast() {
   const [isVisible, setIsVisible] = useState(true)
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const { user } = useUser()
+  const { enableMicForSpeakingRights } = useLiveKit() // 발언권 획득 함수 가져오기
 
   useEffect(() => {
-    // 3초 후에 메시지가 사라지도록 설정
-    const timer = setTimeout(() => {
-      setIsVisible(false)
-    }, 3000)
-
-    // 컴포넌트가 언마운트될 때 타이머를 정리
-    return () => clearTimeout(timer)
+    setRoomId(localStorage.getItem('roomId'))
   }, [])
+
+  const handleConfirmClick = async () => {
+    if (roomId && user?.userId) {
+      await enableMicForSpeakingRights(roomId, user?.userId) // 발언권 획득 및 마이크 활성화
+      setIsVisible(false)
+    }
+  }
 
   if (!isVisible) return null
 
@@ -30,7 +36,7 @@ export default function SpeakingRightsToast() {
         </h2>
         <div className="flex justify-center my-6">
           <Image
-            src="/images/tiger.png"
+            src={user?.avatarImg || '/images/tiger.png'}
             alt="speaking-rights-icon"
             width={435}
             height={574}
@@ -38,6 +44,12 @@ export default function SpeakingRightsToast() {
           />
         </div>
         <p className="text-3xl">답변에 대한 설명을 진행해보세요</p>
+        <button
+          onClick={handleConfirmClick}
+          className="mt-8 bg-white text-3xl py-2 w-1/2 rounded-md text-secondary-800 hover:text-secondary-950"
+        >
+          확인
+        </button>
       </div>
     </div>
   )

@@ -4,9 +4,10 @@ import ScoredBoard from '@/app/scenario/result/components/ScoredBoard'
 import { AnswerData } from '@/app/scenario/result/types/answerTypes'
 import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useUser } from '@/app/_contexts/UserContext'
 
 interface User {
-  userId: number
+  userId: string
   nickname: string
   isCorrect: string
   drawingSrc: string
@@ -22,14 +23,18 @@ export default function AllAnswers() {
   const [roomId, setRoomId] = useState<string | null>(null)
   const [answerData, setAnswerData] = useState<AnswerData[]>([])
   const { isConnected, sendMessage, registerCallback } = useWebSocketContext()
+  const { user } = useUser()
 
   const handleReceivedMessage = (message: CheckAllAnswersMessage) => {
-    const newAnswerData = message.users.map((user: User) => ({
-      id: user.userId,
-      isCorrect: user.isCorrect === 'CORRECT_ANSWER',
-      nickname: user.nickname,
-      characterImage: user.avatarsImgSrc,
-      drawingImage: user.drawingSrc,
+    const newAnswerData = message.users.map((userData: User) => ({
+      id: userData.userId,
+      isCorrect: userData.isCorrect === 'CORRECT_ANSWER',
+      nickname: userData.nickname,
+      characterImage:
+        userData.avatarsImgSrc === 'null'
+          ? '/images/tiger.png'
+          : userData.avatarsImgSrc,
+      drawingImage: userData.drawingSrc,
     }))
     setAnswerData(newAnswerData)
   }
@@ -49,7 +54,7 @@ export default function AllAnswers() {
 
   // WebSocket 연결이 완료된 후 /games/answers로 요청 보내기
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && roomId) {
       sendMessage(
         '/games/answers',
         JSON.stringify({
@@ -60,10 +65,12 @@ export default function AllAnswers() {
   }, [isConnected, roomId, sendMessage])
 
   return (
-    <div className="grid grid-cols-3 gap-x-6">
-      {answerData.map((data) => (
-        <ScoredBoard key={data.id} data={data} />
-      ))}
+    <div className="grid grid-cols-3 gap-x-6 mt-4">
+      {answerData
+        .filter((data) => data.id !== user?.userId)
+        .map((data) => (
+          <ScoredBoard key={data.id} data={data} />
+        ))}
     </div>
   )
 }

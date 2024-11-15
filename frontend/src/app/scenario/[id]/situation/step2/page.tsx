@@ -5,13 +5,18 @@ import { Canvas } from '@react-three/fiber'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
+import { useEffect } from 'react'
 
 function SituationStep2() {
   const speechText =
     '이번에는 불이 엄청 크게 붙었네. 내가 끌 수 없을 것 같아.  어떻게 해야 할까?'
 
+  useEffect(() => {
+    localStorage.setItem('stageNumber', '2')
+  }, [])
+
   return (
-    <StoryLayout speechText={speechText} isSpeechVisible>
+    <StoryLayout speechText={speechText} isSpeechVisible showNextButton>
       <Canvas
         camera={{
           position: [0, 2, 5],
