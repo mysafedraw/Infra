@@ -13,7 +13,7 @@ export default function ScenarioPopup({
   id: number
 }) {
   return (
-    <div className="flex flex-col absolute bg-[#ffee34] border-[4px] border-[#fff38b] top-10 left-1/2 -translate-x-1/2 z-10 shadow-custom-inset px-7 pt-7 pb-3 gap-4 rounded-lg text-white w-full max-w-[42rem] shadow-button-active ">
+    <div className="flex flex-col absolute bg-[#ffee34] border-[4px] border-[#fff38b] top-10 left-1/2 -translate-x-1/2 z-10 shadow-custom-inset px-7 pt-7 pb-3 gap-4 rounded-lg text-white w-full max-w-[42rem] shadow-button-active select-none">
       <div className="flex gap-8 w-full items-start">
         <Image
           src={imgUrl}
@@ -21,9 +21,12 @@ export default function ScenarioPopup({
           height={128}
           alt="scenario-map"
           className="object-cover w-40 h-32 rounded-md"
+          draggable={false}
         />
         <div className="flex flex-col gap-3">
-          <h1 className="text-stroke text-4xl">{name}</h1>
+          <h1 className="text-stroke text-4xl" draggable={false}>
+            {name}
+          </h1>
           <div className="text-text text-2xl">
             <p>{description}</p>
           </div>
