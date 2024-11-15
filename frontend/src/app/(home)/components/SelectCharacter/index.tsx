@@ -4,10 +4,9 @@ import { Canvas } from '@react-three/fiber'
 import { useEffect, useMemo, useState } from 'react'
 import { OrbitControls, useGLTF } from '@react-three/drei'
 import { Character } from '@/app/(home)/page'
-import { useUser } from '@/app/_contexts/UserContext'
+import { User, useUser } from '@/app/_contexts/UserContext'
 import { useRouter } from 'next/navigation'
 import CharacterList from '../CharacterList'
-import Link from 'next/link'
 import SignButton from '@/app/_components/SignButton'
 
 interface CharacterDetail {
@@ -29,16 +28,22 @@ const CHARACTER_ASSETS: Record<number, string> = {
 
 export default function SelectCharacter({
   characters,
+  existAvartarId,
+  background = false,
+  path,
 }: {
   characters: Character[]
+  existAvartarId?: number
+  background: boolean
+  path?: string
 }) {
   const router = useRouter()
   const [selectedCharacter, setSelectedCharacter] = useState(
-    characters[0] ? characters[0].id : 1,
+    existAvartarId ? existAvartarId : characters[0] ? characters[0].id : 1,
   )
   const [characterDetail, setCharacterDetail] = useState('')
   const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
-  const { setUser } = useUser()
+  const { user, setUser } = useUser()
 
   const characterScene = useMemo(() => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -62,6 +67,55 @@ export default function SelectCharacter({
 
     const result = await response.json()
     return result.data
+  }
+
+  const postUserCharacter = async () => {
+    const body = JSON.stringify({
+      userId: user?.userId,
+      avatarId: selectedCharacter,
+    })
+    try {
+      const response = await fetch(
+        `https://3b45-121-135-149-228.ngrok-free.app/api/users/avatars`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body,
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to post avatar')
+      }
+
+      const result = await response.json()
+
+      return result.data
+    } catch (error) {
+      console.error('Error post avatar:', error)
+      return null
+    }
+  }
+
+  const handleClickSelectButton = async () => {
+    if (path === 'setting') {
+      const editedUser = await postUserCharacter()
+      setUser({
+        ...user,
+        avatarId: selectedCharacter,
+        avatarImg: editedUser.avatarsImg,
+      } as User)
+      router.back()
+    } else {
+      setUser({
+        nickname: '',
+        avatarId: selectedCharacter,
+      })
+      router.push('/nickname')
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -102,8 +156,16 @@ export default function SelectCharacter({
     useGLTF.preload('/assets/background/cloud.glb')
   }, [])
 
+  useEffect(() => {
+    if (existAvartarId) {
+      setSelectedCharacter(existAvartarId)
+    }
+  }, [existAvartarId])
+
   return (
-    <section className="h-screen relative">
+    <section
+      className={`h-screen relative ${background ? 'bg-secondary-500' : null}`}
+    >
       <Canvas camera={{ position: [0, -50, 20], fov: 70 }}>
         <primitive
           object={cloudScene}
@@ -135,18 +197,10 @@ export default function SelectCharacter({
             </div>
             <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 flex justify-center items-start text-white rounded-lg relative">
               <div className="absolute -top-[117px] -right-6 z-50">
-                <Link href={'/nickname'}>
-                  <SignButton
-                    content="선택완료"
-                    onClick={() => {
-                      setUser({
-                        nickname: '',
-                        avatarId: selectedCharacter,
-                      })
-                      router.push('/nickname')
-                    }}
-                  />
-                </Link>
+                <SignButton
+                  content="선택완료"
+                  onClick={handleClickSelectButton}
+                />
               </div>
 
               <p className="flex text-3xl leading-normal px-4 w-full overflow-y-auto h-full scrollbar-hide items-start">
