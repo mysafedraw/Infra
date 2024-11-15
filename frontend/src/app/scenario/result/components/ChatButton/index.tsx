@@ -17,9 +17,9 @@ export default function ChatButton() {
       {/* 채팅 버튼 */}
       <button
         onClick={toggleChatBox}
-        className="z-50 fixed bottom-10 right-10 flex flex-col gap-1 items-center justify-center size-40 bg-primary-500 rounded-full text-white shadow-lg"
+        className="z-50 fixed bottom-10 right-10 flex flex-col gap-1 items-center justify-center size-36 bg-primary-500 rounded-full text-white shadow-lg"
       >
-        <Image src="/icons/message.svg" alt="chat" width={63} height={62} />
+        <Image src="/icons/message.svg" alt="chat" width={56} height={56} />
         <div className="relative inline-block">
           <p className="absolute text-primary-800 text-3xl font-outline-4">
             채팅
@@ -30,7 +30,7 @@ export default function ChatButton() {
 
       {/* ChatBox 컴포넌트 */}
       {isChatBoxOpen && (
-        <div className="z-40 fixed bottom-40 right-20 w-[500px] h-3/4 mb-8">
+        <div className="z-40 fixed bottom-40 right-20 w-[500px] h-3/4 mb-4">
           <ChatBox />
         </div>
       )}

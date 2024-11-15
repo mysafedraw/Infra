@@ -6,7 +6,7 @@ export default function ScenarioResultLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="bg-[url('/images/classroom.png')] bg-cover bg-center min-h-screen">
+    <div className="bg-[url('/images/classroom.png')] bg-cover bg-center min-h-screen pb-44">
       {children}
       <ChatButton />
     </div>
