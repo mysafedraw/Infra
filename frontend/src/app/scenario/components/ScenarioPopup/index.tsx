@@ -16,8 +16,8 @@ export default function ScenarioPopup({
 
   return (
     <>
-      <div className="flex flex-col absolute bg-[#ffee34] outline-[4px] outline-[#fff38b] top-10 left-1/2 -translate-x-1/2 z-10 shadow-custom-inset  gap-4 rounded-lg text-white w-full max-w-[42rem] shadow-button-active select-none overflow-hidden">
-        <div className="relative w-full h-full px-7 pt-7 pb-3">
+      <div className="flex flex-col absolute bg-[#ffee34] border-[4px] border-[#fff38b] top-10 left-1/2 -translate-x-1/2 z-10 shadow-custom-inset rounded-lg text-white w-full max-w-[42rem] shadow-button-active select-none overflow-hidden">
+        <div className="flex flex-col relative w-full h-full px-7 pt-7 pb-3 gap-4">
           {unavailableMap.includes(name) ? (
             <div
               style={{ backgroundColor: 'rgba(145, 176, 93, 0.95)' }}
