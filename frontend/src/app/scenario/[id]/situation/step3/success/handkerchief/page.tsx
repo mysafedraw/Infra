@@ -78,17 +78,17 @@ function Step1SucccessMask() {
           </ARController>
           {/* 상호 작용 */}
           <ActionScene>
-            {/* 손수건 */}
-            <ModelLoader
-              path="/assets/scenario/handkerchief.glb"
-              position={[2.9, 0.6, 0]}
-              scale={[1.5, 1.5, 1.5]}
-              rotation={[0.4, 0, 0]}
-              onClick={handleHandkerchiefClick}
-            />
-            {/* 물방울 */}
-            {!showSmoke && (
+            {showSmoke && (
               <>
+                {/* 손수건 */}
+                <ModelLoader
+                  path="/assets/scenario/handkerchief.glb"
+                  position={[2.9, 0.6, 0]}
+                  scale={[1.5, 1.5, 1.5]}
+                  rotation={[0.4, 0, 0]}
+                  onClick={handleHandkerchiefClick}
+                />
+                {/* 물방울 */}
                 <ModelLoader
                   path="/assets/scenario/water-drop.glb"
                   position={[2.5, 1, 0]}
