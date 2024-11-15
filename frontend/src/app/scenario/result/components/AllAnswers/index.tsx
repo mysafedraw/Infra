@@ -54,7 +54,7 @@ export default function AllAnswers() {
 
   // WebSocket 연결이 완료된 후 /games/answers로 요청 보내기
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && roomId) {
       sendMessage(
         '/games/answers',
         JSON.stringify({
