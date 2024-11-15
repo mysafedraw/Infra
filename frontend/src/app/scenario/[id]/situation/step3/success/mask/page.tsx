@@ -14,7 +14,7 @@ import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ActionScene from '@/app/scenario/[id]/situation/components/ActionScene'
 import SmokeModel from '@/app/scenario/[id]/situation/components/SmokeModel'
 
-function Step1SucccessMask() {
+function Step3SucccessMask() {
   const [showSmoke, setShowSmoke] = useState(true)
   const [speechText, setSpeechText] = useState(
     '마스크를 착용하면 연기를 막아낼 수 있을까...?',
@@ -71,9 +71,13 @@ function Step1SucccessMask() {
             />
             {/* 연기 */}
             <Suspense fallback={null}>
-              <SmokeModel position={[-2, -2, -2]} />
-              <SmokeModel position={[-1, -3, -1]} />
-              <SmokeModel position={[-3, -2, -3]} />
+              {showSmoke && (
+                <>
+                  <SmokeModel position={[-2, -2, -2]} />
+                  <SmokeModel position={[-1, -3, -1]} />
+                  <SmokeModel position={[-3, -2, -3]} />
+                </>
+              )}
             </Suspense>
           </ARController>
           {/* 상호 작용 */}
@@ -106,6 +110,6 @@ function Step1SucccessMask() {
   )
 }
 
-export default dynamic(() => Promise.resolve(Step1SucccessMask), {
+export default dynamic(() => Promise.resolve(Step3SucccessMask), {
   ssr: false,
 })
