@@ -33,13 +33,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [roomId, setRoomId] = useState<string | null>(null)
   const { user } = useUser()
+  const { isConnected } = useWebSocketContext()
 
   const { sendMessage: sendWebSocketMessage, registerCallback } =
     useWebSocketContext()
 
   useEffect(() => {
-    setRoomId(localStorage.getItem('roomId'))
-  }, [])
+    if (isConnected) {
+      const newRoomId = localStorage.getItem('roomId')
+      if (newRoomId !== roomId) {
+        setMessages([]) // 새로운 방 접속 시 메시지 날리기
+      }
+      setRoomId(newRoomId)
+    }
+  }, [isConnected])
 
   const addMessage = (message: ChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message])
