@@ -38,6 +38,7 @@ export default function SelectCharacter({
   )
   const [characterDetail, setCharacterDetail] = useState('')
   const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
+  const { scene: mapScene } = useGLTF('/assets/background/background-map.glb')
   const { setUser } = useUser()
 
   const characterScene = useMemo(() => {
@@ -101,61 +102,80 @@ export default function SelectCharacter({
   useEffect(() => {
     useGLTF.preload('/assets/background/cloud.glb')
   }, [])
-
   return (
-    <section className="h-screen relative">
-      <Canvas camera={{ position: [0, -50, 20], fov: 70 }}>
-        <primitive
-          object={cloudScene}
-          dispose={null}
-          scale={[1, 1, 1]}
-          position={[0, 5, 2]}
-        />
-        <ambientLight intensity={0.5} color="#ffffff" />
-        <directionalLight position={[5, 5, 5]} intensity={5} color="#ffffff" />
-        <OrbitControls enableZoom={true} minDistance={2} maxDistance={10} />
-      </Canvas>
-      <div className="flex flex-col items-center gap-8 py-9 px-14 h-screen absolute bottom-0 left-0 w-full">
-        <span className="bg-wood text-5xl py-6 bg-orange-950 text-white px-14 whitespace-nowrap rounded-xl shadow-md select-none">
-          너와 가장 비슷한 친구를 골라줘
-        </span>
-        <div
-          className="flex w-full gap-11 justify-center"
-          style={{ height: 'calc(100% - 7rem' }}
-        >
-          {/* 캐릭터 리스트 */}
-          <CharacterList
-            characters={characters}
-            setSelectedCharacter={setSelectedCharacter}
+    <div className="h-screen">
+      <section className="h-screen relative">
+        <Canvas camera={{ position: [0, -50, 20], fov: 70 }}>
+          <ambientLight intensity={2} color="#ffffff" />
+          <directionalLight
+            castShadow
+            position={[0, 30, 0]}
+            intensity={4}
+            color="#ffffff"
           />
-          {/* 선택된 캐릭터 */}
-          <div className="w-1/2 h-full pb-4">
-            <div className="h-3/4">
-              <CharacterCanvas />
-            </div>
-            <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 flex justify-center items-start text-white rounded-lg relative">
-              <div className="absolute -top-[117px] -right-6 z-50">
-                <Link href={'/nickname'}>
-                  <SignButton
-                    content="선택완료"
-                    onClick={() => {
-                      setUser({
-                        nickname: '',
-                        avatarId: selectedCharacter,
-                      })
-                      router.push('/nickname')
-                    }}
-                  />
-                </Link>
+          <primitive
+            object={cloudScene}
+            dispose={null}
+            scale={[1, 1, 1]}
+            position={[0, 5, 2]}
+          />
+          <primitive
+            object={mapScene}
+            dispose={null}
+            scale={[1, 1, 1]}
+            rotation={[1.1, 1.2, 0]}
+            position={[0, -1, -3]}
+          />
+          <ambientLight intensity={0.5} color="#ffffff" />
+          <directionalLight
+            position={[5, 5, 5]}
+            intensity={5}
+            color="#ffffff"
+          />
+          <OrbitControls enableZoom={true} minDistance={2} maxDistance={10} />
+        </Canvas>
+        <div className="flex flex-col items-center gap-8 py-9 px-14 h-screen absolute bottom-0 left-0 w-full">
+          <span className="bg-wood text-5xl py-6 bg-orange-950 text-white px-14 whitespace-nowrap rounded-xl shadow-md select-none">
+            너와 가장 비슷한 친구를 골라줘
+          </span>
+          <div
+            className="flex w-full gap-11 justify-center"
+            style={{ height: 'calc(100% - 7rem' }}
+          >
+            {/* 캐릭터 리스트 */}
+            <CharacterList
+              characters={characters}
+              setSelectedCharacter={setSelectedCharacter}
+            />
+            {/* 선택된 캐릭터 */}
+            <div className="w-1/2 h-full pb-4">
+              <div className="h-3/4">
+                <CharacterCanvas />
               </div>
+              <div className="bg-primary-600 border-[5px] h-1/4 border-primary-700 flex justify-center items-start text-white rounded-lg relative">
+                <div className="absolute -top-[117px] -right-6 z-50">
+                  <Link href={'/nickname'}>
+                    <SignButton
+                      content="선택완료"
+                      onClick={() => {
+                        setUser({
+                          nickname: '',
+                          avatarId: selectedCharacter,
+                        })
+                        router.push('/nickname')
+                      }}
+                    />
+                  </Link>
+                </div>
 
-              <p className="flex text-3xl leading-normal px-4 w-full overflow-y-auto h-full scrollbar-hide items-start">
-                {characterDetail}
-              </p>
+                <p className="flex text-3xl leading-normal px-4 w-full overflow-y-auto h-full scrollbar-hide items-start">
+                  {characterDetail}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }
