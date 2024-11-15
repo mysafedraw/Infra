@@ -11,13 +11,40 @@ export default function NicknameInput() {
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setNickname(e.target.value)
 
-  const handleClickEditButton = () => {
+  const handleClickEditButton = async () => {
     if (nickname.trim().length === 0) {
       alert('닉네임을 입력해주세요')
       return
     }
     setUser({ ...user, nickname } as User)
     alert('닉네임이 변경되었습니다.')
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/nickname`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user?.userId,
+            nickname,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to post user')
+      }
+
+      const result = await response.json()
+      console.log('result:', result)
+      return result
+    } catch (error) {
+      console.error('Error fetching character list:', error)
+    }
   }
 
   useEffect(() => {
@@ -25,6 +52,32 @@ export default function NicknameInput() {
       setNickname(user?.nickname)
     }
   }, [user])
+
+  // const postUserNickname = async (): Promise<{
+  //   avatarsImg: string
+  //   nickname: string
+  //   userId: string
+  // }> => {
+
+  // }
+
+  // useEffect(() => {
+  //   const postUserInfo = async () => {
+  //     try {
+  //       if (user?.nickname) {
+  //         const userInfo = await postUserNickname()
+  //         setUser({
+  //           ...user,
+  //           nickname: userInfo.nickname,
+  //         })
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to put User nickname:', error)
+  //     }
+  //   }
+
+  //   postUserInfo()
+  // }, [user?.nickname])
 
   return (
     <div className="relative grid grid-cols-[1fr_3fr] items-center">
