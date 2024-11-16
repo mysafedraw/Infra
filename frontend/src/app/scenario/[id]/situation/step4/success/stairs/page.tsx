@@ -14,7 +14,7 @@ import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ActionScene from '@/app/scenario/[id]/situation/components/ActionScene'
 import SmokeModel from '@/app/scenario/[id]/situation/components/SmokeModel'
 
-function Step3SucccessHandkerchief() {
+function Step4SucccessStairs() {
   const [showGuide, setShowGuide] = useState(true)
   const [speechText, setSpeechText] = useState(
     '저기 계단을 통해 빨리 대피해보자!!',
@@ -106,6 +106,6 @@ function Step3SucccessHandkerchief() {
   )
 }
 
-export default dynamic(() => Promise.resolve(Step3SucccessHandkerchief), {
+export default dynamic(() => Promise.resolve(Step4SucccessStairs), {
   ssr: false,
 })

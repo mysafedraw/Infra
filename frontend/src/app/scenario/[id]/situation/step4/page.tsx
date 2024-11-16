@@ -11,7 +11,7 @@ import SmokeModel from '@/app/scenario/[id]/situation/components/SmokeModel'
 import ActionScene from '@/app/scenario/[id]/situation/components/ActionScene'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
-function Step3() {
+function Step4() {
   useEffect(() => {
     localStorage.setItem('stageNumber', '4')
   }, [])
@@ -94,4 +94,4 @@ function Step3() {
   )
 }
 
-export default dynamic(() => Promise.resolve(Step3), { ssr: false })
+export default dynamic(() => Promise.resolve(Step4), { ssr: false })
