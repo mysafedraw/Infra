@@ -63,14 +63,14 @@ function Step3() {
           <ActionScene>
             <ModelLoader
               path="/assets/scenario/stairs.glb"
-              position={[-4, -0.5, 0]}
+              position={[-2.8, -0.5, 0]}
               scale={[1, 1, 1]}
               rotation={[0, 1.4, 0]}
             />
             <ModelLoader
               path="/assets/scenario/elevator.glb"
-              position={[3.5, 1.5, 0]}
-              scale={[0.015, 0.015, 0.015]}
+              position={[2.5, 1.5, 0]}
+              scale={[0.012, 0.012, 0.012]}
               rotation={[0, -0.4, 0]}
             />
           </ActionScene>
