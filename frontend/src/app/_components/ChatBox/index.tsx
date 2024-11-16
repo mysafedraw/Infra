@@ -35,8 +35,8 @@ export default function ChatBox() {
             {!message.isSender && (
               <div className="flex items-center gap-2">
                 <Image
-                  src="/images/tiger.png"
-                  alt="user1"
+                  src={message.avatarImg}
+                  alt={message.user}
                   width={32}
                   height={32}
                   className="size-8 shrink-0 bg-secondary-400 rounded-full object-cover object-top pt-1"

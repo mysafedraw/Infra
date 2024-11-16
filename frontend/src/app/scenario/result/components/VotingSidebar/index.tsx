@@ -6,6 +6,8 @@ import VoteAction from '@/app/scenario/result/participant/components/VoteAction'
 import VotingStatus from '@/app/scenario/result/host/components/VotingStatus'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import VoteConfirm from '@/app/scenario/result/host/components/VoteConfirm'
+import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function VotingSidebar({ role }: { role: string }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -13,15 +15,25 @@ export default function VotingSidebar({ role }: { role: string }) {
 
   const { sendMessage } = useWebSocketContext()
   const [roomId, setRoomId] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
+
+  const { speakingRightInfo } = useSpeakingRight()
+  const { user } = useUser()
 
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
-    setUserId('user1') // 발언중인 애 userId로 바꿔야 함
-  }, [])
+  }, [speakingRightInfo?.userId])
+
+  useEffect(() => {
+    if (speakingRightInfo && speakingRightInfo.userId !== user?.userId) {
+      setIsOpen(true)
+    }
+  }, [speakingRightInfo, user?.userId])
 
   const handleEndVote = () => {
-    const message = JSON.stringify({ roomId, userId })
+    const message = JSON.stringify({
+      roomId,
+      userId: speakingRightInfo?.userId, // 발언중인 애
+    })
     sendMessage('/games/vote/end', message)
     setIsConfirmVisible(true)
     setIsOpen(false)
@@ -68,7 +80,7 @@ export default function VotingSidebar({ role }: { role: string }) {
           <div className="p-6 pl-2">
             <div className="flex items-center justify-between">
               <h2 className="text-4xl">현재 진행 중인 투표</h2>
-              {role === 'host' && (
+              {role === 'host' && speakingRightInfo && (
                 <button
                   onClick={handleEndVote}
                   className="bg-amber-200 border border-amber-500 text-3xl py-2 px-8 rounded-lg hover:bg-amber-300"
@@ -78,13 +90,26 @@ export default function VotingSidebar({ role }: { role: string }) {
               )}
             </div>
 
-            {role === 'host' ? <VotingStatus /> : <VoteAction />}
+            {speakingRightInfo ? (
+              role === 'host' ? (
+                <VotingStatus drawing={speakingRightInfo.drawingSrc} />
+              ) : (
+                <VoteAction drawing={speakingRightInfo.drawingSrc} />
+              )
+            ) : (
+              <p className="text-3xl py-14 my-4 min-w-[36rem] bg-secondary-50 rounded-xl text-center text-secondary-800">
+                진행 중인 투표가 없어요
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {isConfirmVisible && (
-        <VoteConfirm onClose={() => setIsConfirmVisible(false)} />
+      {isConfirmVisible && speakingRightInfo && (
+        <VoteConfirm
+          votingUserId={speakingRightInfo.userId}
+          onClose={() => setIsConfirmVisible(false)}
+        />
       )}
     </>
   )

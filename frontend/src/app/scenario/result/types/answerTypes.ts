@@ -1,5 +1,5 @@
 export interface AnswerData {
-  id: number
+  id: string
   isCorrect: boolean
   nickname: string
   characterImage: string

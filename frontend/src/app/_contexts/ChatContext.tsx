@@ -15,6 +15,7 @@ interface ChatMessage {
   user: string
   text: string
   time: string
+  avatarImg: string
   isSender: boolean
 }
 
@@ -32,13 +33,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [roomId, setRoomId] = useState<string | null>(null)
   const { user } = useUser()
+  const { isConnected } = useWebSocketContext()
 
   const { sendMessage: sendWebSocketMessage, registerCallback } =
     useWebSocketContext()
 
   useEffect(() => {
-    setRoomId(localStorage.getItem('roomId'))
-  }, [])
+    if (isConnected) {
+      const newRoomId = localStorage.getItem('roomId')
+      if (newRoomId !== roomId) {
+        setMessages([]) // 새로운 방 접속 시 메시지 날리기
+      }
+      setRoomId(newRoomId)
+    }
+  }, [isConnected])
 
   const addMessage = (message: ChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message])
@@ -50,6 +58,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       nickname: string
       content: string
       sentAt: string
+      avatarsImgSrc: string
     }) => {
       if (parsedMessage.senderId === user?.userId) return
 
@@ -60,6 +69,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
           user: parsedMessage.nickname,
           text: parsedMessage.content,
           time: parsedMessage.sentAt,
+          avatarImg: parsedMessage.avatarsImgSrc,
           isSender: parsedMessage.senderId === user?.userId,
         },
       ])
@@ -88,6 +98,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       user: user?.nickname || '',
       text: content,
       time: newMessage.sentAt,
+      avatarImg: user?.avatarImg || '/images/tiger.png',
       isSender: true,
     })
   }
