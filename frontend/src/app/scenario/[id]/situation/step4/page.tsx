@@ -67,11 +67,25 @@ function Step3() {
               scale={[1, 1, 1]}
               rotation={[0, 1.4, 0]}
             />
+
             <ModelLoader
               path="/assets/scenario/elevator.glb"
-              position={[2.5, 1.5, 0]}
-              scale={[0.012, 0.012, 0.012]}
+              position={[2.5, 1, 0]}
+              scale={[0.01, 0.01, 0.01]}
               rotation={[0, -0.4, 0]}
+            />
+            {/* 화살표 */}
+            <ModelLoader
+              path="/assets/scenario/arrow-animation.glb"
+              position={[-3, 2.2, 0]}
+              scale={[0.25, 0.25, 0.25]}
+              rotation={[0, 0, 0]}
+            />
+            <ModelLoader
+              path="/assets/scenario/arrow-animation.glb"
+              position={[2.5, 2.3, 0]}
+              scale={[0.25, 0.25, 0.25]}
+              rotation={[0, 0, 0]}
             />
           </ActionScene>
         </Canvas>
