@@ -217,7 +217,7 @@ export default function Room() {
           <StudentGroup students={roomData?.currentPlayers} />
         </div>
         {/* 채팅 */}
-        <div className="w-[350px] h-[600px]">
+        <div className="w-[350px] h-[452px]">
           <ChatBox />
         </div>
       </div>
