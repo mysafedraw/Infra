@@ -182,14 +182,23 @@ export default function Draw() {
 
             // 정답 상호작용 페이지로 이동
             if (response.isCorrect === 'CORRECT_ANSWER') {
-              router.push(
-                `/scenario/1/situation/step${stageNumber}/success/${moveLabel}`,
-              )
+              if (stageNumber === '2') {
+                router.push(`/scenario/1/situation/step${stageNumber}/success`)
+              } else {
+                router.push(
+                  `/scenario/1/situation/step${stageNumber}/success/${moveLabel}`,
+                )
+              }
               // 오답 상호작용 페이지로 이동
             } else if (response.isCorrect === 'PROHIBITED_ANSWER') {
-              router.push(
-                `/scenario/1/situation/step${stageNumber}/fail/${moveLabel}`,
-              )
+              if (stageNumber === '2') {
+                router.push(`/scenario/1/situation/step${stageNumber}/fail`)
+              } else {
+                router.push(
+                  `/scenario/1/situation/step${stageNumber}/fail/${moveLabel}`,
+                )
+              }
+
               // 오답 페이지로 이동
             } else if (response.isCorrect === 'INCORRECT_ANSWER') {
               router.push(`/scenario/1/situation/step${stageNumber}/fail`)
