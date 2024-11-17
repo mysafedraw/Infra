@@ -16,8 +16,6 @@ export default function NicknameInput() {
       alert('닉네임을 입력해주세요')
       return
     }
-    setUser({ ...user, nickname } as User)
-    alert('닉네임이 변경되었습니다.')
 
     try {
       const response = await fetch(
@@ -36,14 +34,14 @@ export default function NicknameInput() {
       )
 
       if (!response.ok) {
-        throw new Error('Failed to post user')
+        throw new Error('Failed to post nickname')
       }
 
-      const result = await response.json()
-      console.log('result:', result)
-      return result
+      setUser({ ...user, nickname } as User)
+      alert('닉네임이 변경되었습니다.')
     } catch (error) {
-      console.error('Error fetching character list:', error)
+      console.error('Error post nickname:', error)
+      alert('닉네임 변경에 실패했습니다')
     }
   }
 
@@ -52,32 +50,6 @@ export default function NicknameInput() {
       setNickname(user?.nickname)
     }
   }, [user])
-
-  // const postUserNickname = async (): Promise<{
-  //   avatarsImg: string
-  //   nickname: string
-  //   userId: string
-  // }> => {
-
-  // }
-
-  // useEffect(() => {
-  //   const postUserInfo = async () => {
-  //     try {
-  //       if (user?.nickname) {
-  //         const userInfo = await postUserNickname()
-  //         setUser({
-  //           ...user,
-  //           nickname: userInfo.nickname,
-  //         })
-  //       }
-  //     } catch (error) {
-  //       console.error('Failed to put User nickname:', error)
-  //     }
-  //   }
-
-  //   postUserInfo()
-  // }, [user?.nickname])
 
   return (
     <div className="relative grid grid-cols-[1fr_3fr] items-center">
