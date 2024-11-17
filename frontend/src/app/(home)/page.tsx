@@ -4,9 +4,12 @@
 
 import dynamic from 'next/dynamic'
 
-const SelectCharacter = dynamic(() => import('./components/SelectCharacter'), {
-  ssr: false,
-})
+const SelectCharacter = dynamic(
+  () => import('../_components/SelectCharacter'),
+  {
+    ssr: false,
+  },
+)
 const Scroll = dynamic(() => import('./components/Scroll'), {
   ssr: false,
 })

@@ -6,7 +6,7 @@ import { OrbitControls, useGLTF } from '@react-three/drei'
 import { Character } from '@/app/(home)/page'
 import { User, useUser } from '@/app/_contexts/UserContext'
 import { useRouter } from 'next/navigation'
-import CharacterList from '../CharacterList'
+import CharacterList from '@/app/(home)/components/CharacterList'
 import SignButton from '@/app/_components/SignButton'
 
 interface CharacterDetail {
@@ -34,7 +34,7 @@ export default function SelectCharacter({
 }: {
   characters: Character[]
   existAvartarId?: number
-  background: boolean
+  background?: boolean
   path?: string
 }) {
   const router = useRouter()
@@ -70,10 +70,6 @@ export default function SelectCharacter({
   }
 
   const postUserCharacter = async () => {
-    const body = JSON.stringify({
-      userId: user?.userId,
-      avatarId: selectedCharacter,
-    })
     try {
       const response = await fetch(
         `https://3b45-121-135-149-228.ngrok-free.app/api/users/avatars`,
@@ -83,7 +79,10 @@ export default function SelectCharacter({
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },
-          body,
+          body: JSON.stringify({
+            userId: user?.userId,
+            avatarId: selectedCharacter,
+          }),
         },
       )
 
@@ -103,12 +102,17 @@ export default function SelectCharacter({
   const handleClickSelectButton = async () => {
     if (path === 'setting') {
       const editedUser = await postUserCharacter()
-      setUser({
-        ...user,
-        avatarId: selectedCharacter,
-        avatarImg: editedUser.avatarsImg,
-      } as User)
-      router.back()
+
+      if (editedUser) {
+        setUser({
+          ...user,
+          avatarId: selectedCharacter,
+          avatarImg: editedUser.avatarsImg,
+        } as User)
+        router.back()
+      } else {
+        alert('캐릭터 변경에 실패했습니다.')
+      }
     } else {
       setUser({
         nickname: '',
@@ -118,7 +122,6 @@ export default function SelectCharacter({
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CharacterCanvas = () => (
     <Canvas camera={{ position: [0, 0, 0], fov: 80 }}>
       <ambientLight intensity={1.3} color="#ffffff" />

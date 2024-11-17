@@ -1,6 +1,6 @@
 'use client'
 
-import SelectCharacter from '@/app/(home)/components/SelectCharacter'
+import SelectCharacter from '@/app/_components/SelectCharacter'
 import { Character } from '@/app/(home)/page'
 import { useUser } from '@/app/_contexts/UserContext'
 import { useEffect, useState } from 'react'
