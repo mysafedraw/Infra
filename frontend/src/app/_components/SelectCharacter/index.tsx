@@ -72,7 +72,7 @@ export default function SelectCharacter({
   const postUserCharacter = async () => {
     try {
       const response = await fetch(
-        `https://3b45-121-135-149-228.ngrok-free.app/api/users/avatars`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/avatars`,
         {
           method: 'POST',
           headers: {
