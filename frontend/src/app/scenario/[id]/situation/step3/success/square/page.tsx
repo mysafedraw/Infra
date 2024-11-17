@@ -98,21 +98,18 @@ function Step3SucccessHandkerchief() {
                   position={[2.5, 1, 0]}
                   scale={[0.2, 0.2, 0.2]}
                   rotation={[0.4, 0, 0]}
-                  onClick={handleHandkerchiefClick}
                 />
                 <ModelLoader
                   path="/assets/scenario/water-drop.glb"
                   position={[3.0, 1.4, 0]}
                   scale={[0.2, 0.2, 0.2]}
                   rotation={[0.4, 0, 0]}
-                  onClick={handleHandkerchiefClick}
                 />
                 <ModelLoader
                   path="/assets/scenario/water-drop.glb"
                   position={[3.5, 1, 0]}
                   scale={[0.2, 0.2, 0.2]}
                   rotation={[0.4, 0, 0]}
-                  onClick={handleHandkerchiefClick}
                 />
               </>
             )}
