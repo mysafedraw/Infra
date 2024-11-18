@@ -61,15 +61,21 @@ export default function ChatBox() {
       </div>
 
       {/* 입력창 */}
-      <form className="p-4 flex items-center" onSubmit={handleSendMessage}>
+      <form
+        className="p-4 flex items-center w-full"
+        onSubmit={handleSendMessage}
+      >
         <input
           type="text"
           placeholder="메시지를 입력하세요"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          className="flex-grow bg-gray-medium rounded-lg px-4 py-3 mr-3 text-2xl hover:outline-primary-500 focus:outline-primary-500 focus:bg-gray-light"
+          className="w-full flex-grow bg-gray-medium rounded-lg px-4 py-3 mr-3 text-2xl hover:outline-primary-500 focus:outline-primary-500 focus:bg-gray-light"
         />
-        <button type="submit" className="bg-primary-500 p-3 rounded-lg">
+        <button
+          type="submit"
+          className="bg-primary-500 p-3 rounded-lg shrink-0"
+        >
           <Image
             src="/icons/direct-right.svg"
             alt="send"
