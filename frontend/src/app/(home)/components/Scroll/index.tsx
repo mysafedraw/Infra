@@ -1,17 +1,10 @@
 'use client'
 
-import { useGLTF } from '@react-three/drei'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import { Canvas } from '@react-three/fiber'
 import Image from 'next/image'
-import { useEffect } from 'react'
 
 export default function Scroll() {
-  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
-
-  useEffect(() => {
-    useGLTF.preload('/assets/background/cloud.glb')
-  }, [])
-
   return (
     <section className="h-screen relative">
       <>
@@ -37,9 +30,8 @@ export default function Scroll() {
       >
         <ambientLight intensity={2} color="#ffffff" />
         <directionalLight position={[5, 5, 5]} intensity={5} color="#ffffff" />
-        <primitive
-          object={cloudScene.clone()}
-          dispose={null}
+        <ModelLoader
+          path="/assets/background/cloud.glb"
           scale={[4, 4, 4]}
           position={[25, -25, -18]}
           rotation={[0, 0, 0]}

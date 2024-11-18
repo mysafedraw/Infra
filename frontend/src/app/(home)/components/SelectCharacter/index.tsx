@@ -1,14 +1,15 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useEffect, useMemo, useState } from 'react'
-import { OrbitControls, useGLTF } from '@react-three/drei'
+import { useEffect, useState } from 'react'
+import { OrbitControls } from '@react-three/drei'
 import { Character } from '@/app/(home)/page'
 import { useUser } from '@/app/_contexts/UserContext'
 import { useRouter } from 'next/navigation'
 import CharacterList from '../CharacterList'
 import Link from 'next/link'
 import SignButton from '@/app/_components/SignButton'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
 interface CharacterDetail {
   assetImg: string
@@ -37,14 +38,7 @@ export default function SelectCharacter({
     characters[0] ? characters[0].id : 1,
   )
   const [characterDetail, setCharacterDetail] = useState('')
-  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
-  const { scene: mapScene } = useGLTF('/assets/background/background-map.glb')
   const { setUser } = useUser()
-
-  const characterScene = useMemo(() => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useGLTF(CHARACTER_ASSETS[selectedCharacter]).scene
-  }, [selectedCharacter])
 
   const fetchCharacterDetail = async (
     characterId: number,
@@ -65,7 +59,6 @@ export default function SelectCharacter({
     return result.data
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CharacterCanvas = () => (
     <Canvas camera={{ position: [0, 0, 0], fov: 80 }}>
       <ambientLight intensity={1.3} color="#ffffff" />
@@ -77,12 +70,17 @@ export default function SelectCharacter({
         maxPolarAngle={Math.PI / 2.3}
         minPolarAngle={Math.PI / 2.3}
       />
-      <primitive
+      <ModelLoader
+        path={CHARACTER_ASSETS[selectedCharacter]}
+        scale={[0.1, 0.1, 0.1]}
+        position={[0, -6, 0]}
+      />
+      {/* <primitive
         object={characterScene}
         dispose={null}
         scale={[0.1, 0.1, 0.1]}
         position={[0, -6, 0]}
-      />
+      /> */}
     </Canvas>
   )
 
@@ -99,9 +97,6 @@ export default function SelectCharacter({
     updateCharacterDetail()
   }, [selectedCharacter])
 
-  useEffect(() => {
-    useGLTF.preload('/assets/background/cloud.glb')
-  }, [])
   return (
     <div className="h-screen">
       <section className="h-screen relative">
@@ -113,15 +108,13 @@ export default function SelectCharacter({
             intensity={4}
             color="#ffffff"
           />
-          <primitive
-            object={cloudScene}
-            dispose={null}
+          <ModelLoader
+            path="/assets/background/cloud.glb"
             scale={[1, 1, 1]}
             position={[0, 5, 2]}
           />
-          <primitive
-            object={mapScene}
-            dispose={null}
+          <ModelLoader
+            path="/assets/background/background-map.glb"
             scale={[1, 1, 1]}
             rotation={[1.1, 1.2, 0]}
             position={[0, -1, -3]}

@@ -4,14 +4,11 @@ import SafeIcon from '/public/icons/safe-word.svg'
 import NoIcon from '/public/icons/no.svg'
 import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
-import { useGLTF } from '@react-three/drei'
 import Image from 'next/image'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
 export default function Splash() {
-  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
-
   useEffect(() => {
-    useGLTF.preload('/assets/background/cloud.glb')
     document.documentElement.classList.add('scrollbar-hide')
 
     return () => {
@@ -65,9 +62,8 @@ export default function Splash() {
       >
         <ambientLight intensity={0.5} color="#ffffff" />
         <directionalLight position={[5, 5, 5]} intensity={5} color="#ffffff" />
-        <primitive
-          object={cloudScene.clone()}
-          dispose={null}
+        <ModelLoader
+          path="/assets/background/cloud.glb"
           scale={[2, 2, 2]}
           position={[0, -10, -10]}
         />
