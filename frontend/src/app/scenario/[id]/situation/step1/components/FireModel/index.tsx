@@ -4,7 +4,7 @@ interface FireModelsProps {
   scale?: [number, number, number]
 }
 
-export default function FireModel({ scale = [6, 6, 6] }: FireModelsProps) {
+export default function FireModel({ scale = [5, 5, 5] }: FireModelsProps) {
   return (
     <>
       <ModelLoader

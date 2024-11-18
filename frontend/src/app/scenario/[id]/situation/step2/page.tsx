@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 
 function SituationStep2() {
   const speechText =
@@ -31,51 +31,12 @@ function SituationStep2() {
           preserveDrawingBuffer: true,
         }}
       >
-        <>
-          <ModelLoader
-            path="/assets/scenario/fire2.glb"
-            position={[-2, -1, 0]}
-            scale={[5, 5.5, 5]}
-            rotation={[0, 0.2, 0]}
-          />
-          <ModelLoader
-            path="/assets/scenario/fire2.glb"
-            position={[-1, -2, 0.9]}
-            scale={[5, 5.5, 5]}
-            rotation={[0, 0.2, 0]}
-          />
-          <ModelLoader
-            path="/assets/scenario/fire2.glb"
-            position={[-2.5, -2, 0.9]}
-            scale={[5.5, 5.5, 5.5]}
-            rotation={[0, 0.2, 0]}
-          />
-          <ModelLoader
-            path="/assets/scenario/fire2.glb"
-            position={[-3, -3, 1.5]}
-            scale={[5, 5, 5]}
-            rotation={[0, 0.2, 0]}
-          />
-          <ModelLoader
-            path="/assets/scenario/fire2.glb"
-            position={[-2, -3, 1.5]}
-            scale={[5, 5, 5]}
-            rotation={[0, 0.2, 0]}
-          />
-          <ModelLoader
-            path="/assets/scenario/fire2.glb"
-            position={[-0.5, -3, 1.5]}
-            scale={[5.5, 5.5, 5.5]}
-            rotation={[0, 0.2, 0]}
-          />
-        </>
-
         <ARController>
           <ambientLight intensity={0.5} />
           <pointLight
             position={[0, 2, 0]}
             intensity={2}
-            color="#ff7700"
+            color="#ffffff"
             distance={10}
             decay={2}
           />
@@ -86,6 +47,46 @@ function SituationStep2() {
             intensity={1}
             castShadow
           />
+          <Suspense fallback={null}>
+            <>
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-2, -1, 0]}
+                scale={[7, 7.5, 7]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-1, -2, 0.9]}
+                scale={[7, 7.5, 7]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-2.5, -2, 0.9]}
+                scale={[7.5, 7.5, 7.5]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-3, -3, 1.5]}
+                scale={[7, 7, 7]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-2, -3, 1.5]}
+                scale={[7, 7, 7]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-0.5, -3, 1.5]}
+                scale={[7.5, 7.5, 7.5]}
+                rotation={[0, 0.2, 0]}
+              />
+            </>
+          </Suspense>
         </ARController>
       </Canvas>
     </StoryLayout>
