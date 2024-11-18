@@ -28,6 +28,8 @@ export default function StudentGroup({ students }: { students: Student[] }) {
     setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))
   }
 
+  const hasNoStudents = students.length === 0
+
   return (
     <div className="bg-primary-500 px-4 py-4 rounded-lg shadow-md">
       <div className="grid grid-cols-3 gap-4">
@@ -68,23 +70,25 @@ export default function StudentGroup({ students }: { students: Student[] }) {
       <div className="flex justify-center mt-4 space-x-4">
         <button
           onClick={handlePrevPage}
-          disabled={currentPage === 0}
+          disabled={currentPage === 0 || hasNoStudents}
           className="transition-colors"
         >
           <LeftArrowIcon
             className={`fill-current ${
-              currentPage === 0 ? 'text-gray-300' : 'text-primary-50'
+              currentPage === 0 || hasNoStudents
+                ? 'text-gray-300'
+                : 'text-primary-50'
             }`}
           />
         </button>
         <button
           onClick={handleNextPage}
-          disabled={currentPage === totalPages - 1}
+          disabled={currentPage === totalPages - 1 || hasNoStudents}
           className="transition-colors"
         >
           <RightArrowIcon
             className={`fill-current ${
-              currentPage === totalPages - 1
+              currentPage === totalPages - 1 || hasNoStudents
                 ? 'text-gray-300'
                 : 'text-primary-50'
             }`}

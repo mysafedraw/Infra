@@ -6,6 +6,7 @@ import BackArrowIcon from '/public/icons/back-arrow.svg'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { User, useUser } from '@/app/_contexts/UserContext'
 import Image from 'next/image'
+import { useEffect } from 'react'
 
 export default function Scenario() {
   const router = useRouter()
@@ -13,6 +14,10 @@ export default function Scenario() {
   const scenarioName = searchParams.get('name')
   const { isConnected } = useWebSocketContext()
   const { user, setUser } = useUser()
+
+  useEffect(() => {
+    localStorage.removeItem('roomId')
+  }, [])
 
   const fetchCreateRoom = async () => {
     try {

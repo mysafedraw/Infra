@@ -4,6 +4,7 @@ import AnswerBoard from '@/app/scenario/result/components/AnswerBoard'
 import MicIcon from '/public/icons/microphone.svg'
 import { AnswerData } from '@/app/scenario/result/types/answerTypes'
 import VolumeMicIcon from '@/app/scenario/result/components/VolumeMicIcon'
+import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
 
 interface ExplainQueueBoardProps {
   data: AnswerData
@@ -11,10 +12,11 @@ interface ExplainQueueBoardProps {
 
 export default function ExplainQueueBoard({ data }: ExplainQueueBoardProps) {
   const { id, nickname, characterImage, drawingImage } = data
+  const { speakingRightInfo } = useSpeakingRight()
 
   return (
-    <div className="relative">
-      {id === 1 ? (
+    <div className="relative min-w-max">
+      {speakingRightInfo?.userId === id ? (
         <div className="z-10 absolute top-0-1 -left-1 px-5 py-2 rounded-lg border-4 border-primary-500 bg-white">
           <VolumeMicIcon />
         </div>

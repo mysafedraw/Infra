@@ -12,6 +12,7 @@ import { useUser } from '@/app/_contexts/UserContext'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ActionScene from '@/app/scenario/[id]/situation/components/ActionScene'
+import FireModel from '@/app/scenario/[id]/situation/step1/components/FireModel'
 
 function Step1SucccessFirehydrant() {
   const [showFire, setShowFire] = useState(true)
@@ -65,27 +66,7 @@ function Step1SucccessFirehydrant() {
               castShadow
             />
 
-            <Suspense fallback={null}>
-              {showFire && (
-                <>
-                  <ModelLoader
-                    path="/assets/scenario/fire2.glb"
-                    position={[2, 3, 0]}
-                    scale={[6, 6, 6]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire2.glb"
-                    position={[4, 3, 0]}
-                    scale={[6, 6, 6]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire2.glb"
-                    position={[3, 3, 0]}
-                    scale={[6, 6, 6]}
-                  />
-                </>
-              )}
-            </Suspense>
+            <Suspense fallback={null}>{showFire && <FireModel />}</Suspense>
           </ARController>
 
           {/* 상호 작용 */}
@@ -97,15 +78,17 @@ function Step1SucccessFirehydrant() {
               scale={[0.12, 0.12, 0.12]}
               onClick={handlefirehydrantClick}
             />
-            <Html position={[3, 0, 0]} style={{ pointerEvents: 'none' }}>
-              <div className="relative flex justify-center items-center">
-                <div className="rounded-full border-[10px] border-dashed border-primary-500 w-96 h-96 absolute"></div>
-                <div className="rounded-full border-[10px] border-dashed border-primary-500 w-80 h-80 absolute"></div>
-                <p className="animate-bounce bg-primary-500 whitespace-nowrap py-5 px-8 text-2xl rounded-lg shadow-md absolute top-0 left-14">
-                  소화기를 눌러주세요
-                </p>
-              </div>
-            </Html>
+            {showFire && (
+              <Html position={[3, 0, 0]} style={{ pointerEvents: 'none' }}>
+                <div className="relative flex justify-center items-center">
+                  <div className="rounded-full border-[10px] border-dashed border-primary-500 w-96 h-96 absolute"></div>
+                  <div className="rounded-full border-[10px] border-dashed border-primary-500 w-80 h-80 absolute"></div>
+                  <p className="animate-bounce bg-primary-500 whitespace-nowrap py-5 px-8 text-2xl rounded-lg shadow-md absolute top-0 left-14">
+                    소화기를 눌러주세요
+                  </p>
+                </div>
+              </Html>
+            )}
           </ActionScene>
         </Canvas>
       </div>

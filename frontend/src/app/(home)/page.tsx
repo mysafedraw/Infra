@@ -1,6 +1,6 @@
 'use client'
 
-import SelectCharacter from './components/SelectCharacter'
+import SelectCharacter from '@/app/_components/SelectCharacter'
 import Splash from './components/Splash'
 import Scroll from './components/Scroll'
 import { useEffect, useState } from 'react'

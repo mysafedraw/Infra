@@ -14,7 +14,7 @@ export default function TimerSetting({
       <Image
         src="/images/sketchbook.png"
         alt="sketchbook-timer"
-        width={250}
+        width={240}
         height={100}
         className="rounded-lg object-cover"
       />

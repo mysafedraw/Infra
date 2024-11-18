@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useUser } from '@/app/_contexts/UserContext'
 
-export default function VotingStatus() {
+export default function VotingStatus({ drawing }: { drawing: string }) {
   const { user } = useUser()
   const { registerCallback } = useWebSocketContext()
   const [agreeVotes, setAgreeVotes] = useState(0)
@@ -32,7 +32,7 @@ export default function VotingStatus() {
     <div className="flex flex-col justify-center items-center m-4 w-[36rem]">
       {/* 그림 */}
       <div className="relative flex items-center justify-center w-80 mx-6 mb-4">
-        <Chalkboard drawingImage="/images/drawing.png" />
+        <Chalkboard drawingImage={drawing} />
       </div>
 
       {/* 현황 텍스트 */}
