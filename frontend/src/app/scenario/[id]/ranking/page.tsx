@@ -1,9 +1,16 @@
+'use client'
+
 import Image from 'next/image'
 import RankingBox from '@/app/scenario/components/RankingBox'
 import Medal1 from '/public/icons/1st-place-medal.svg'
 import Medal2 from '/public/icons/2nd-place-medal.svg'
 import Medal3 from '/public/icons/3rd-place-medal.svg'
 import RankingElement from '@/app/scenario/components/RankingElement'
+import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { useEffect, useState } from 'react'
+import Confetti from '@/app/lib/Confetti'
+import { useUser } from '@/app/_contexts/UserContext'
+import { useRouter } from 'next/navigation'
 
 const RANKING_BOXES = [
   {
@@ -37,7 +44,92 @@ const RANKING_BOXES = [
   },
 ]
 
+interface Rank {
+  avatarsImgSrc?: string
+  nickname: string
+  rank: number
+  score: number
+  userId: string
+}
+
+interface RankMessage {
+  action: string
+  users: Rank[]
+}
+
 export default function ScenarioRanking() {
+  const router = useRouter()
+  const { user } = useUser()
+  const [ranks, setRanks] = useState<Rank[]>([])
+  const { isConnected, sendMessage, registerCallback } = useWebSocketContext()
+
+  useEffect(() => {
+    const roomId = localStorage.getItem('roomId')
+
+    registerCallback(
+      `/games/${roomId}`,
+      'FINAL_RANK',
+      (message: RankMessage) => {
+        const rankLength = message.users.length
+
+        if (rankLength >= 3) {
+          setRanks(message.users)
+        } else {
+          const getRank = message.users
+
+          new Array(3 - rankLength)
+            .fill(0)
+            .map((_, index) => rankLength + index + 1)
+            .forEach((rank) => {
+              getRank.push({
+                avatarsImgSrc: '',
+                nickname: '',
+                rank,
+                score: 0,
+                userId: '',
+              })
+            })
+
+          const rank2 = getRank[1]
+          const rank1 = getRank[0]
+          getRank[1] = rank1
+          getRank[0] = rank2
+
+          setRanks(getRank)
+        }
+      },
+    )
+
+    if (isConnected) {
+      sendMessage(
+        '/games/rank',
+        JSON.stringify({
+          roomId,
+        }),
+      )
+    } else {
+      console.error('소켓 연결 실패')
+    }
+  }, [isConnected])
+
+  // 방 나가기 -> 1. 소켓방 나가기, 2. 대기방으로 나가기
+  const handleLeaveRoom = () => {
+    const roomId = localStorage.getItem('roomId')
+    registerCallback(`/rooms/${roomId}`, 'LEAVE_ROOM', () => {
+      localStorage.removeItem('roomId')
+      router.push(`/scenario`)
+    })
+
+    sendMessage(
+      '/rooms/leave',
+      JSON.stringify({ roomId: roomId, userId: user?.userId }),
+    )
+  }
+
+  useEffect(() => {
+    Confetti()
+  }, [])
+
   return (
     <section className="bg-secondary-500 min-h-screen w-full flex flex-col items-center gap-48 pb-20 overflow-hidden">
       <header className="w-full h-48 relative">
@@ -63,27 +155,34 @@ export default function ScenarioRanking() {
       </header>
       <main className="flex flex-col gap-9 items-center max-w-[68rem] w-full px-7">
         <section className="flex items-end">
-          {RANKING_BOXES.map((rankingInfo) => {
+          {ranks.map((rank, index) => {
             return (
               <RankingBox
-                key={rankingInfo.user}
-                height={rankingInfo.height}
-                ranking={rankingInfo.ranking}
-                score={rankingInfo.score}
-                user={rankingInfo.user}
-                border={rankingInfo.border}
-                profileSize={rankingInfo.profileSize}
+                key={rank.userId}
+                height={RANKING_BOXES[index].height}
+                ranking={RANKING_BOXES[index].ranking}
+                score={rank.score}
+                user={rank.nickname}
+                character={rank.avatarsImgSrc}
+                border={RANKING_BOXES[index].border}
+                profileSize={RANKING_BOXES[index].profileSize}
               />
             )
           })}
         </section>
         <ul className="flex flex-col gap-5 w-full">
-          {new Array(8)
-            .fill(0)
-            .map((_, index) => index + 4)
-            .map((rank) => {
-              return <RankingElement key={rank} rank={rank} />
-            })}
+          {ranks.length > 3
+            ? ranks.slice(3).map((rank) => {
+                return (
+                  <RankingElement
+                    key={rank.userId}
+                    rank={rank.rank}
+                    nickname={rank.nickname}
+                    score={rank.score}
+                  />
+                )
+              })
+            : null}
         </ul>
       </main>
     </section>

@@ -1,6 +1,14 @@
 import Image from 'next/image'
 
-export default function RankingElement({ rank }: { rank: number }) {
+export default function RankingElement({
+  rank,
+  nickname,
+  score,
+}: {
+  rank: number
+  nickname: string
+  score: number
+}) {
   return (
     <li className="flex border-[5px] border-white rounded-full bg-[rgba(255,255,255,0.8)] overflow-hidden h-16 items-center justify-between pr-7">
       <div className="flex w-full h-full items-center">
@@ -18,9 +26,11 @@ export default function RankingElement({ rank }: { rank: number }) {
             />
           </span>
         </p>
-        <span className="text-2xl text-text">2학년 1반 김유경</span>
+        <span className="text-2xl text-text">{nickname}</span>
       </div>
-      <span className="whitespace-nowrap text-3xl text-primary-950">200점</span>
+      <span className="whitespace-nowrap text-3xl text-primary-950">
+        {score}점
+      </span>
     </li>
   )
 }
