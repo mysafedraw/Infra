@@ -19,6 +19,7 @@ interface WebSocketContextProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     callback: (message: any) => void,
   ) => void
+  unregisterCallback: (destination: string, action: string) => void
   initializeWebSocket: () => Promise<void> // 초기화 함수 추가
 }
 
@@ -143,6 +144,21 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     callbackRegistry.current[destination][action] = callback
   }
 
+  const unregisterCallback = (destination: string, action: string) => {
+    if (callbackRegistry.current[destination]?.[action]) {
+      delete callbackRegistry.current[destination][action]
+
+      if (Object.keys(callbackRegistry.current[destination]).length === 0) {
+        delete callbackRegistry.current[destination]
+      }
+
+      console.log(`콜백 제거됨: destination=${destination}, action=${action}`)
+    } else {
+      console.warn(
+        `콜백을 찾을 수 없습니다: destination=${destination}, action=${action}`,
+      )
+    }
+  }
   return (
     <WebSocketContext.Provider
       value={{
@@ -150,6 +166,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         isConnected,
         sendMessage,
         registerCallback,
+        unregisterCallback,
         initializeWebSocket,
       }}
     >
