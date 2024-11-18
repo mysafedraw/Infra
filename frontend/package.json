@@ -1,0 +1,45 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ar-js-org/ar.js": "^3.4.5",
+    "@react-three/drei": "^9.115.0",
+    "@react-three/fiber": "^8.17.10",
+    "@stomp/stompjs": "^7.0.0",
+    "@svgr/webpack": "^8.1.0",
+    "canvas-confetti": "^1.9.3",
+    "livekit-client": "^2.6.0",
+    "next": "14.2.11",
+    "react": "^18",
+    "react-canvas-confetti": "^2.0.7",
+    "react-dom": "^18",
+    "sockjs-client": "^1.6.1",
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/sockjs-client": "^1.5.4",
+    "@types/three": "^0.169.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-config-next": "14.2.11",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "postcss": "^8",
+    "prettier": "^3.3.3",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
