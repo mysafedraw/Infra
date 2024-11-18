@@ -1,0 +1,15 @@
+export const DRAW_TYPES: Record<string, string> = {
+  'wine bottle': '물',
+  bucket: '물양동이',
+  'cell phone': '핸드폰',
+  book: '엘리베이터',
+  ambulance: '구급차',
+  hospital: '병원',
+  fan: '선풍기',
+  'fire hydrant': '소화기',
+  stairs: '계단',
+  telephone: '전화기',
+  flashlight: '손전등',
+  square: '손수건',
+  backpack: '마스크',
+}
