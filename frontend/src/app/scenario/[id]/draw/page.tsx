@@ -5,7 +5,7 @@ import DrawingBoard from '@/app/scenario/[id]/draw/components/DrawingBoard'
 import DrawTimer from '@/app/scenario/[id]/draw/components/DrawTimer'
 import Image from 'next/image'
 import QuestionBubble from '@/app/scenario/[id]/draw/components/QuestionBubble'
-import { DRAW_TYPES } from '@/app/_constants/draw'
+import { DRAW_TYPES, URL_MAPPING } from '@/app/_constants/draw'
 import CommonToast from '@/app/_components/CommonToast'
 import { useRouter } from 'next/navigation'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
@@ -179,7 +179,8 @@ export default function Draw() {
           if (isSuccess) {
             setHasSentAnswer(true)
 
-            const moveLabel = label.replace(/\s/g, '')
+            // URL에 사용할 라벨 결정
+            const moveLabel = URL_MAPPING[label] || label.replace(/\s/g, '')
 
             // 정답 상호작용 페이지로 이동
             if (response.isCorrect === 'CORRECT_ANSWER') {
