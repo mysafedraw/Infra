@@ -16,9 +16,8 @@ interface ModelLoaderProps {
   onLoad?: (model: THREE.Group) => void // 모델이 로드될 때 실행할 콜백
   onClick?: () => void // 클릭 이벤트 핸들러
   animation?: {
-    // 애니메이션 작동 여부
-    timeScale: number
-    loop: number
+    timeScale: number // 애니메이션 속도 조정
+    loop: number // 애니메이션 루프 횟수
   }
 }
 
