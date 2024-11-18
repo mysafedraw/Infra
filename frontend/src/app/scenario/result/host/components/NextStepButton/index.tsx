@@ -19,6 +19,10 @@ export default function NextStepButton() {
         stageNumber: nextStageNumber,
       })
 
+      if (nextStageNumber === 6) {
+        router.push(`/scenario/1/ranking`)
+      }
+
       sendMessage('/games/start', message)
       router.push(`/scenario/1/situation/step${nextStageNumber}`)
     } else {
