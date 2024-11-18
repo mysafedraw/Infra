@@ -4,9 +4,17 @@ import { Canvas } from '@react-three/fiber'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
+import { useRouter } from 'next/router'
+import { useUser } from '@/app/_contexts/UserContext'
 
 export default function FailSituation() {
+  const router = useRouter()
+  const { user } = useUser()
   const speechText = '친구가 여우별로 떠났어..'
+
+  setTimeout(() => {
+    router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
+  }, 4000)
 
   return (
     <StoryLayout speechText={speechText} isSpeechVisible>
