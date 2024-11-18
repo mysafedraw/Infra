@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend-app
-        image: 575108921650.dkr.ecr.ap-northeast-2.amazonaws.com/mysafedraw/frontend-image:60
+        image: 575108921650.dkr.ecr.ap-northeast-2.amazonaws.com/mysafedraw/frontend-image:61
         ports:
         - containerPort: 3000
         env:
