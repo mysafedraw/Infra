@@ -284,14 +284,6 @@ export default function DrawingBoard({
         onTouchEnd={stopDrawing}
         onTouchCancel={stopDrawing}
       />
-
-      <div id="result" className="mt-4 p-4">
-        {predictions.map((prediction, index) => (
-          <div key={index}>
-            {index + 1}위: {prediction.label} {prediction.probability}%
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
@@ -11,7 +11,7 @@ import { useUser } from '@/app/_contexts/UserContext'
 
 function Fail() {
   const router = useRouter()
-  const [fireScale, setFireScale] = useState(5)
+  const [fireScale, setFireScale] = useState(7)
   const { user } = useUser()
 
   useEffect(() => {
@@ -45,57 +45,12 @@ function Fail() {
             preserveDrawingBuffer: true,
           }}
         >
-          <ambientLight intensity={1.3} color="#ffffff" />
-          <directionalLight
-            position={[5, 5, 5]}
-            intensity={3}
-            color="#ffffff"
-          />
-          <>
-            <ModelLoader
-              path="/assets/scenario/fire2.glb"
-              position={[-2, -1, 0]}
-              scale={[fireScale, fireScale, fireScale]}
-              rotation={[0, 0.2, 0]}
-            />
-            <ModelLoader
-              path="/assets/scenario/fire2.glb"
-              position={[-1, -2, 0.9]}
-              scale={[fireScale, fireScale, fireScale]}
-              rotation={[0, 0.2, 0]}
-            />
-            <ModelLoader
-              path="/assets/scenario/fire2.glb"
-              position={[-2.5, -2, 0.9]}
-              scale={[fireScale, fireScale, fireScale]}
-              rotation={[0, 0.2, 0]}
-            />
-            <ModelLoader
-              path="/assets/scenario/fire2.glb"
-              position={[-3, -3, 1.5]}
-              scale={[fireScale, fireScale, fireScale]}
-              rotation={[0, 0.2, 0]}
-            />
-            <ModelLoader
-              path="/assets/scenario/fire2.glb"
-              position={[-2, -3, 1.5]}
-              scale={[fireScale, fireScale, fireScale]}
-              rotation={[0, 0.2, 0]}
-            />
-            <ModelLoader
-              path="/assets/scenario/fire2.glb"
-              position={[-0.5, -3, 1.5]}
-              scale={[fireScale, fireScale, fireScale]}
-              rotation={[0, 0.2, 0]}
-            />
-          </>
-
           <ARController>
             <ambientLight intensity={0.5} />
             <pointLight
               position={[0, 2, 0]}
               intensity={2}
-              color="#ff7700"
+              color="#ffffff"
               distance={10}
               decay={2}
             />
@@ -106,6 +61,45 @@ function Fail() {
               intensity={1}
               castShadow
             />
+
+            <Suspense fallback={null}>
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-2, -1, 0]}
+                scale={[fireScale, fireScale, fireScale]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-1, -2, 0.9]}
+                scale={[fireScale, fireScale, fireScale]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-2.5, -2, 0.9]}
+                scale={[fireScale, fireScale, fireScale]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-3, -3, 1.5]}
+                scale={[fireScale, fireScale, fireScale]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-2, -3, 1.5]}
+                scale={[fireScale, fireScale, fireScale]}
+                rotation={[0, 0.2, 0]}
+              />
+              <ModelLoader
+                path="/assets/scenario/fire2.glb"
+                position={[-0.5, -3, 1.5]}
+                scale={[fireScale, fireScale, fireScale]}
+                rotation={[0, 0.2, 0]}
+              />
+            </Suspense>
           </ARController>
         </Canvas>
       </div>
