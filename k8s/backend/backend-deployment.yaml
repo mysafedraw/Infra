@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend-app
-        image: dongwonkwon/backend-image:latest
+        image: 575108921650.dkr.ecr.ap-northeast-2.amazonaws.com/mysafedraw/backend-image:cd79f73ef0c405dc413679c7dc42658180037977
         ports:
         - containerPort: 8080
         env:
