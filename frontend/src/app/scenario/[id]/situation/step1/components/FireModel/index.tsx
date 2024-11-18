@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
 interface FireModelsProps {

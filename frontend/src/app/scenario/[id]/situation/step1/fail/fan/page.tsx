@@ -73,7 +73,7 @@ function Step1FailFan() {
             />
             <Suspense fallback={null}>
               <>
-                <FireModel scale={[fireScale, fireScale,fireScale]}/>
+                <FireModel />
                 {showMoreFire && (
                   <>
                     <ModelLoader
@@ -88,7 +88,7 @@ function Step1FailFan() {
                     />
                   </>
                 )}
-              </FireM>
+              </>
             </Suspense>
           </ARController>
           {/* 상호 작용 */}

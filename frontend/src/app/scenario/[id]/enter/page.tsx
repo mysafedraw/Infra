@@ -17,6 +17,36 @@ export default function Enter() {
     setErrorText('')
   }
 
+  // 흔들림 트리거
+  const triggerShake = (message: string) => {
+    setErrorText(message)
+    setIsError(false)
+    setTimeout(() => setIsError(true), 0)
+  }
+
+  const fetchExistRoom = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/rooms/${roomId}`,
+        {
+          method: 'GET',
+          cache: 'no-store',
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch roomId')
+      }
+
+      const result = await response.json()
+
+      return result.isExisting
+    } catch (error) {
+      console.error('Error fetching roomId:', error)
+      return false
+    }
+  }
+
   // 에러 발생 흔들림
   useEffect(() => {
     if (errorText) {
@@ -44,36 +74,6 @@ export default function Enter() {
 
     router.push(`/scenario/1/room/${roomId}`)
     setUser({ ...user, isHost: false } as User) // isHost 저장
-  }
-
-  const fetchExistRoom = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/rooms/${roomId}`,
-        {
-          method: 'GET',
-          cache: 'no-store',
-        },
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch roomId')
-      }
-
-      const result = await response.json()
-
-      return result.isExisting
-    } catch (error) {
-      console.error('Error fetching roomId:', error)
-      return false
-    }
-  }
-
-  // 흔들림 트리거
-  const triggerShake = (message: string) => {
-    setErrorText(message)
-    setIsError(false)
-    setTimeout(() => setIsError(true), 0)
   }
 
   return (
