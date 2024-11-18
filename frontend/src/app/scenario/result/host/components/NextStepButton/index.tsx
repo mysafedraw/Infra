@@ -3,9 +3,11 @@
 import Image from 'next/image'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useRouter } from 'next/navigation'
+import { useOpenVidu } from '@/app/_contexts/OpenViduContext'
 
 export default function NextStepButton() {
   const { sendMessage } = useWebSocketContext()
+  const { muteMicrophone } = useOpenVidu()
   const router = useRouter()
 
   const handleNextStep = async () => {
@@ -28,6 +30,9 @@ export default function NextStepButton() {
         return
       }
 
+
+      muteMicrophone() // 방장 발언 중일 경우 mute
+      sendMessage('/games/start', message)
       router.push(`/scenario/1/situation/step${nextStageNumber}`)
     } else {
       console.warn('필요한 데이터가 localStorage에 없습니다.')
