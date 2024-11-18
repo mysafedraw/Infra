@@ -73,6 +73,13 @@ export default function ScenarioRanking() {
         const rankLength = message.users.length
 
         if (rankLength >= 3) {
+          const getRank = message.users
+
+          const rank2 = getRank[1]
+          const rank1 = getRank[0]
+          getRank[1] = rank1
+          getRank[0] = rank2
+
           setRanks(message.users)
         } else {
           const getRank = message.users
@@ -158,20 +165,35 @@ export default function ScenarioRanking() {
       </header>
       <main className="flex flex-col gap-9 items-center max-w-[68rem] w-full px-7">
         <section className="flex items-end">
-          {ranks.map((rank, index) => {
-            return (
-              <RankingBox
-                key={rank.userId}
-                height={RANKING_BOXES[index].height}
-                ranking={RANKING_BOXES[index].ranking}
-                score={rank.score}
-                user={rank.nickname}
-                character={rank.avatarsImgSrc}
-                border={RANKING_BOXES[index].border}
-                profileSize={RANKING_BOXES[index].profileSize}
-              />
-            )
-          })}
+          {ranks.length >= 3
+            ? ranks.slice(0, 3).map((rank, index) => {
+                return (
+                  <RankingBox
+                    key={rank.userId}
+                    height={RANKING_BOXES[index].height}
+                    ranking={RANKING_BOXES[index].ranking}
+                    score={rank.score}
+                    user={rank.nickname}
+                    character={rank.avatarsImgSrc}
+                    border={RANKING_BOXES[index].border}
+                    profileSize={RANKING_BOXES[index].profileSize}
+                  />
+                )
+              })
+            : ranks.map((rank, index) => {
+                return (
+                  <RankingBox
+                    key={rank.userId}
+                    height={RANKING_BOXES[index].height}
+                    ranking={RANKING_BOXES[index].ranking}
+                    score={rank.score}
+                    user={rank.nickname}
+                    character={rank.avatarsImgSrc}
+                    border={RANKING_BOXES[index].border}
+                    profileSize={RANKING_BOXES[index].profileSize}
+                  />
+                )
+              })}
         </section>
         <ul className="flex flex-col gap-5 w-full">
           {ranks.length > 3
