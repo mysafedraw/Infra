@@ -17,6 +17,7 @@ export default function ScoredBoard({ data }: ScoredBoardProps) {
           alt={isCorrect ? 'correct' : 'wrong'}
           width={46}
           height={46}
+          className="size-12 object-contain"
         />
       </div>
       <AnswerBoard

@@ -19,6 +19,7 @@ interface WebSocketContextProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     callback: (message: any) => void,
   ) => void
+  initializeWebSocket: () => Promise<void> // 초기화 함수 추가
 }
 
 const WebSocketContext = createContext<WebSocketContextProps | undefined>(
@@ -55,59 +56,63 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  useEffect(() => {
-    const initializeClient = async () => {
-      const roomId = localStorage.getItem('roomId')
-      const user = JSON.parse(localStorage.getItem('user') || '{}')
-      const userId = user?.userId
-
-      return new Promise<Client>((resolve, reject) => {
-        const wsClient = new Client({
-          brokerURL: 'http://70.12.247.148:8080/ws-stomp',
-          reconnectDelay: 5000,
-          heartbeatIncoming: 4000,
-          heartbeatOutgoing: 4000,
-          debug: (str) => console.log('STOMP: ', str),
-        })
-
-        wsClient.onConnect = (frame: Frame) => {
-          console.log('WebSocket 연결 성공:', frame)
-          setIsConnected(true)
-
-          if (roomId && userId) {
-            // 단일 구독 설정
-            wsClient.subscribe(`/games/${roomId}`, handleMessage)
-            wsClient.subscribe(`/chat/${roomId}`, handleMessage)
-            wsClient.subscribe(`/games/${userId}`, handleMessage)
-            wsClient.subscribe(`/rooms/${roomId}`, handleMessage)
-          } else {
-            console.warn('roomId 또는 userId가 localStorage에 없습니다.')
-          }
-
-          resolve(wsClient)
-        }
-
-        wsClient.onStompError = (frame) => {
-          console.error('STOMP Error:', frame.headers.message)
-          reject(new Error('STOMP connection error'))
-        }
-
-        wsClient.onDisconnect = () => {
-          console.log('WebSocket 연결 해제')
-          setIsConnected(false)
-        }
-
-        wsClient.activate()
-      })
+  // 초기화
+  const initializeWebSocket = async () => {
+    // 기존 연결이 있다면 해제
+    if (clientRef.current) {
+      await clientRef.current.deactivate()
     }
 
-    initializeClient()
-      .then((wsClient) => {
-        clientRef.current = wsClient
+    const roomId = localStorage.getItem('roomId')
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    const userId = user?.userId
+
+    return new Promise<void>((resolve, reject) => {
+      const wsClient = new Client({
+        brokerURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}/ws-stomp`,
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+        debug: (str) => console.log('STOMP: ', str),
       })
-      .catch((error) =>
-        console.error('WebSocket initialization failed:', error),
-      )
+
+      wsClient.onConnect = (frame: Frame) => {
+        console.log('WebSocket 연결 성공:', frame)
+        setIsConnected(true)
+
+        if (roomId && userId) {
+          console.log(`구독 설정 중: roomId=${roomId}, userId=${userId}`)
+
+          wsClient.subscribe(`/games/${roomId}`, handleMessage)
+          wsClient.subscribe(`/chat/${roomId}`, handleMessage)
+          wsClient.subscribe(`/games/${userId}`, handleMessage)
+          wsClient.subscribe(`/rooms/${roomId}`, handleMessage)
+        } else {
+          console.warn('roomId 또는 userId가 localStorage에 없습니다.')
+        }
+
+        clientRef.current = wsClient
+        resolve()
+      }
+
+      wsClient.onStompError = (frame) => {
+        console.error('STOMP Error:', frame.headers.message)
+        reject(new Error('STOMP connection error'))
+      }
+
+      wsClient.onDisconnect = () => {
+        console.log('WebSocket 연결 해제')
+        setIsConnected(false)
+      }
+
+      wsClient.activate()
+    })
+  }
+
+  useEffect(() => {
+    initializeWebSocket().catch((error) =>
+      console.error('WebSocket initialization failed:', error),
+    )
 
     return () => {
       if (clientRef.current) {
@@ -145,6 +150,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         isConnected,
         sendMessage,
         registerCallback,
+        initializeWebSocket,
       }}
     >
       {children}

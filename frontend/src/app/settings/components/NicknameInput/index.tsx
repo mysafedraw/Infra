@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { useUser } from '@/app/_contexts/UserContext'
+import { User, useUser } from '@/app/_contexts/UserContext'
 
 export default function NicknameInput() {
   const [nickname, setNickname] = useState<string>('')
@@ -58,6 +58,46 @@ export default function NicknameInput() {
     setIsEditing(true)
     inputRef.current?.focus()
   }
+
+  const handleClickEditButton = async () => {
+    if (nickname.trim().length === 0) {
+      alert('닉네임을 입력해주세요')
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/nickname`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user?.userId,
+            nickname,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to post nickname')
+      }
+
+      setUser({ ...user, nickname } as User)
+      alert('닉네임이 변경되었습니다.')
+    } catch (error) {
+      console.error('Error post nickname:', error)
+      alert('닉네임 변경에 실패했습니다')
+    }
+  }
+
+  useEffect(() => {
+    if (user?.nickname) {
+      setNickname(user?.nickname)
+    }
+  }, [user])
 
   return (
     <div className="relative grid grid-cols-[1fr_3fr] items-center">

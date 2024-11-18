@@ -4,30 +4,41 @@ import RoomActionButton from '@/app/scenario/components/RoomActionButton'
 import { useRouter, useSearchParams } from 'next/navigation'
 import BackArrowIcon from '/public/icons/back-arrow.svg'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
+import { User, useUser } from '@/app/_contexts/UserContext'
+import { useEffect } from 'react'
 
 export default function Scenario() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const scenarioName = searchParams.get('name')
   const { isConnected } = useWebSocketContext()
+  const { user, setUser } = useUser()
+
+  useEffect(() => {
+    localStorage.removeItem('roomId')
+  }, [])
 
   const fetchCreateRoom = async () => {
     try {
-      const response = await fetch('http://70.12.247.148:8080/api/rooms', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/rooms`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            hostId: user?.userId,
+          }),
         },
-        body: JSON.stringify({
-          hostId: 'a8861570-eb52-488f-9138-d8970c38ae86',
-        }),
-      })
+      )
 
       const result = await response.json()
       console.log(result)
 
       if (result && result?.roomId) {
         router.push(`/scenario/1/room/${result.roomId}`)
+        setUser({ ...user, isHost: true } as User)
       }
     } catch (error) {
       console.error('방 생성 중 오류 발생:', error)

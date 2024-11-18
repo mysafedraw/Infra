@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useRouter } from 'next/navigation'
