@@ -12,6 +12,8 @@ import { useParams, useRouter } from 'next/navigation'
 import LoadingScreen from '@/app/_components/LoadingScreen'
 import { useUser } from '@/app/_contexts/UserContext'
 import BackArrowIcon from '/public/icons/back-arrow.svg'
+import CommonToast from '@/app/_components/CommonToast'
+import { useToast } from '@/app/_hooks/useToast'
 
 interface RoomResponse {
   action: 'ENTER_ROOM'
@@ -41,7 +43,7 @@ export default function Room() {
 
   const [roomData, setRoomData] = useState<RoomResponse>()
   const [isInitialized, setIsInitialized] = useState(false)
-
+  const { toast, showToast, hideToast } = useToast(1000)
   const [time, setTime] = useState(30)
 
   // 게임 시작 응답 처리
@@ -98,6 +100,12 @@ export default function Room() {
 
   // 게임 시작
   const handleGameStart = () => {
+    // 참여 인원이 1명 이하인 경우 토스트 표시
+    if (roomData?.currentPlayers.length === 0) {
+      showToast('게임 참여자가 1명 이상인 경우에\n 시작이 가능합니다')
+      return
+    }
+
     const startRequest = {
       roomId: roomId,
       stageNumber: 1,
@@ -207,7 +215,12 @@ export default function Room() {
         <div
           className={`flex items-center justify-center ${user?.isHost ? 'w-[350px]' : 'w-[100px]'}`}
         >
-          {user?.isHost && <TimerSetting time={time} onTimeChange={setTime} />}
+          {user?.isHost && (
+            <div>
+              <div className="text-center">방 번호 : {roomId}</div>
+              <TimerSetting time={time} onTimeChange={setTime} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -221,6 +234,14 @@ export default function Room() {
           <ChatBox />
         </div>
       </div>
+      {toast.isVisible && (
+        <CommonToast
+          message={toast.message}
+          duration={2000}
+          imageSrc="/images/tiger.png"
+          handleDurationEnd={hideToast}
+        />
+      )}
     </div>
   )
 }

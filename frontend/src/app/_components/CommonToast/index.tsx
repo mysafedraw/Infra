@@ -8,6 +8,7 @@ interface CommonToastProps {
   duration?: number
   imageSrc?: string
   altText?: string
+  isBackGround?: boolean
   handleDurationEnd?: () => void
 }
 
@@ -17,6 +18,7 @@ export default function CommonToast({
   imageSrc,
   altText = 'toast-icon',
   handleDurationEnd,
+  isBackGround = true,
 }: CommonToastProps) {
   const [isVisible, setIsVisible] = useState(true)
 
@@ -37,7 +39,9 @@ export default function CommonToast({
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center">
       {/* 어두운 블러 배경 */}
-      <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur"></div>
+      {isBackGround && (
+        <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur"></div>
+      )}
       {/* 토스트 메시지 */}
       <div className="relative bg-secondary-500 border-4 border-secondary-300 text-center rounded-xl py-12 px-28 shadow-button-active">
         {imageSrc && (
@@ -51,7 +55,7 @@ export default function CommonToast({
             />
           </div>
         )}
-        <p className="text-3xl text-text">{message}</p>
+        <p className="text-3xl text-text whitespace-pre-line">{message}</p>
       </div>
     </div>
   )
