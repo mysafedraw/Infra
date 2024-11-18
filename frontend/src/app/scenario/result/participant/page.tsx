@@ -8,14 +8,14 @@ import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useUser } from '@/app/_contexts/UserContext'
-import { useLiveKit } from '@/app/_contexts/LiveKitContext'
 import { AnswerData } from '@/app/scenario/result/types/answerTypes'
 import { useSpeakingRight } from '@/app/_contexts/SpeakingRight'
+import { useOpenVidu } from '@/app/_contexts/OpenViduContext'
 
 export default function ScenarioResultParticipant() {
   const router = useRouter()
   const { sendMessage, registerCallback } = useWebSocketContext()
-  const { joinVoiceRoom, leaveVoiceRoom } = useLiveKit()
+  const { joinVoiceRoom, leaveVoiceRoom } = useOpenVidu()
   const { user } = useUser()
   const [roomId, setRoomId] = useState<string | null>(null)
   const [isListening, setIsListening] = useState(false) // 음성채팅 참여 상태

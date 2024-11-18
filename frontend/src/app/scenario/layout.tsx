@@ -1,8 +1,8 @@
 import { ReactNode } from 'react'
 import { ChatProvider } from '@/app/_contexts/ChatContext'
 import { WebSocketProvider } from '@/app/_contexts/WebSocketContext'
-import { LiveKitProvider } from '@/app/_contexts/LiveKitContext'
 import { SpeakingRightProvider } from '@/app/_contexts/SpeakingRight'
+import { OpenViduProvider } from '@/app/_contexts/OpenViduContext'
 
 export default function ScenarioLayout({
   children,
@@ -13,14 +13,14 @@ export default function ScenarioLayout({
 }) {
   return (
     <SpeakingRightProvider>
-      <LiveKitProvider>
+      <OpenViduProvider>
         <WebSocketProvider>
           <ChatProvider>
             {modal}
             <main>{children}</main>
           </ChatProvider>
         </WebSocketProvider>
-      </LiveKitProvider>
+      </OpenViduProvider>
     </SpeakingRightProvider>
   )
 }
