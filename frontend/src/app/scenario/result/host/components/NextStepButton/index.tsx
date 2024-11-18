@@ -8,7 +8,7 @@ export default function NextStepButton() {
   const { sendMessage } = useWebSocketContext()
   const router = useRouter()
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     const roomId = localStorage.getItem('roomId')
     const nextStageNumber =
       parseInt(localStorage.getItem('stageNumber') || '1') + 1
@@ -19,11 +19,15 @@ export default function NextStepButton() {
         stageNumber: nextStageNumber,
       })
 
+      await sendMessage('/games/start', message)
+
+      localStorage.setItem('stageNumber', nextStageNumber.toString()) // stage 업데이트
+
       if (nextStageNumber === 6) {
         router.push(`/scenario/1/ranking`)
+        return
       }
 
-      sendMessage('/games/start', message)
       router.push(`/scenario/1/situation/step${nextStageNumber}`)
     } else {
       console.warn('필요한 데이터가 localStorage에 없습니다.')

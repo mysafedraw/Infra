@@ -38,6 +38,7 @@ export default function Room() {
     isConnected,
     sendMessage,
     registerCallback,
+    unregisterCallback,
     initializeWebSocket,
   } = useWebSocketContext()
 
@@ -80,13 +81,6 @@ export default function Room() {
         },
       )
 
-      // 콜백 등록
-      registerCallback(
-        `/games/${roomId}`,
-        'GAME_START',
-        handleGameStartResponse,
-      )
-
       const subscribeRequest = {
         userId: user?.userId,
         roomId: roomId,
@@ -100,6 +94,18 @@ export default function Room() {
       console.error('방 초기화 중 오류 발생:', error)
     }
   }
+
+  // 게임 시작 콜백 등록 & 제거
+  useEffect(() => {
+    const destination = `/games/${roomId}`
+    const action = 'GAME_START'
+
+    registerCallback(destination, action, handleGameStartResponse)
+
+    return () => {
+      unregisterCallback(destination, action)
+    }
+  }, [registerCallback, unregisterCallback])
 
   // 게임 시작
   const handleGameStart = () => {
