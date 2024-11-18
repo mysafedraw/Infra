@@ -64,49 +64,6 @@ export default function ScenarioRanking() {
   const { isConnected, sendMessage, registerCallback } = useWebSocketContext()
 
   useEffect(() => {
-    const message = {
-      action: 'test',
-      users: [
-        {
-          avatarsImgSrc: '/images/tiger.png',
-          nickname: '미피',
-          rank: 1,
-          score: 0,
-          userId: 'hksdflj',
-        },
-      ],
-    }
-
-    const rankLength = message.users.length
-
-    if (rankLength >= 3) {
-      setRanks(message.users)
-    } else {
-      const getRank = message.users
-
-      new Array(3 - rankLength)
-        .fill(0)
-        .map((_, index) => rankLength + index + 1)
-        .forEach((rank) => {
-          getRank.push({
-            avatarsImgSrc: '',
-            nickname: '',
-            rank,
-            score: 0,
-            userId: '',
-          })
-        })
-
-      const rank2 = getRank[1]
-      const rank1 = getRank[0]
-      getRank[1] = rank1
-      getRank[0] = rank2
-
-      setRanks(getRank)
-    }
-  }, [])
-
-  useEffect(() => {
     const roomId = localStorage.getItem('roomId')
 
     registerCallback(
@@ -124,8 +81,21 @@ export default function ScenarioRanking() {
             .fill(0)
             .map((_, index) => rankLength + index + 1)
             .forEach((rank) => {
-              console.log(rank)
+              getRank.push({
+                avatarsImgSrc: '',
+                nickname: '',
+                rank,
+                score: 0,
+                userId: '',
+              })
             })
+
+          const rank2 = getRank[1]
+          const rank1 = getRank[0]
+          getRank[1] = rank1
+          getRank[0] = rank2
+
+          setRanks(getRank)
         }
       },
     )
