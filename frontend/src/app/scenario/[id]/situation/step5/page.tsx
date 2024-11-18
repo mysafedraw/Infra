@@ -15,7 +15,7 @@ export default function SituationStep5() {
   }, [])
 
   return (
-    <StoryLayout speechText={speechText} isSpeechVisible>
+    <StoryLayout speechText={speechText} isSpeechVisible showNextButton>
       <Canvas
         camera={{
           position: [0, 0, 5],
