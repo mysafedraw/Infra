@@ -61,10 +61,7 @@ export default function ChatBox() {
       </div>
 
       {/* 입력창 */}
-      <form
-        className="absolute bottom-0 inset-x-0 m-4 flex items-center"
-        onSubmit={handleSendMessage}
-      >
+      <form className="p-4 flex items-center" onSubmit={handleSendMessage}>
         <input
           type="text"
           placeholder="메시지를 입력하세요"

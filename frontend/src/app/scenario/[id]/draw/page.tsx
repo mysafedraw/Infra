@@ -10,6 +10,7 @@ import CommonToast from '@/app/_components/CommonToast'
 import { useRouter } from 'next/navigation'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useUser } from '@/app/_contexts/UserContext'
+import { useToast } from '@/app/_hooks/useToast'
 
 interface DrawResponse {
   label: string
@@ -22,27 +23,27 @@ interface CheckAnswerResponse {
 }
 
 export default function Draw() {
-  const scenario =
-    '헉 콘센트에 불이 붙었어!\n초기에 빨리 진압해야 할 텐데... 지금 필요한 건.....'
-
   const router = useRouter()
   const [canvasData, setCanvasData] = useState<(() => string) | null>(null)
   const [question, setQuestion] = useState<string>('...')
   const [label, setLabel] = useState<string>('')
-  const [showRetryToast, setShowRetryToast] = useState(false)
 
   const { sendMessage, registerCallback } = useWebSocketContext()
   const { user } = useUser()
 
+  const [dialogue, setDialogue] = useState<string | null>(null)
   const [roomId, setRoomId] = useState<string | null>(null)
   const [stageNumber, setStageNumber] = useState<string | null>(null)
   const [isTimeEnded, setIsTimeEnded] = useState(false)
   const [hasSentAnswer, setHasSentAnswer] = useState(false)
 
+  const { toast, showToast } = useToast(3000)
+
   // roomId, stageNumber 가져오기
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
     setStageNumber(localStorage.getItem('stageNumber'))
+    setDialogue(localStorage.getItem('situationDialogue'))
   }, [])
 
   const getParticle = (word: string): string => {
@@ -164,13 +165,13 @@ export default function Draw() {
         `/games/${user?.userId}`,
         'CHECK_ANSWER',
         async (response: CheckAnswerResponse) => {
-          if (response.isCorrect === 'INCORRECT_ANSWER') {
-            if (!isTimeEnd) {
-              setShowRetryToast(true)
-              setTimeout(() => setShowRetryToast(false), 1000)
-              resolve()
-              return
-            }
+          if (response.isCorrect === 'INCORRECT_ANSWER' && !isTimeEnd) {
+            showToast('다시 생각해보세요', {
+              duration: 1000,
+              imageSrc: '/images/tiger.png',
+              altText: 'draw-retry-icon',
+            })
+            return
           }
 
           // CORRECT_ANSWER나 PROHIBITED_ANSWER인 경우, 또는 시간 종료 시
@@ -218,6 +219,10 @@ export default function Draw() {
   // 타이머 종료
   const handleTimeEnd = async () => {
     setIsTimeEnded(true)
+    showToast('시간이 끝났어요', {
+      imageSrc: '/images/tiger.png',
+      altText: 'draw-time-end',
+    })
     await handleAnswerProcess(true)
   }
 
@@ -226,7 +231,7 @@ export default function Draw() {
       {/* 시나리오 말풍선 문장 */}
       <div className="flex py-4 px-2 bg-primary-600 border-4 border-primary-700 w-full rounded-md justify-center">
         <p className="whitespace-pre-wrap leading-9 text-center text-text text-4xl select-none">
-          {scenario}
+          {dialogue}
         </p>
       </div>
       {/* 그림판 */}
@@ -259,21 +264,12 @@ export default function Draw() {
           </p>
         </button>
       </div>
-      {isTimeEnded && (
+      {toast.isVisible && (
         <CommonToast
-          message="시간이 끝났어요"
-          duration={3000}
-          imageSrc="/images/tiger.png"
-          altText="draw-rights-icon"
-        />
-      )}
-
-      {showRetryToast && (
-        <CommonToast
-          message="다시 생각해보세요"
-          duration={1000}
-          imageSrc="/images/tiger.png"
-          altText="draw-retry-icon"
+          message={toast.message}
+          duration={toast.duration}
+          imageSrc={toast.imageSrc}
+          altText={toast.altText}
         />
       )}
     </div>
