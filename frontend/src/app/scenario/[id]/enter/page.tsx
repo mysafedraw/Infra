@@ -7,10 +7,10 @@ import { User, useUser } from '@/app/_contexts/UserContext'
 
 export default function Enter() {
   const router = useRouter()
-  const [roomId, setRoomId] = useState<string>('')
-  const { user, setUser } = useUser()
-  const [errorText, setErrorText] = useState<string>('')
-  const [isError, setIsError] = useState<boolean>(false)
+  const [roomId, setRoomId] = useState<string>('') // 방 코드
+  const { user, setUser } = useUser() // 유저 정보
+  const [errorText, setErrorText] = useState<string>('') // 에러 메시지
+  const [isError, setIsError] = useState<boolean>(false) // 흔들림 상태
 
   const handleRoomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRoomId(e.target.value)
@@ -31,14 +31,14 @@ export default function Enter() {
 
   const handleMove = async () => {
     if (!roomId.trim()) {
-      setErrorText('방 코드를 입력해주세요')
+      triggerShake('방 코드를 입력해주세요')
       return
     }
 
     const isExists = await fetchExistRoom()
 
     if (!isExists) {
-      setErrorText('존재하지 않는 방입니다')
+      triggerShake('존재하지 않는 방입니다')
       return
     }
 
@@ -62,13 +62,18 @@ export default function Enter() {
 
       const result = await response.json()
 
-      console.log(result)
-
-      return result.data
+      return result.isExisting
     } catch (error) {
       console.error('Error fetching roomId:', error)
       return false
     }
+  }
+
+  // 흔들림 트리거
+  const triggerShake = (message: string) => {
+    setErrorText(message)
+    setIsError(false)
+    setTimeout(() => setIsError(true), 0)
   }
 
   return (
@@ -103,7 +108,7 @@ export default function Enter() {
           )}
         </div>
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end select-none">
         <SignButton content={'접속하기'} onClick={handleMove} />
       </div>
     </div>
