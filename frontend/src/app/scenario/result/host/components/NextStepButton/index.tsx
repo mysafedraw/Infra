@@ -19,11 +19,12 @@ export default function NextStepButton() {
         stageNumber: nextStageNumber,
       })
 
+      sendMessage('/games/start', message)
+
       if (nextStageNumber === 6) {
         router.push(`/scenario/1/ranking`)
+        return
       }
-
-      sendMessage('/games/start', message)
       router.push(`/scenario/1/situation/step${nextStageNumber}`)
     } else {
       console.warn('필요한 데이터가 localStorage에 없습니다.')
