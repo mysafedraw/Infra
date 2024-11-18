@@ -6,7 +6,7 @@ import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import { useState } from 'react'
 import { Html } from '@react-three/drei'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
 
 type PenguinState = 'sick' | 'healthy'

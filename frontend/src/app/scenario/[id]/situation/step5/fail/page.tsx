@@ -4,7 +4,7 @@ import { Canvas } from '@react-three/fiber'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
 
 export default function FailSituation() {
