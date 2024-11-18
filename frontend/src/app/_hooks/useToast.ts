@@ -6,6 +6,7 @@ interface ToastState {
   duration: number
   imageSrc?: string
   altText?: string
+  isBackGround?: boolean
 }
 
 export const useToast = (duration = 3000) => {
@@ -13,12 +14,18 @@ export const useToast = (duration = 3000) => {
     message: '',
     isVisible: false,
     duration: duration,
+    isBackGround: true,
   })
 
   const showToast = useCallback(
     (
       message: string,
-      options?: { duration?: number; imageSrc?: string; altText?: string },
+      options?: {
+        duration?: number
+        imageSrc?: string
+        altText?: string
+        isBackGround?: boolean
+      },
     ) => {
       setToast({
         message,
@@ -26,6 +33,7 @@ export const useToast = (duration = 3000) => {
         duration: options?.duration || duration,
         imageSrc: options?.imageSrc,
         altText: options?.altText,
+        isBackGround: options?.isBackGround,
       })
 
       setTimeout(() => {
