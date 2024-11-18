@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useUser } from '@/app/_contexts/UserContext'
-import { useLiveKit } from '@/app/_contexts/LiveKitContext'
+import { useOpenVidu } from '@/app/_contexts/OpenViduContext'
 
 export default function SpeakingRightsToast() {
   const [isVisible, setIsVisible] = useState(true)
   const [roomId, setRoomId] = useState<string | null>(null)
   const { user } = useUser()
-  const { enableMicForSpeakingRights } = useLiveKit() // 발언권 획득 함수 가져오기
+  const { enableMicForSpeakingRights } = useOpenVidu() // 발언권 획득 함수 가져오기
 
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
