@@ -7,20 +7,24 @@ import VolumeSlider from './components/VolumeSlider'
 import MicTest from './components/MicTest'
 import Link from 'next/link'
 import { useUser } from '@/app/_contexts/UserContext'
+import { useRouter } from 'next/navigation'
 
 export default function Settings() {
   const { user } = useUser()
+  const router = useRouter()
 
   return (
     <div className="p-20 pt-16 w-full h-full min-h-screen bg-secondary-500 flex flex-col">
       <div className="flex items-center drop-shadow-md mb-8">
-        <Image
-          src="/icons/back-arrow.svg"
-          alt="back"
-          width={60}
-          height={60}
-          className="h-12 w-auto select-none"
-        />
+        <button onClick={() => router.back()}>
+          <Image
+            src="/icons/back-arrow.svg"
+            alt="back"
+            width={60}
+            height={60}
+            className="h-12 w-auto"
+          />
+        </button>
         <h1 className="ml-6 text-6xl text-white">설정</h1>
       </div>
       <div className="p-16 flex flex-1 bg-white bg-opacity-80 rounded-xl">
