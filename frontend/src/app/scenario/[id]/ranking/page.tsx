@@ -133,7 +133,10 @@ export default function ScenarioRanking() {
   return (
     <section className="bg-secondary-500 min-h-screen w-full flex flex-col items-center gap-48 pb-20 overflow-hidden">
       <header className="w-full h-48 relative">
-        <button className="absolute right-6 top-11 flex items-center justify-center z-10">
+        <button
+          className="absolute right-6 top-11 flex items-center justify-center z-10"
+          onClick={handleLeaveRoom}
+        >
           <Image
             src="/images/wood-arrow.png"
             alt="finish-button"
