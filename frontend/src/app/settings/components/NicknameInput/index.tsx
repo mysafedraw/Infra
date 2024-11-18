@@ -24,36 +24,6 @@ export default function NicknameInput() {
     }
   }
 
-  const handleNicknameUpdate = async () => {
-    if (user?.userId && nickname) {
-      try {
-        const response = await fetch(
-          'https://mysafedraw.site/api/users/nickname',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: user.userId,
-              nickname,
-            }),
-          },
-        )
-        if (response.ok) {
-          setUser((prevUser) =>
-            prevUser ? { ...prevUser, nickname } : prevUser,
-          )
-          setIsEditing(false)
-        } else {
-          console.error('Failed to update nickname')
-        }
-      } catch (error) {
-        console.error('Error updating nickname:', error)
-      }
-    }
-  }
-
   const focusInput = () => {
     setIsEditing(true)
     inputRef.current?.focus()
@@ -93,12 +63,6 @@ export default function NicknameInput() {
     }
   }
 
-  useEffect(() => {
-    if (user?.nickname) {
-      setNickname(user?.nickname)
-    }
-  }, [user])
-
   return (
     <div className="relative grid grid-cols-[1fr_3fr] items-center">
       <label className="text-4xl">닉네임</label>
@@ -124,7 +88,7 @@ export default function NicknameInput() {
           )}
         </div>
         <button
-          onClick={handleNicknameUpdate}
+          onClick={handleClickEditButton}
           className={`h-full bg-primary-500 text-3xl rounded-lg transition-all duration-300 overflow-hidden text-nowrap ${isEditing ? 'w-28 ml-2' : 'w-0'}`}
         >
           변경

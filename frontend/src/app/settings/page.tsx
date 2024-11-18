@@ -11,19 +11,11 @@ import { useRouter } from 'next/navigation'
 
 export default function Settings() {
   const { user } = useUser()
-
   const router = useRouter()
 
   return (
     <div className="p-20 pt-16 w-full h-full min-h-screen bg-secondary-500 flex flex-col">
       <div className="flex items-center drop-shadow-md mb-8">
-        <Image
-          src="/icons/back-arrow.svg"
-          alt="back"
-          width={60}
-          height={60}
-          className="h-12 w-auto select-none"
-        />
         <button onClick={() => router.back()}>
           <Image
             src="/icons/back-arrow.svg"
