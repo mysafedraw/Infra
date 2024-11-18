@@ -12,6 +12,7 @@ import { useUser } from '@/app/_contexts/UserContext'
 import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import ActionScene from '@/app/scenario/[id]/situation/components/ActionScene'
+import FireModel from '@/app/scenario/[id]/situation/step1/components/FireModel'
 
 function Step1SucccessFirehydrant() {
   const [showFire, setShowFire] = useState(true)
@@ -65,27 +66,7 @@ function Step1SucccessFirehydrant() {
               castShadow
             />
 
-            <Suspense fallback={null}>
-              {showFire && (
-                <>
-                  <ModelLoader
-                    path="/assets/scenario/fire2.glb"
-                    position={[2, 3, 0]}
-                    scale={[6, 6, 6]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire2.glb"
-                    position={[4, 3, 0]}
-                    scale={[6, 6, 6]}
-                  />
-                  <ModelLoader
-                    path="/assets/scenario/fire2.glb"
-                    position={[3, 3, 0]}
-                    scale={[6, 6, 6]}
-                  />
-                </>
-              )}
-            </Suspense>
+            <Suspense fallback={null}>{showFire && <FireModel />}</Suspense>
           </ARController>
 
           {/* 상호 작용 */}
