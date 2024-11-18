@@ -8,7 +8,7 @@ export default function CharacterDialogue({
 }) {
   const { user } = useUser()
   return (
-    <div className="absolute bottom-2 left-6 right-6">
+    <div className="absolute -bottom-4 left-6 right-6">
       <div className="flex items-end max-w-5xl mx-auto">
         <div className="relative inline-block py-8 mb-7 mr-4 px-10 w-full bg-white border-4 border-primary-600 rounded-3xl shadow-md z-50">
           <p className="text-3xl text-gray-800">{speechText}</p>

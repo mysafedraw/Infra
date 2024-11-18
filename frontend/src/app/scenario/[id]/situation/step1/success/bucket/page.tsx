@@ -72,16 +72,39 @@ function Step1SucccessBucket() {
             {/* 양동이 */}
             <ModelLoader
               path="/assets/scenario/bucket.glb"
-              position={[2.5, -0.5, 0]}
+              position={[2.7, 0.2, 0]}
               scale={[0.07, 0.07, 0.07]}
               onClick={handleBucketClick}
             />
+            {/* 물방울 */}
+            {!showFire && (
+              <>
+                <ModelLoader
+                  path="/assets/scenario/water-drop.glb"
+                  position={[-2.5, 1, 0]}
+                  scale={[0.2, 0.2, 0.2]}
+                  rotation={[0.4, 0, 0]}
+                />
+                <ModelLoader
+                  path="/assets/scenario/water-drop.glb"
+                  position={[-2.0, 1.4, 0]}
+                  scale={[0.2, 0.2, 0.2]}
+                  rotation={[0.4, 0, 0]}
+                />
+                <ModelLoader
+                  path="/assets/scenario/water-drop.glb"
+                  position={[-1.5, 1, 0]}
+                  scale={[0.2, 0.2, 0.2]}
+                  rotation={[0.4, 0, 0]}
+                />
+              </>
+            )}
             {showFire && (
-              <Html position={[3, 0, 0]} style={{ pointerEvents: 'none' }}>
+              <Html position={[3, 0.7, 0]} style={{ pointerEvents: 'none' }}>
                 <div className="relative flex justify-center items-center">
                   <div className="rounded-full border-[10px] border-dashed border-primary-500 w-96 h-96 absolute"></div>
                   <div className="rounded-full border-[10px] border-dashed border-primary-500 w-80 h-80 absolute"></div>
-                  <p className="animate-bounce bg-primary-500 whitespace-nowrap py-5 px-8 text-2xl rounded-lg shadow-md absolute top-0 left-14">
+                  <p className="animate-bounce bg-primary-500 whitespace-nowrap py-5 px-8 text-2xl rounded-lg shadow-md absolute -top-16 left-28">
                     양동이를 눌러주세요
                   </p>
                 </div>
