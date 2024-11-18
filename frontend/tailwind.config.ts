@@ -75,10 +75,17 @@ const config: Config = {
           '80%': { transform: 'translateX(0)', opacity: '1' },
           '100%': { transform: 'translateX(-100%)', opacity: '0' },
         },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-5px)' },
+          '50%': { transform: 'translateX(5px)' },
+          '75%': { transform: 'translateX(-5px)' },
+        },
       },
       animation: {
         'small-ping': 'smallPing 1s cubic-bezier(0, 0, 0.2, 1) infinite',
         'slide-in-out': 'slideInOut 3s ease forwards',
+        shake: 'shake 0.5s ease-in-out',
       },
     },
   },

@@ -4,13 +4,11 @@ import SafeIcon from '/public/icons/safe-word.svg'
 import NoIcon from '/public/icons/no.svg'
 import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
-import { useGLTF } from '@react-three/drei'
+import Image from 'next/image'
+import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 
 export default function Splash() {
-  const { scene: cloudScene } = useGLTF('/assets/background/cloud.glb')
-
   useEffect(() => {
-    useGLTF.preload('/assets/background/cloud.glb')
     document.documentElement.classList.add('scrollbar-hide')
 
     return () => {
@@ -25,7 +23,7 @@ export default function Splash() {
     let currentPosition = window.scrollY
 
     const interval = setInterval(() => {
-      currentPosition += 10
+      currentPosition += 15
       window.scrollTo(0, currentPosition)
 
       if (currentPosition >= targetPosition) {
@@ -57,16 +55,15 @@ export default function Splash() {
   }, [])
 
   return (
-    <section className="relative h-screen w-full">
+    <section className="relative h-screen w-full overflow-hidden">
       <Canvas
         camera={{ position: [0, 0, 20], fov: 70 }}
         className="absolute top-0"
       >
         <ambientLight intensity={0.5} color="#ffffff" />
         <directionalLight position={[5, 5, 5]} intensity={5} color="#ffffff" />
-        <primitive
-          object={cloudScene.clone()}
-          dispose={null}
+        <ModelLoader
+          path="/assets/background/cloud.glb"
           scale={[2, 2, 2]}
           position={[0, -10, -10]}
         />
@@ -74,6 +71,22 @@ export default function Splash() {
       <div>
         <div className="flex flex-col justify-center items-center gap-28 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <div className="relative">
+            <>
+              <Image
+                src="/images/siren-cloud.png"
+                alt="siren-cloud"
+                height={252}
+                width={200}
+                className="absolute -top-44 -left-64 -z-10"
+              />
+              <Image
+                src="/images/prohibition-cloud.png"
+                alt="siren-cloud"
+                height={252}
+                width={200}
+                className="absolute -bottom-72 -right-56 -z-10"
+              />
+            </>
             <h1 className="text-9xl text-text whitespace-nowrap select-none">
               내가 그린 기린 그림
             </h1>

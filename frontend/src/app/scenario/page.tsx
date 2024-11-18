@@ -1,4 +1,6 @@
 import dynamic from 'next/dynamic'
+import Setting from '/public/icons/setting.svg'
+import Link from 'next/link'
 
 const Map = dynamic(() => import('@/app/scenario/components/Map'), {
   ssr: false,
@@ -39,6 +41,9 @@ export default async function Home() {
 
   return (
     <div className="w-screen h-screen">
+      <Link href="/settings" className="fixed top-6 right-6 w-20 h-20 z-50">
+        <Setting />
+      </Link>
       <Map scenarios={scenarios} />
     </div>
   )

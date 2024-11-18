@@ -11,6 +11,7 @@ import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/app/_contexts/UserContext'
 import ActionScene from '@/app/scenario/[id]/situation/components/ActionScene'
+import FireModel from '@/app/scenario/[id]/situation/step1/components/FireModel'
 
 function Step1FailFan() {
   const router = useRouter()
@@ -72,31 +73,17 @@ function Step1FailFan() {
             />
             <Suspense fallback={null}>
               <>
-                <ModelLoader
-                  path="/assets/scenario/fire2.glb"
-                  position={[2, 3, 0]}
-                  scale={[fireScale, fireScale, fireScale]}
-                />
-                <ModelLoader
-                  path="/assets/scenario/fire2.glb"
-                  position={[4, 3, 0]}
-                  scale={[fireScale, fireScale, fireScale]}
-                />
-                <ModelLoader
-                  path="/assets/scenario/fire2.glb"
-                  position={[3, 3, 0]}
-                  scale={[fireScale, fireScale, fireScale]}
-                />
+                <FireModel />
                 {showMoreFire && (
                   <>
                     <ModelLoader
                       path="/assets/scenario/fire2.glb"
-                      position={[2, 4, 0]}
+                      position={[2, 3, 0]}
                       scale={[fireScale, fireScale, fireScale]}
                     />
                     <ModelLoader
                       path="/assets/scenario/fire2.glb"
-                      position={[3, 4, 0]}
+                      position={[3, 3, 0]}
                       scale={[fireScale, fireScale, fireScale]}
                     />
                   </>

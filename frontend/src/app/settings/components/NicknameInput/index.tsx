@@ -1,15 +1,33 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { User, useUser } from '@/app/_contexts/UserContext'
 
 export default function NicknameInput() {
-  const { user, setUser } = useUser()
   const [nickname, setNickname] = useState<string>('')
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const { user, setUser } = useUser()
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setNickname(e.target.value)
+  useEffect(() => {
+    if (user) {
+      setNickname(user.nickname)
+    }
+  }, [user])
+
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newNickname = e.target.value
+    // 10자 제한
+    if (newNickname.length <= 10) {
+      setNickname(newNickname)
+    }
+  }
+
+  const focusInput = () => {
+    setIsEditing(true)
+    inputRef.current?.focus()
+  }
 
   const handleClickEditButton = async () => {
     if (nickname.trim().length === 0) {
@@ -45,24 +63,37 @@ export default function NicknameInput() {
     }
   }
 
-  useEffect(() => {
-    if (user?.nickname) {
-      setNickname(user?.nickname)
-    }
-  }, [user])
-
   return (
     <div className="relative grid grid-cols-[1fr_3fr] items-center">
       <label className="text-4xl">닉네임</label>
-      <input
-        type="text"
-        value={nickname}
-        onChange={handleNicknameChange}
-        className="w-full px-6 py-3 bg-gray-white border border-gray-dark hover:outline-primary-500 focus:outline-primary-500 rounded-xl text-3xl"
-      />
-      <button className="absolute right-4" onClick={handleClickEditButton}>
-        <Image src="/icons/pencil.svg" alt="edit" width={32} height={32} />
-      </button>
+      <div className="flex items-center h-full">
+        <div className="relative w-full">
+          <input
+            type="text"
+            value={nickname}
+            onChange={handleNicknameChange}
+            onFocus={() => setIsEditing(true)}
+            onBlur={() => setIsEditing(false)}
+            className="w-full px-6 py-3 bg-gray-white border border-gray-dark hover:outline-primary-500 focus:outline-primary-500 rounded-xl text-3xl"
+          />
+          {!isEditing && (
+            <Image
+              src="/icons/pencil.svg"
+              alt="edit"
+              width={32}
+              height={32}
+              className="absolute top-4 right-4 cursor-pointer"
+              onClick={focusInput}
+            />
+          )}
+        </div>
+        <button
+          onClick={handleClickEditButton}
+          className={`h-full bg-primary-500 text-3xl rounded-lg transition-all duration-300 overflow-hidden text-nowrap ${isEditing ? 'w-28 ml-2' : 'w-0'}`}
+        >
+          변경
+        </button>
+      </div>
     </div>
   )
 }

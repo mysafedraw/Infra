@@ -45,8 +45,12 @@ export default function ScenarioResultParticipant() {
   useEffect(() => {
     const stageNumber = parseInt(localStorage.getItem('stageNumber') || '1') // 기본값 1 설정
 
-    const handleGameStart = () => {
+    const handleGameStart = (response: {
+      action: string
+      situationDialogue: string
+    }) => {
       router.push(`/scenario/1/situation/step${stageNumber + 1}`)
+      localStorage.setItem('situationDialogue', response?.situationDialogue)
     }
 
     registerCallback(`/games/${roomId}`, 'GAME_START', handleGameStart)
