@@ -37,7 +37,6 @@ export default function DrawingBoard({
   const [scale, setScale] = useState<number>(1)
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
   const [strokes, setStrokes] = useState<Stroke[]>([])
-  const [predictions, setPredictions] = useState<DrawResponse[]>([])
 
   const getCanvasData = useCallback(() => {
     if (!canvasRef.current) return ''
@@ -110,8 +109,6 @@ export default function DrawingBoard({
           probability: result.top_probabilities[index],
         }),
       )
-
-      setPredictions(resultPredictions)
 
       if (onPrediction && resultPredictions.length > 0) {
         onPrediction(resultPredictions[0])
@@ -221,7 +218,6 @@ export default function DrawingBoard({
     const canvas = canvasRef.current
     context.clearRect(0, 0, canvas.width / scale, canvas.height / scale)
     setStrokes([])
-    setPredictions([]) // 예측 결과 초기화
 
     if (onPrediction) {
       onPrediction({ label: '', probability: 0 }) // 예측값 초기화
