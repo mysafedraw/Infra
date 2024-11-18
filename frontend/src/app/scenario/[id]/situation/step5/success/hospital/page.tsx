@@ -6,10 +6,14 @@ import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
 import { useState } from 'react'
 import { Html } from '@react-three/drei'
+import { useRouter } from 'next/router'
+import { useUser } from '@/app/_contexts/UserContext'
 
 type PenguinState = 'sick' | 'healthy'
 
 export default function HospitalScene() {
+  const router = useRouter()
+  const { user } = useUser()
   const [speechText, setSpeechText] = useState(
     '내가 병원에 빨리 데려다줘서 친구가 살 수 있을 것 같아!!',
   )
@@ -18,6 +22,10 @@ export default function HospitalScene() {
   const handleClickHospital = () => {
     setPenguinState('healthy')
     setSpeechText('와 병원에서 치료를 받아서 내 친구 펭펭이가 살아났어!')
+
+    setTimeout(() => {
+      router.push(`/scenario/result/${user?.isHost ? 'host' : 'participant'}`)
+    }, 4000)
   }
 
   return (
