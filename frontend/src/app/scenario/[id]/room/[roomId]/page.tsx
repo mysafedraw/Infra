@@ -49,7 +49,6 @@ export default function Room() {
 
   // 게임 시작 응답 처리
   const handleGameStartResponse = (response: GameStartResponse) => {
-    console.log(response)
     if (response.action === 'GAME_START') {
       // Situation 페이지로 이동
       router.push(`/scenario/1/situation/step1`)
