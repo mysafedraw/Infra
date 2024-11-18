@@ -23,9 +23,6 @@ interface CheckAnswerResponse {
 }
 
 export default function Draw() {
-  const scenario =
-    '헉 콘센트에 불이 붙었어!\n초기에 빨리 진압해야 할 텐데... 지금 필요한 건.....'
-
   const router = useRouter()
   const [canvasData, setCanvasData] = useState<(() => string) | null>(null)
   const [question, setQuestion] = useState<string>('...')
@@ -34,6 +31,7 @@ export default function Draw() {
   const { sendMessage, registerCallback } = useWebSocketContext()
   const { user } = useUser()
 
+  const [dialogue, setDialogue] = useState<string | null>(null)
   const [roomId, setRoomId] = useState<string | null>(null)
   const [stageNumber, setStageNumber] = useState<string | null>(null)
   const [isTimeEnded, setIsTimeEnded] = useState(false)
@@ -45,6 +43,7 @@ export default function Draw() {
   useEffect(() => {
     setRoomId(localStorage.getItem('roomId'))
     setStageNumber(localStorage.getItem('stageNumber'))
+    setDialogue(localStorage.getItem('situationDialogue'))
   }, [])
 
   const getParticle = (word: string): string => {
@@ -232,7 +231,7 @@ export default function Draw() {
       {/* 시나리오 말풍선 문장 */}
       <div className="flex py-4 px-2 bg-primary-600 border-4 border-primary-700 w-full rounded-md justify-center">
         <p className="whitespace-pre-wrap leading-9 text-center text-text text-4xl select-none">
-          {scenario}
+          {dialogue}
         </p>
       </div>
       {/* 그림판 */}

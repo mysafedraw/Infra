@@ -54,6 +54,9 @@ export default function Room() {
       router.push(`/scenario/1/situation/step1`)
       // 스테이지 넘버 저장
       localStorage.setItem('stageNumber', '1')
+
+      // 시작 문장 저장
+      localStorage.setItem('situationDialogue', response?.situationDialogue)
     }
   }
 
