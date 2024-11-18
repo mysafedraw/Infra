@@ -7,14 +7,14 @@ import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
 import NextStepButton from '@/app/scenario/result/host/components/NextStepButton'
 import { useUser } from '@/app/_contexts/UserContext'
-import { useLiveKit } from '@/app/_contexts/LiveKitContext'
+import { useOpenVidu } from '@/app/_contexts/OpenViduContext'
 
 export default function ScenarioResultHost() {
   const [toastMessage, setToastMessage] = useState<string>('')
   const [isVoiceRoomJoined, setIsVoiceRoomJoined] = useState(false)
   const { registerCallback } = useWebSocketContext()
   const { user } = useUser()
-  const { joinVoiceRoom, toggleMicrophone, isMuted } = useLiveKit()
+  const { joinVoiceRoom, toggleMicrophone, isMuted } = useOpenVidu()
   const [roomId, setRoomId] = useState<string | null>(null)
 
   useEffect(() => {

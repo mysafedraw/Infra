@@ -13,3 +13,19 @@ export const DRAW_TYPES: Record<string, string> = {
   square: '손수건',
   backpack: '마스크',
 }
+
+export const URL_MAPPING: Record<string, string> = {
+  backpack: 'mask',
+  square: 'handkerchief',
+  book: 'elevator',
+  'wine bottle': 'bucket',
+  bucket: 'bucket',
+  'cell phone': 'cell-phone',
+  ambulance: 'ambulance',
+  hospital: 'hospital',
+  fan: 'fan',
+  'fire hydrant': 'firehydrant',
+  stairs: 'stairs',
+  telephone: 'telephone',
+  flashlight: 'flashlight',
+}

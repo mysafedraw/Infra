@@ -3,12 +3,14 @@
 import Image from 'next/image'
 import { useWebSocketContext } from '@/app/_contexts/WebSocketContext'
 import { useRouter } from 'next/navigation'
+import { useOpenVidu } from '@/app/_contexts/OpenViduContext'
 
 export default function NextStepButton() {
   const { sendMessage } = useWebSocketContext()
+  const { muteMicrophone } = useOpenVidu()
   const router = useRouter()
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     const roomId = localStorage.getItem('roomId')
     const nextStageNumber =
       parseInt(localStorage.getItem('stageNumber') || '1') + 1
@@ -19,10 +21,16 @@ export default function NextStepButton() {
         stageNumber: nextStageNumber,
       })
 
+      await sendMessage('/games/start', message)
+
+      localStorage.setItem('stageNumber', nextStageNumber.toString()) // stage 업데이트
+
       if (nextStageNumber === 6) {
         router.push(`/scenario/1/ranking`)
+        return
       }
 
+      muteMicrophone() // 방장 발언 중일 경우 mute
       sendMessage('/games/start', message)
       router.push(`/scenario/1/situation/step${nextStageNumber}`)
     } else {

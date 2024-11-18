@@ -27,17 +27,45 @@ export default function ARController({
   const markerRoot = useRef(new THREE.Group())
   const markerControls = useRef<any>(null)
 
+  // 리사이즈 핸들러
   const onResize = useCallback(() => {
     if (arSource.current) {
       arSource.current.onResizeElement()
       arSource.current.copyElementSizeTo(gl.domElement)
-      if (arContext.current?.arController !== null) {
+      if (arContext.current && arContext.current.arController) {
         arSource.current.copyElementSizeTo(
           arContext.current.arController.canvas,
         )
       }
     }
   }, [gl])
+
+  // 클린업 함수 - AR 및 카메라 리소스 정리
+  const cleanup = useCallback(() => {
+    if (arSource.current) {
+      const video = arSource.current.domElement
+      if (video instanceof HTMLVideoElement) {
+        const stream = video.srcObject as MediaStream
+        if (stream) {
+          const tracks = stream.getTracks()
+          tracks.forEach((track) => track.stop())
+          video.srcObject = null
+        }
+      }
+    }
+
+    if (arContext.current) {
+      if (arContext.current.arController) {
+        arContext.current.arController.dispose()
+      }
+      arContext.current = null
+    }
+
+    markerControls.current = null
+
+    // AR 소스 정리
+    arSource.current = null
+  }, [])
 
   useEffect(() => {
     let isMarkerVisible = false
@@ -133,7 +161,9 @@ export default function ARController({
     window.addEventListener('resize', onResize)
     window.addEventListener('orientationchange', onResize)
 
+    // 컴포넌트 언마운트 시 클린업 실행
     return () => {
+      cleanup()
       window.removeEventListener('resize', onResize)
       window.removeEventListener('orientationchange', onResize)
     }
@@ -145,6 +175,7 @@ export default function ARController({
     onMarkerFound,
     onMarkerLost,
     onResize,
+    cleanup,
   ])
 
   // AR 업데이트 프레임
