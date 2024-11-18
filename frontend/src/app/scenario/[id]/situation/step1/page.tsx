@@ -6,8 +6,8 @@ import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Canvas } from '@react-three/fiber'
 import ARController from '@/app/scenario/[id]/situation/components/ARController'
-import ModelLoader from '@/app/scenario/[id]/situation/components/ModelLoader'
 import StoryLayout from '@/app/scenario/[id]/situation/components/StoryLayout'
+import FireModel from '@/app/scenario/[id]/situation/step1/components/FireModel'
 
 function Step1() {
   return (
@@ -52,21 +52,7 @@ function Step1() {
 
             {/* 작은 불 */}
             <Suspense fallback={null}>
-              <ModelLoader
-                path="/assets/scenario/fire2.glb"
-                position={[2, 3, 0]}
-                scale={[6, 6, 6]}
-              />
-              <ModelLoader
-                path="/assets/scenario/fire2.glb"
-                position={[4, 3, 0]}
-                scale={[6, 6, 6]}
-              />
-              <ModelLoader
-                path="/assets/scenario/fire2.glb"
-                position={[3, 3, 0]}
-                scale={[6, 6, 6]}
-              />
+              <FireModel />
             </Suspense>
           </ARController>
         </Canvas>
