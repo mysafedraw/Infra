@@ -30,7 +30,6 @@ export default function NextStepButton() {
         return
       }
 
-
       muteMicrophone() // 방장 발언 중일 경우 mute
       sendMessage('/games/start', message)
       router.push(`/scenario/1/situation/step${nextStageNumber}`)
