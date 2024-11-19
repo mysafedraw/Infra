@@ -49,16 +49,17 @@ export default function ScenarioResultParticipant() {
       action: string
       situationDialogue: string
     }) => {
-      if (stageNumber === 6) {
-        router.push(`/scenario/1/ranking`)
-        return
-      }
-
       router.push(`/scenario/1/situation/step${stageNumber + 1}`)
       localStorage.setItem('situationDialogue', response?.situationDialogue)
     }
 
     registerCallback(`/games/${roomId}`, 'GAME_START', handleGameStart)
+
+    if (stageNumber === 5) {
+      registerCallback(`/games/${roomId}`, 'FINAL_RANK', () => {
+        router.push(`/scenario/1/ranking`)
+      })
+    }
   }, [registerCallback, roomId, router])
 
   useEffect(() => {

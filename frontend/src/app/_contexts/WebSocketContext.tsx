@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Client, Frame, Message } from '@stomp/stompjs'
+import { Client, Message } from '@stomp/stompjs'
 
 interface WebSocketContextProps {
   client: Client | null
@@ -74,16 +74,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
-        debug: (str) => console.log('STOMP: ', str),
       })
 
-      wsClient.onConnect = (frame: Frame) => {
-        console.log('WebSocket 연결 성공:', frame)
+      wsClient.onConnect = () => {
         setIsConnected(true)
 
         if (roomId && userId) {
-          console.log(`구독 설정 중: roomId=${roomId}, userId=${userId}`)
-
           wsClient.subscribe(`/games/${roomId}`, handleMessage)
           wsClient.subscribe(`/chat/${roomId}`, handleMessage)
           wsClient.subscribe(`/games/${userId}`, handleMessage)
@@ -102,7 +98,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       wsClient.onDisconnect = () => {
-        console.log('WebSocket 연결 해제')
         setIsConnected(false)
       }
 
@@ -117,9 +112,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
     return () => {
       if (clientRef.current) {
-        clientRef.current
-          .deactivate()
-          .then(() => console.log('WebSocket 연결 해제 완료'))
+        clientRef.current.deactivate().then()
       }
     }
   }, [])
@@ -151,8 +144,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       if (Object.keys(callbackRegistry.current[destination]).length === 0) {
         delete callbackRegistry.current[destination]
       }
-
-      console.log(`콜백 제거됨: destination=${destination}, action=${action}`)
     } else {
       console.warn(
         `콜백을 찾을 수 없습니다: destination=${destination}, action=${action}`,

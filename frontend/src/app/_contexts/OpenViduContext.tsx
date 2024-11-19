@@ -76,7 +76,6 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
       sessionRef.current = undefined
       publisherRef.current = undefined
       setRemoteAudioTracks([])
-      console.log('Left voice room.')
     }
   }
 
@@ -84,17 +83,15 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
     if (sessionRef.current) return
 
     const OV = new OpenVidu()
+    OV.enableProdMode()
     const session = OV.initSession()
     sessionRef.current = session
 
     session.on('streamCreated', (event) => {
-      console.log('Stream created:', event.stream)
-
       const isRemoteStream =
         event.stream.connection.connectionId !== session.connection.connectionId
 
       if (!isRemoteStream) {
-        console.log('Skipping local stream.')
         return
       }
 
@@ -104,20 +101,13 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
         const tryGetMediaStream = (attempts: number) => {
           const mediaStream = subscriber.stream.getMediaStream()
           if (mediaStream) {
-            console.log('MediaStream retrieved successfully:', mediaStream)
-
             const audioElement = document.createElement('audio')
             audioElement.srcObject = mediaStream
             audioElement.autoplay = true
 
-            audioElement
-              .play()
-              .then(() => {
-                console.log('Audio playback started successfully.')
-              })
-              .catch((error) => {
-                console.error('Audio playback failed:', error)
-              })
+            audioElement.play().catch((error) => {
+              console.error('Audio playback failed:', error)
+            })
           } else if (attempts > 0) {
             console.warn('MediaStream not ready. Retrying...')
             setTimeout(() => tryGetMediaStream(attempts - 1), 100)
@@ -133,7 +123,6 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
     })
 
     session.on('streamDestroyed', (event) => {
-      console.log('Stream destroyed:', event.stream)
       setRemoteAudioTracks((prev) =>
         prev.filter(
           (track) => track.streamManager !== event.stream.streamManager,
@@ -157,8 +146,6 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
       publisherRef.current = publisher
 
       setIsMuted(true)
-
-      console.log('Joined voice room and published local audio track.')
     } catch (error) {
       console.error('Error connecting to voice room:', error)
       await leaveVoiceRoom()
@@ -169,10 +156,8 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
     if (publisherRef.current) {
       if (isMuted) {
         publisherRef.current.publishAudio(true)
-        console.log('Microphone unmuted.')
       } else {
         publisherRef.current.publishAudio(false)
-        console.log('Microphone muted.')
       }
       setIsMuted((prev) => !prev)
     }
@@ -182,7 +167,6 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
     if (publisherRef.current) {
       publisherRef.current.publishAudio(false)
       setIsMuted(true)
-      console.log('Microphone has been muted.')
     }
   }
 
@@ -191,14 +175,12 @@ export const OpenViduProvider: React.FC<{ children: React.ReactNode }> = ({
     participantName: string,
   ) => {
     if (!sessionRef.current) {
-      console.log('Room not connected. Attempting to join the room.')
       await joinVoiceRoom(roomName, participantName)
     }
 
     if (publisherRef.current) {
       publisherRef.current.publishAudio(true)
       setIsMuted(false)
-      console.log('Microphone enabled for speaking rights.')
     }
   }
 
