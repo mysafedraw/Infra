@@ -23,7 +23,6 @@ export default function FailSituation() {
   useEffect(() => {
     if (user?.avatarImg) {
       const match = user.avatarImg.match(/\/([^/]+)\.png$/)
-      console.log(match)
       if (match) {
         if (match[1] === 'cat' || match[1] === 'fox') {
           setAvatarUrl(`/assets/scenario/unicorn-sick.glb`)
