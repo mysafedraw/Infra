@@ -28,7 +28,7 @@ export default function FailSituation() {
         if (match[1] === 'cat' || match[1] === 'fox') {
           setAvatarUrl(`/assets/scenario/unicorn-sick.glb`)
         } else {
-          setAvatarUrl(`/assets/scenario/${match[1]}.glb`)
+          setAvatarUrl(`/assets/character/${match[1]}.glb`)
         }
       }
     }
