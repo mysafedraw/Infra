@@ -35,7 +35,6 @@ export default function Scenario() {
       )
 
       const result = await response.json()
-      console.log(result)
 
       if (result && result?.roomId) {
         router.push(`/scenario/1/room/${result.roomId}`)
