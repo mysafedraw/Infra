@@ -21,3 +21,10 @@ spec:
         env:
         - name: TZ
           value: "Asia/Seoul"
+        resources:  # 리소스 설정
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
