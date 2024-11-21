@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-deployment  # 이름 유지: 배포 리소스는 명확하게
+  namespace: default
+spec:
+  replicas: 1  # 최소 인스턴스 수는 1
+  selector:
+    matchLabels:
+      app: ai  # 간결한 레이블 사용
+  template:
+    metadata:
+      labels:
+        app: ai
+    spec:
+      containers:
+      - name: ai  # 컨테이너 이름은 짧게
+        image: dongwonkwon/ai-image:latest  # AI 이미지 설정
+        ports:
+        - containerPort: 8000  # 기본 서비스 포트
+        env:
+        - name: TZ  # 타임존 설정
+          value: "Asia/Seoul"

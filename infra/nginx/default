@@ -1,0 +1,84 @@
+# sudo nano /etc/nginx/sites-available/default
+# v1
+# 기본 도메인과 www 서브도메인을 Next.js로 연결
+server {
+    listen 443 ssl;
+    server_name test.mysafedraw.site;
+
+    ssl_certificate /etc/letsencrypt/live/mysafedraw.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mysafedraw.site/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;  # Next.js 서버
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # /api 경로를 Spring Boot로 연결 (REST API 용)
+    location /api {
+        proxy_pass http://localhost:8080;  # Spring Boot 서버
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # WebSocket 연결을 위한 /ws-stomp 경로 설정
+    location /ws-stomp {
+        proxy_pass http://localhost:8080;  # Spring Boot WebSocket 서버
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        # WebSocket용 타임아웃 설정 (1시간)
+        proxy_read_timeout 3600;
+        proxy_send_timeout 3600;
+    }
+
+    # /api2 경로를 AI 서버로 연결
+    location /api2 {
+        proxy_pass http://localhost:8000;  # AI 서버
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# jenkins 서브도메인을 Jenkins 서버로 연결
+server {
+    listen 443 ssl;
+    server_name jenkins.test.mysafedraw.site;
+
+    ssl_certificate /etc/letsencrypt/live/mysafedraw.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mysafedraw.site/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://localhost:8787;  # Jenkins 서버
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# HTTP 요청을 HTTPS로 리디렉션
+server {
+    listen 80;
+    server_name test.mysafedraw.site;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 80;
+    server_name jenkins.test.mysafedraw.site;
+    return 301 https://$host$request_uri;
+}

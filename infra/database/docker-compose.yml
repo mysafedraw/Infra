@@ -1,0 +1,44 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ssafy  # root 비밀번호 설정
+      MYSQL_DATABASE: my_safe_picture  # 데이터베이스 이름 설정
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - project-network  # 프로젝트 네트워크 사용
+
+  redis:
+    image: redis:7-alpine
+    container_name: origin-redis
+    ports:
+      - "16379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - project-network
+  
+  mongodb:
+    image: mongo:8.0.3
+    container_name: mongodb
+    ports:
+      - "37017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: my_safe_trip
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - project-network
+
+volumes:
+  mysql-data:
+  redis-data:
+  mongo-data:
+
+networks:
+  project-network:
+    external: true
