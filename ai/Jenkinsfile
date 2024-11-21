@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    environment {
+        CI = 'false'
+    }
+
+    stages {
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    dir('ai') {
+                        echo 'Building and deploying with Docker Compose...'
+                        sh 'docker-compose up --build -d'
+                    }
+                }
+            }
+        }
+
+        stage('Cleaning Up Unused Images') {
+            steps {
+                script {
+                    echo 'Cleaning up unused images...'
+                    sh 'docker image prune -f'
+                }
+            }
+        }
+    }
+}
