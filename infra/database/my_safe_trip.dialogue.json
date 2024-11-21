@@ -1,0 +1,356 @@
+[{
+  "_id": {
+    "$oid": "672486967c725eb3ba581739"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "상황",
+  "situationAsset": null,
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "헉 저기에 불이 붙었어! 초기에 빨리 진압해야 할 텐데... 지금 필요한 건......"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672486e87c725eb3ba58173a"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "상호작용",
+  "situationAsset": "소화기",
+  "dialogues": [
+    {
+      "situationInteraction": "불이 난 곳으로 드래그해주세요",
+      "situationDialogue": null
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672486fa7c725eb3ba58173b"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "상호작용",
+  "situationAsset": "물양동이",
+  "dialogues": [
+    {
+      "situationInteraction": "불이 난 곳으로 드래그해주세요",
+      "situationDialogue": null
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672487017c725eb3ba58173c"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "상호작용",
+  "situationAsset": "물",
+  "dialogues": [
+    {
+      "situationInteraction": "불이 난 곳으로 드래그해주세요",
+      "situationDialogue": null
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6724883f7c725eb3ba58173d"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "상호작용",
+  "situationAsset": "부채",
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "불난 집에 부채질이 돼 버렸어!! 이걸론 불을 끌 수 없나 봐!!!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6724887a7c725eb3ba58173e"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "상호작용",
+  "situationAsset": "선풍기",
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "으악 선풍기를 틀었더니 불이 더 커지고 있어!!!! 우린 다 죽을 거야!!!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672488a97c725eb3ba58173f"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "성공",
+  "situationAsset": null,
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "야호! 무사히 불을 껐어! 소화기 사용법도 반드시 익혀두어야겠네!!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672488ca7c725eb3ba581740"
+  },
+  "stageNumber": 1,
+  "description": "1단계: 작은 화재 발생",
+  "situationTag": "실패",
+  "situationAsset": null,
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "으악 불이 더 커지고 있어! 그 물건은 불을 끄는 데 전혀 도움이 안된 것 같아!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6724890a7c725eb3ba581741"
+  },
+  "stageNumber": 2,
+  "description": "2단계: 혼자 끌 수 없는 큰 불",
+  "situationTag": "상황",
+  "situationAsset": null,
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "이번에는 불이 엄청 크게 붙었네. 내가 끌 수 없을 것 같아.  어떻게 해야 할까?"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6724899b7c725eb3ba581742"
+  },
+  "stageNumber": 2,
+  "description": "2단계: 혼자 끌 수 없는 큰 불",
+  "situationTag": "상호작용",
+  "situationAsset": "핸드폰",
+  "dialogues": [
+    {
+      "situationInteraction": "핸드폰에 번호를 눌러주세요"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672489a37c725eb3ba581743"
+  },
+  "stageNumber": 2,
+  "description": "2단계: 혼자 끌 수 없는 큰 불",
+  "situationTag": "상호작용",
+  "situationAsset": "전화기",
+  "dialogues": [
+    {
+      "situationInteraction": "핸드폰에 번호를 눌러주세요"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672489e37c725eb3ba581744"
+  },
+  "stageNumber": 2,
+  "description": "2단계: 혼자 끌 수 없는 큰 불",
+  "situationTag": "성공",
+  "dialogues": [
+    {
+      "situationDialogue": "와! 빠르게 119에 신고한 덕분에 벌써 소방차가 오고 있어!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "672489f67c725eb3ba581745"
+  },
+  "stageNumber": 2,
+  "description": "2단계: 혼자 끌 수 없는 큰 불",
+  "situationTag": "실패",
+  "dialogues": [
+    {
+      "situationDialogue": "으악 불이 더 커지고 있어! 불이 났을 때 바로 119에 신고해야 했는데......"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248a2b7c725eb3ba581746"
+  },
+  "stageNumber": 3,
+  "description": "3단계: 자욱한 연기",
+  "situationTag": "상황",
+  "dialogues": [
+    {
+      "situationDialogue": "연기가 자욱하게 나오고 있어. 유독가스는 위험해! 기관지를 보호하려면..."
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248a5c7c725eb3ba581747"
+  },
+  "stageNumber": 3,
+  "description": "3단계: 자욱한 연기",
+  "situationTag": "상호작용",
+  "situationAsset": "마스크",
+  "dialogues": [
+    {
+      "situationInteraction": "마스크를 드래그 해주세요",
+      "situationDialogue": "다행이야! 마스크를 착용하니깐 연기가 코로 덜 들어오는 것 같아! "
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248aac7c725eb3ba581748"
+  },
+  "stageNumber": 3,
+  "description": "3단계: 자욱한 연기",
+  "situationTag": "상호작용",
+  "situationAsset": "손수건",
+  "dialogues": [
+    {
+      "situationInteraction": "손수건을 클릭해주세요",
+      "situationDialogue": "우선 손수건에 물을 묻혀주자."
+    },
+    {
+      "situationInteraction": "손수건을 드래그해주세요",
+      "situationDialogue": "다행이야! 손수건으로 코와 입을 막으니깐 연기가 덜 들어오는 것 같아!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248d3a7c725eb3ba581749"
+  },
+  "stageNumber": 3,
+  "description": "3단계: 자욱한 연기",
+  "situationTag": "실패",
+  "dialogues": [
+    {
+      "situationDialogue": "연기를 너무 많이 마셨어.. 빠르게 대처했어야 했는데..."
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248d657c725eb3ba58174a"
+  },
+  "stageNumber": 4,
+  "description": "4단계: 대피 상황",
+  "situationTag": "상황",
+  "dialogues": [
+    {
+      "situationDialogue": "화재 현장은 너무 위험해! 어서 대피하자. 어디로 가야 하지?"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248e877c725eb3ba58174b"
+  },
+  "stageNumber": 4,
+  "description": "4단계: 대피 상황",
+  "situationTag": "상호작용",
+  "situationAsset": "계단",
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "저기 계단이 있네! 빨리 계단을 통해 대피하자!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248ee27c725eb3ba58174c"
+  },
+  "stageNumber": 4,
+  "description": "4단계: 대피 상황",
+  "situationTag": "상호작용",
+  "situationAsset": "엘리베이터",
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "앗 엘리베이터가 왔다. 빨리 타보자."
+    },
+    {
+      "situationInteraction": null,
+      "situationDialogue": "엇? 엘리베이터가 멈췄어. 무슨 일이지? 너무 무서워 ..."
+    },
+    {
+      "situationInteraction": null,
+      "situationDialogue": "연기는 계속 들어오는데 엘리베이터가 멈춰서 탈출할 수가 없어... 나는 여기까지인 것 같아... 다음에는 꼭 탈출시켜줘."
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248f3e7c725eb3ba58174d"
+  },
+  "stageNumber": 4,
+  "description": "4단계: 대피 상황",
+  "situationTag": "실패",
+  "dialogues": [
+    {
+      "situationDialogue": "나갈 수가 없어.. 어떻게든 방법이..."
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248f627c725eb3ba58174e"
+  },
+  "stageNumber": 5,
+  "description": "5단계: 쓰러진 친구",
+  "situationTag": "상황",
+  "dialogues": [
+    {
+      "situationDialogue": "앗! 친구가 연기를 마셨는지 힘들어해요! 어떡하지?"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248fa27c725eb3ba58174f"
+  },
+  "stageNumber": 5,
+  "description": "5단계: 쓰러진 친구",
+  "situationTag": "상호작용",
+  "situationAsset": "구급차",
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "내가 구급차를 빨리 불러서 친구가 살 수 있을 것 같아!"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67248fbb7c725eb3ba581750"
+  },
+  "stageNumber": 5,
+  "description": "5단계: 쓰러진 친구",
+  "situationTag": "상호작용",
+  "situationAsset": "병원",
+  "dialogues": [
+    {
+      "situationInteraction": null,
+      "situationDialogue": "내가 병원에 빨리 데려다줘서 친구가 살 수 있을 것 같아!!"
+    }
+  ]
+}]
